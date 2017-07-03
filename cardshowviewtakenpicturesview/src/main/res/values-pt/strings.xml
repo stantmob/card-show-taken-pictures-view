@@ -6,13 +6,15 @@
     <string name="card_show_taken_picture_view.btn_cancel">Cancelar</string>
     <string name="card_show_taken_picture_view.image_taken_updated_date">Atualizado em</string>
 
-    <string name="add_item_method_inspection_reproved_form.picture_title">Foto</string>
-    <string name="add_item_method_inspection.add_image_text">Adicionar Foto</string>
+    <string name="card_show_taken_picture_view.date_hint">00/00/00</string>
+    <string name="card_show_taken_picture_view.picture_title">Fotos</string>
+    <string name="card_show_taken_picture_view.add_image_text">Adicionar Foto</string>
 
-    <string name="ok_hint">Ok</string>
+    <string name="card_show_taken_picture_view.request_chooser_msg">Selecione ou tire uma nova foto.</string>
 
+    <string name="permission_information_dialog.ok_hint">Ok</string>
+    <string name="permission_information_dialog.settings">Configurações</string>
     <string name="permission_information_dialog.message">É necessário aceitar as permissões a seguir para utilizar o aplicativo</string>
     <string name="permission_information_dialog.never_checked_message">Ao clicar no botão você será redirecionado para a tela de detalhes do aplicativo, lá você deve clicar em permissões e aceitar as permissões para utilizar o aplicativo</string>
 
-    <string name="login_information_dialog.settings">configurações</string>
 </resources>

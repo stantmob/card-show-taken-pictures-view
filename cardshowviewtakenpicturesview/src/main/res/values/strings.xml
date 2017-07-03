@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Card Show Taken Pictures Library</string>
+
+    <string name="card_show_taken_picture_view.image_taken_text">By:</string>
+    <string name="card_show_taken_picture_view.btn_save">Save</string>
+    <string name="card_show_taken_picture_view.btn_cancel">Cancel</string>
+    <string name="card_show_taken_picture_view.image_taken_updated_date">updated in</string>
+
+    <string name="ok_hint">Ok</string>
+
+    <string name="add_item_method_inspection_reproved_form.picture_title">Picture</string>
+    <string name="add_item_method_inspection.add_image_text">ADD PICTURE</string>
+
+    <string name="add_service_inspection_form_filled_dialog.request_chooser_msg">Select or take a new Picture.</string>
+    <string name="login_information_dialog.settings">configurations</string>
+
+    <string name="permission_information_dialog.message">You must accept the following permissions to use the application</string>
+    <string name="permission_information_dialog.never_checked_message">You must go to settings click on permissions and allow the following permissions to use the application</string>
+
+</resources>

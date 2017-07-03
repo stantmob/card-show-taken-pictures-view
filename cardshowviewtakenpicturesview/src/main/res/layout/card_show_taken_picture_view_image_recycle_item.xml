@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+            name="handler"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter"/>
+
+        <variable
+            name="imageUrl"
+            type="String"/>
+
+        <variable
+            name="cardStateEnum"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum" />
+
+    </data>
+
+    <RelativeLayout
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_margin="10dp">
+
+        <com.github.siyamed.shapeimageview.CircularImageView
+            android:id="@+id/card_show_taken_picture_view_general_circular_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            app:imgUrl="@{imageUrl}"
+            app:imgSize="@{`500`}"
+            app:imgHolder="@{@drawable/stant_city}"
+            tools:src="@drawable/ic_cam"/>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            android:onClick="@{(view)->handler.removeImage(view,imageUrl)}"
+            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
+
+            <LinearLayout
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/shape_round_gray"
+                android:layout_alignParentEnd="true"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_close_dialog"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+
+
+
+</layout>

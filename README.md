@@ -22,7 +22,7 @@ and on your project dependencies:
 
 ```gradle
 dependencies {
-        compile 'com.github.stantmob:card-show-taken-pictures-view:v0.0.8'
+        compile 'com.github.stantmob:card-show-taken-pictures-view:v0.0.9'
 }
 
 ```

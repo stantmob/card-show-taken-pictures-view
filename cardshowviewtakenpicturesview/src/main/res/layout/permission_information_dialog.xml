@@ -42,7 +42,7 @@
                 android:layout_marginEnd="20dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="@string/login_information_dialog.settings" />
+                android:text="@string/permission_information_dialog.settings" />
 
             <TextView
                 android:id="@+id/permission_information_dialog_confirmation_text_view"
@@ -55,7 +55,7 @@
                 android:layout_marginEnd="20dp"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="@string/ok_hint" />
+                android:text="@string/permission_information_dialog.ok_hint" />
 
         </LinearLayout>
     </RelativeLayout>

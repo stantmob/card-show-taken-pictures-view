@@ -219,7 +219,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         Intent galleryPickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         Intent takePhotoIntent   = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        String pickTitle = getResources().getString(R.string.add_service_inspection_form_filled_dialog_request_chooser_msg);
+        String pickTitle = getResources().getString(R.string.card_show_taken_picture_view_request_chooser_msg);
         Intent chooserIntent = Intent.createChooser(galleryPickIntent, pickTitle);
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { takePhotoIntent });
 

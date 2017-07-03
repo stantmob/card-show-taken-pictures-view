@@ -19,6 +19,6 @@ and on your project dependencies:
 
 ```gradle
 dependencies {
-        compile 'com.github.stantmob:card-show-taken-pictures-view:aa9e2f9137'
+        compile 'com.github.stantmob:card-show-taken-pictures-view:v0.0.8'
 }
 ```

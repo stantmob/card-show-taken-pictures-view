@@ -67,7 +67,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
-                    android:text="@string/add_item_method_inspection_reproved_form.picture_title"
+                    android:text="@string/card_show_taken_picture_view.picture_title"
                     android:textStyle="bold"
                     android:textColor="@color/gray"
                     android:layout_alignParentStart="true"
@@ -155,7 +155,9 @@
                 android:gravity="center"
                 android:textColor="@color/gray"
                 android:textSize="12sp"
-                android:text="@string/add_item_method_inspection.add_image_text" />
+                android:layout_marginTop="5dp"
+                android:textAllCaps="true"
+                android:text="@string/card_show_taken_picture_view.add_image_text" />
         </LinearLayout>
 
         <RelativeLayout
@@ -198,7 +200,7 @@
                             android:textSize="10sp"
                             android:textColor="@color/gray"
                             android:text="@{updatedAt}"
-                            tools:text="@string/date_hint" />
+                            tools:text="@string/card_show_taken_picture_view.date_hint" />
 
                     </LinearLayout>
 

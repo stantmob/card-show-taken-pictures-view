@@ -13,10 +13,14 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
+import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    public static final String KEY_GALLERY = "KEY_CHOSE_CONSTRUCTION_SITE_GUID";
 
     private ActivityMainBinding mBinding;
 
@@ -26,6 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding = DataBindingUtil.setContentView(
                 this, R.layout.activity_main);
+
+        Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
+
 
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
@@ -38,6 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+        if(gallery != null)
+            mBinding.cardShowViewTakenPicturesView.setImageUrls(gallery.getImages());
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
     }

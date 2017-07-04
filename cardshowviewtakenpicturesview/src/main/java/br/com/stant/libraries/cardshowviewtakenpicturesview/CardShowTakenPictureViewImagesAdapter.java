@@ -112,7 +112,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                 cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
                         v -> mView.showPreviewPicDialog(imageUrl));
 
-
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
     }
 
@@ -139,13 +138,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                 mImageBitmap, TEMP_IMAGE_NAME, null);
 
         return imageUrl;
-
-//        mCardShowTakenPictureViewBinding.setImageUrl(imageUrl);
-
-
-//
-//        FileUtil.shouImageFromUrl(mImageUrl, serviceInspectionFormFilledDetailFinishSiffDialogBinding.serviceInspectionFormFilledDetailFinishSiffDialogCardTakePictureTakenPictureInclude.
-//                inspectionDataCardShowTakenPictureImageView,getContext());
     }
 
     public void addPicture(String url){
@@ -153,7 +145,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mImagesAsAdded.add(url);
         replaceData(mCurrentImageUrlsList);
     }
-
 
     @Override
     public int getItemCount() {

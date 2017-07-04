@@ -115,7 +115,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if(mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
             showEditStateViewConfiguration(this);
         else
-            cancelEditImagesStateViewConfiguration(this);
+            showNormalStateViewConfiguration();
     }
 
     @Override
@@ -135,6 +135,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.EDIT);
         blockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showNormalStateViewConfiguration() {
+        mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
+        unblockEditStateViewConfiguration();
     }
 
     @Override
@@ -189,7 +195,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void setImageUrls(List<String> imageUrls){
-        mCardShowTakenPictureViewImagesAdapter.replaceData(imageUrls);
+        if(imageUrls != null) {
+            mCardShowTakenPictureViewImagesAdapter.replaceData(imageUrls);
+            checkIfHasImages();
+        }
     }
 
     public List<String> getImageUrls(){

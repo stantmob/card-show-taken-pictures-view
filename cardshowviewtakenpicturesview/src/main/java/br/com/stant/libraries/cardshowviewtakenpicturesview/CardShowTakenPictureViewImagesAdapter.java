@@ -1,11 +1,9 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.app.Activity;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.media.ExifInterface;
-import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
 
 /**
@@ -28,32 +26,32 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private static final String TEMP_IMAGE_NAME = "card_show_taken_picture_temp_image";
 
     private ItemViewHolder mViewHolder;
-    private List<String> mCurrentImageUrlsList;
-    private List<String> mOriginalTempImageUrlsList;
-    private List<String> mImagesAsAdded;
-    private List<String> mImagesAsRemoved;
+    private List<CardImage> mCurrentCardImageList;
+    private List<CardImage> mOriginalTempCardImageList;
+    private List<CardImage> mCardImageListAsAdded;
+    private List<CardImage> mImagesAsRemoved;
     private Context mContext;
     private CardShowTakenPictureView mView;
     private Bitmap mImageBitmap;
 
 
-    public CardShowTakenPictureViewImagesAdapter(Context context, List<String> imageUrlsList, CardShowTakenPictureView view){
-        this.mCurrentImageUrlsList = imageUrlsList;
+    public CardShowTakenPictureViewImagesAdapter(Context context, List<CardImage> imageUrlsList, CardShowTakenPictureView view){
+        this.mCurrentCardImageList = imageUrlsList;
         this.mContext       = context;
         this.mView          = view;
-        this.mOriginalTempImageUrlsList = new ArrayList<>();
-        this.mImagesAsAdded = new ArrayList<>();
+        this.mOriginalTempCardImageList = new ArrayList<>();
+        this.mCardImageListAsAdded = new ArrayList<>();
         this.mImagesAsRemoved = new ArrayList<>();
     }
 
 
-    public void replaceData(List<String> imageUrlsList) {
-        mCurrentImageUrlsList = imageUrlsList;
+    public void replaceData(List<CardImage> imageUrlsList) {
+        mCurrentCardImageList = imageUrlsList;
         notifyDataSetChanged();
     }
 
-    public List<String> getData(){
-        return mCurrentImageUrlsList;
+    public List<CardImage> getData(){
+        return mCurrentCardImageList;
     }
 
     public void saveEditData(){
@@ -61,27 +59,27 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void cancelEditData(){
-        replaceData(mOriginalTempImageUrlsList);
+        replaceData(mOriginalTempCardImageList);
     }
 
-    public List<String> getImagesAsAdded(){
-        return mImagesAsAdded;
+    public List<CardImage> getImagesAsAdded(){
+        return mCardImageListAsAdded;
     }
 
-    public List<String> getImagesAsRemoved() {
+    public List<CardImage> getImagesAsRemoved() {
         return mImagesAsRemoved;
     }
 
     void saveOriginalList(){
-        mOriginalTempImageUrlsList = ((List) ((ArrayList) mCurrentImageUrlsList).clone());
-        mImagesAsAdded = new ArrayList<>();
+        mOriginalTempCardImageList = ((List) ((ArrayList) mCurrentCardImageList).clone());
+        mCardImageListAsAdded = new ArrayList<>();
         mImagesAsRemoved = new ArrayList<>();
     }
 
-    public void removeImage(View view, String imageUrl){
-        mCurrentImageUrlsList.remove(imageUrl);
-        mImagesAsRemoved.add(imageUrl);
-        replaceData(mCurrentImageUrlsList);
+    public void removeImage(View view, CardImage cardImage){
+        mCurrentCardImageList.remove(cardImage);
+        mImagesAsRemoved.add(cardImage);
+        replaceData(mCurrentCardImageList);
     }
 
 
@@ -102,15 +100,15 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     public void onBindViewHolder(ItemViewHolder holder, int position) {
         mViewHolder = holder;
 
-        String imageUrl = mCurrentImageUrlsList.get(position);
+        CardImage cardImage = mCurrentCardImageList.get(position);
 
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
 
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setImageUrl(imageUrl);
+        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardImage(cardImage);
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.
                 cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
-                        v -> mView.showPreviewPicDialog(imageUrl));
+                        v -> mView.showPreviewPicDialog(cardImage));
 
 
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
@@ -118,7 +116,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
 
 
-    public String generateImageUrlFromBitmapBasedInImageView(String imageUrl, Activity activity){
+    public CardImage generateCardImageFromBitmapBasedInImageView(String imageUrl, String imageFilename){
         mImageBitmap = FileUtil.createBitFromPath(imageUrl);
 
         ExifInterface exif = null;
@@ -135,10 +133,9 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
             mImageBitmap = FileUtil.rotateBitmap(mImageBitmap, 180);
         }
 
-        imageUrl = MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                mImageBitmap, TEMP_IMAGE_NAME, null);
+        CardImage cardImage = new CardImage(mImageBitmap, imageUrl, imageFilename);
 
-        return imageUrl;
+        return cardImage;
 
 //        mCardShowTakenPictureViewBinding.setImageUrl(imageUrl);
 
@@ -148,16 +145,16 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 //                inspectionDataCardShowTakenPictureImageView,getContext());
     }
 
-    public void addPicture(String url){
-        mCurrentImageUrlsList.add(url);
-        mImagesAsAdded.add(url);
-        replaceData(mCurrentImageUrlsList);
+    public void addPicture(CardImage cardImage){
+        mCurrentCardImageList.add(cardImage);
+        mCardImageListAsAdded.add(cardImage);
+        replaceData(mCurrentCardImageList);
     }
 
 
     @Override
     public int getItemCount() {
-        return mCurrentImageUrlsList.size();
+        return mCurrentCardImageList.size();
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder{

@@ -26,6 +26,7 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
 
@@ -74,7 +75,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setOrientation(HORIZONTAL);
 
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<String>(0), this);
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<CardImage>(0), this);
 //        setExampleImages();
 
 
@@ -119,8 +120,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public void showPreviewPicDialog(String imageUrl) {
-        mCardShowTakenPicturePreviewDialogBinding.setImageUrl(imageUrl);
+    public void showPreviewPicDialog(CardImage cardImage) {
+        mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardImage.getImageUrl());
         mPreviewPicDialog.show();
     }
 
@@ -142,7 +143,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
         unblockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
-        mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+//        mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
     }
 
     @Override
@@ -188,19 +189,18 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
        return mCardShowTakenPictureViewBinding.getCardStateEnum();
     }
 
-    public void setImageUrls(List<String> imageUrls){
-        mCardShowTakenPictureViewImagesAdapter.replaceData(imageUrls);
+    public void setCardImages(List<CardImage> cardImages){
+        mCardShowTakenPictureViewImagesAdapter.replaceData(cardImages);
     }
 
-    public List<String> getImageUrls(){
+    public List<CardImage> getCardImages(){
         return mCardShowTakenPictureViewImagesAdapter.getData();
     }
 
     private void setExampleImages(){
-        List<String> images = new ArrayList<>();
-        images.add("http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg");
-        images.add("http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png");
-//        images.add("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDFVGm5gksvKLVgb6l5KNobxRH3TcQlLjitrW4XKT2B2h6KgeCDQ");
+        List<CardImage> images = new ArrayList<>();
+        images.add(new CardImage(null,"http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", null));
+        images.add(new CardImage(null,"http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png", null));
 
         mCardShowTakenPictureViewImagesAdapter.replaceData(images);
     }
@@ -241,8 +241,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() == null) {
 
-            String imageUrl = mCardShowTakenPictureViewImagesAdapter.generateImageUrlFromBitmapBasedInImageView(mImageUrl, mActivity);
-            mCardShowTakenPictureViewImagesAdapter.addPicture(imageUrl);
+            CardImage cardImage = mCardShowTakenPictureViewImagesAdapter.generateCardImageFromBitmapBasedInImageView(mImageUrl, imageFileName);
+            mCardShowTakenPictureViewImagesAdapter.addPicture(cardImage);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount()-1);
 
         }else if(requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
@@ -260,8 +260,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
             mImageUrl = res;
 
-            String imageUrl = mCardShowTakenPictureViewImagesAdapter.generateImageUrlFromBitmapBasedInImageView(mImageUrl, mActivity);
-            mCardShowTakenPictureViewImagesAdapter.addPicture(imageUrl);
+            CardImage cardImage = mCardShowTakenPictureViewImagesAdapter.generateCardImageFromBitmapBasedInImageView(mImageUrl, imageFileName);
+            mCardShowTakenPictureViewImagesAdapter.addPicture(cardImage);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount()-1);
 
         }else{

@@ -10,7 +10,7 @@
 
         <variable
             name="imageUrl"
-            type="java.lang.String"/>
+            type="String"/>
     </data>
     <RelativeLayout
         android:orientation="vertical"

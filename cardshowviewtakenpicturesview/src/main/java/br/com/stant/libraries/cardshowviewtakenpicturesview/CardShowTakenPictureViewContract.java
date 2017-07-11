@@ -6,7 +6,7 @@ import android.view.View;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 /**
  * Created by denisvieira on 08/06/17.
@@ -18,7 +18,7 @@ public interface CardShowTakenPictureViewContract {
     void dispatchTakePictureOrPickGalleryIntent();
     void addImageOnActivityResult(int requestCode, int resultCode, Intent data);
     void checkIfHasImages();
-    void showPreviewPicDialog(CardImage cardImage);
+    void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage);
     void closePreviewPicDialog(View View);
     void showEditStateViewConfiguration(View view);
     void saveImageStateViewConfiguration(View view);
@@ -28,7 +28,7 @@ public interface CardShowTakenPictureViewContract {
     void setCardStateEnum(CardShowTakenPictureStateEnum cardStateEnum);
 
     interface OnSavedCardListener {
-        void onSaved(List<String> imagesAsAdded, List<String> imagesAsRemoved);
+        void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);
         void onCancel();
     }
 

@@ -15,6 +15,7 @@ import java.util.List;
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
             @Override
-            public void onSaved(List<String> imagesAsAdded, List<String> imagesAsRemoved) {
+            public void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved) {
+
             }
 
             @Override
@@ -46,5 +48,7 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mBinding.cardShowViewTakenPicturesView.addImageOnActivityResult(requestCode, resultCode, data);
     }
+
+
 
 }

@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -225,5 +226,22 @@ public class FileUtil {
                 file.delete();
             }
         }
+    }
+
+    public static String convertBitmapToBase64(Bitmap bitmapImage){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmapImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        return encoded;
+    }
+
+    public static Bitmap convertBase64ToBitmap(String encondedBase64Image){
+        byte[] decodedString = Base64.decode(encondedBase64Image, Base64.DEFAULT);
+        Bitmap decodedByteImage = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+        return decodedByteImage;
     }
 }

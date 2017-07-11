@@ -121,7 +121,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if(mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
             showEditStateViewConfiguration(this);
         else
-            cancelEditImagesStateViewConfiguration(this);
+            showNormalStateViewConfiguration();
     }
 
     @Override
@@ -141,6 +141,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.EDIT);
         blockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void showNormalStateViewConfiguration() {
+        mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
+        unblockEditStateViewConfiguration();
     }
 
     @Override
@@ -216,7 +222,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void setCardImages(List<CardShowTakenImage> cardShowTakenImages){
-        mCardShowTakenPictureViewImagesAdapter.replaceData(cardShowTakenImages);
+        if(cardShowTakenImages != null) {
+            mCardShowTakenPictureViewImagesAdapter.replaceData(cardShowTakenImages);
+            checkIfHasImages();
+        }
     }
 
     public List<CardShowTakenImage> getCardImages(){
@@ -328,7 +337,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         return MediaStore.Images.Media.insertImage(activity.getContentResolver(),
                 bitmap, TEMP_IMAGE_BASE_NAME+indexTempImage, null);
     }
-
 
     public boolean hasUpdatedAt(){
         return mCardShowTakenPictureViewBinding.getUpdatedAt() != null;

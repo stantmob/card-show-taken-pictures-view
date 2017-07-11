@@ -21,6 +21,7 @@ public interface CardShowTakenPictureViewContract {
     void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage);
     void closePreviewPicDialog(View View);
     void showEditStateViewConfiguration(View view);
+    void showNormalStateViewConfiguration();
     void saveImageStateViewConfiguration(View view);
     void cancelEditImagesStateViewConfiguration(View view);
     void blockEditStateViewConfiguration();

@@ -191,7 +191,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="3dp"
-                            android:textSize="10sp"
+                            android:textSize="12sp"
                             android:textColor="@color/gray"
                             android:text="@string/card_show_taken_picture_view.image_taken_updated_date"
                             />
@@ -199,7 +199,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="10sp"
+                            android:textSize="12sp"
                             android:textColor="@color/gray"
                             android:text="@{updatedAt}"
                             tools:text="@string/card_show_taken_picture_view.date_hint" />
@@ -215,14 +215,14 @@
                         <TextView
                             android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:textSize="10sp"
+                            android:textSize="12sp"
                             android:textColor="@color/gray"
                             tools:text="@string/card_show_taken_picture_view.image_taken_text" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="10sp"
+                            android:textSize="12sp"
                             android:textColor="@color/gray"
                             android:text="@{pictureByName}"
                             tools:text="Teste" />

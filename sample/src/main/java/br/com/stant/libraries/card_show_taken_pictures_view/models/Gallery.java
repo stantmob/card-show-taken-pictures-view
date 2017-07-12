@@ -3,6 +3,8 @@ package br.com.stant.libraries.card_show_taken_pictures_view.models;
 import java.io.Serializable;
 import java.util.List;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+
 /**
  * Created by stant on 04/07/17.
  */
@@ -10,9 +12,9 @@ import java.util.List;
 public class Gallery implements Serializable {
 
     private final String mId;
-    private final List<String> mImages;
+    private final List<CardShowTakenImage> mImages;
 
-    public Gallery(String mId, List<String> mImages) {
+    public Gallery(String mId, List<CardShowTakenImage> mImages) {
         this.mId = mId;
         this.mImages = mImages;
     }
@@ -21,7 +23,7 @@ public class Gallery implements Serializable {
         return mId;
     }
 
-    public List<String> getImages() {
+    public List<CardShowTakenImage> getImages() {
         return mImages;
     }
 }

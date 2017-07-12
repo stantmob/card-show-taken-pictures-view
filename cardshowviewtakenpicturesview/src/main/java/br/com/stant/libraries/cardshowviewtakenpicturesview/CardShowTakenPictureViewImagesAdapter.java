@@ -2,6 +2,8 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
+import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +14,7 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
 
 /**
  * Created by denisvieira on 08/06/17.
@@ -87,7 +90,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
         final ItemViewHolder vh = new ItemViewHolder(mCardShowTakenPictureViewImageRecycleItemBinding);
         return vh;
-
     }
 
     @Override
@@ -99,6 +101,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
 
+        cardShowTakenImage.setTempImagePathToShow(getCorrectImageUrlToShow(cardShowTakenImage));
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
         mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.
                 cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
@@ -113,6 +116,45 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         replaceData(mCurrentCardShowTakenImageList);
     }
 
+    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage){
+        if (hasOnlyRemoteImageUrl(cardShowTakenImage)) {
+            return cardShowTakenImage.getRemoteImageUrl();
+        }else if(hasTempImagePathToShow(cardShowTakenImage)){
+            return cardShowTakenImage.getTempImagePathToShow();
+        } else if (hasOnlyLocalImage(cardShowTakenImage)) {
+            return getTempImageFileToShowFromLocalImageFilename(cardShowTakenImage.getLocalImageFilename());
+        }else{
+            return null;
+        }
+    }
+
+    private boolean hasTempImagePathToShow(CardShowTakenImage cardShowTakenImage){
+        return cardShowTakenImage.getTempImagePathToShow() != null &&
+                cardShowTakenImage.getLocalImageFilename() != null &&
+                cardShowTakenImage.getRemoteImageUrl() == null;
+    }
+
+    private boolean hasOnlyRemoteImageUrl(CardShowTakenImage cardShowTakenImage){
+        return cardShowTakenImage.getRemoteImageUrl() != null &&
+                cardShowTakenImage.getTempImagePathToShow() == null &&
+                cardShowTakenImage.getLocalImageFilename() == null;
+    }
+
+    private boolean hasOnlyLocalImage(CardShowTakenImage cardShowTakenImage){
+        return cardShowTakenImage.getLocalImageFilename() != null &&
+                cardShowTakenImage.getTempImagePathToShow() == null &&
+                cardShowTakenImage.getRemoteImageUrl() == null;
+    }
+
+    private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
+        String tempImageFilePath;
+        Bitmap bitmap = FileUtil.getBitMapFromFile(localImageFilename, FileUtil.getFile());
+
+        tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
+                bitmap, "temp_image_stant", null);
+
+        return tempImageFilePath;
+    }
 
     @Override
     public int getItemCount() {

@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
+        mBinding.cardShowViewTakenPicturesView.setExampleImages();
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
             @Override
             public void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved) {
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if(gallery != null)
-            mBinding.cardShowViewTakenPicturesView.setImageUrls(gallery.getImages());
+            mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
     }

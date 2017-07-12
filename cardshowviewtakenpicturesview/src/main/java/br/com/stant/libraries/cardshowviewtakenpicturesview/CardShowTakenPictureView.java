@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -20,7 +19,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -81,8 +79,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         setOrientation(HORIZONTAL);
 
         mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<CardShowTakenImage>(0), this);
-        setExampleImages();
-
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
@@ -126,7 +122,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage) {
-        mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getImagePath());
+        mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
         mPreviewPicDialog.show();
     }
 
@@ -155,28 +151,37 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         unblockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
-        List<CardShowTakenImage> imagesAsAdded = mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded();
-        List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
-
-//        FileUtil.saveImage();
-
-        mOnSavedCardListener.onSaved(imagesAsAdded, imagesAsRemoved);
+        mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
     }
 
-//    private List<CardShowTakenImage> saveImagesAsAdded(List<CardShowTakenImage> cardShowTakenImages){
+//    private List<CardShowTakenImage> updateLocalImageFilenameOfImagesAsAdded(List<CardShowTakenImage> cardShowTakenImages){
 //
+//        for (CardShowTakenImage cardShowTakenImage : cardShowTakenImages) {
+//            cardShowTakenImage.setLocalImageFilename(saveImageAndGetSavedImageFilename(cardShowTakenImage));
+//        }
 //
+//        return cardShowTakenImages;
+//    }
+//
+//    private String saveImageAndGetSavedImageFilename(CardShowTakenImage cardShowTakenImage){
+//        return FileUtil.saveImage(cardShowTakenImage.getBitmapImageFromIntentPath(), cardShowTakenImage.getLocalImageFilename());
 //    }
 
-    private List<String> convertImagesIntoBase64(List<CardShowTakenImage> cardShowTakenImages){
-        List<String> base64Images = new ArrayList<>();
-        for (CardShowTakenImage cardShowTakenImage : cardShowTakenImages) {
+//    private void updateSavedPathInCardShowTakenImage(CardShowTakenImage cardShowTakenImage){
+//        Integer cardShowTakenImageAdapterPosition = mCardShowTakenPictureViewImagesAdapter.getPosition(cardShowTakenImage);
+//        mCardShowTakenPictureViewImagesAdapter.updateCardShowTakenImagePath(cardShowTakenImageAdapterPosition, cardShowTakenImage);
+//        mCardShowTakenPictureViewImagesAdapter.notifyItemChanged(cardShowTakenImageAdapterPosition);
+//    }
 
-            base64Images.add(FileUtil.convertBitmapToBase64(cardShowTakenImage.getImageBitmap()));
-        }
-
-        return base64Images;
-    }
+//    private List<String> convertImagesIntoBase64(List<CardShowTakenImage> cardShowTakenImages){
+//        List<String> base64Images = new ArrayList<>();
+//        for (CardShowTakenImage cardShowTakenImage : cardShowTakenImages) {
+//
+//            base64Images.add(FileUtil.convertBitmapToBase64(cardShowTakenImage.getImageBitmap()));
+//        }
+//
+//        return base64Images;
+//    }
 
     @Override
     public void cancelEditImagesStateViewConfiguration(View view) {
@@ -232,10 +237,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         return mCardShowTakenPictureViewImagesAdapter.getData();
     }
 
-    private void setExampleImages(){
+    public void setExampleImages(){
         List<CardShowTakenImage> images = new ArrayList<>();
-        images.add(new CardShowTakenImage("http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));
-        images.add(new CardShowTakenImage("http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+        images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));
+        images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
 
         setCardImages(images);
     }
@@ -276,7 +281,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         }else if(requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
 
-            CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromImageGallery(data, mActivity);
+            CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity);
             mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount()-1);
 
@@ -286,32 +291,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     }
 
-    private Bitmap fixImageOrientation(Bitmap bitmap, String imageUrl){
-                ExifInterface exif = null;
-        try {
-            exif = new ExifInterface(imageUrl);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
-            bitmap = FileUtil.rotateBitmap(bitmap, 90);
-        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
-            bitmap = FileUtil.rotateBitmap(bitmap, 270);
-        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
-            bitmap = FileUtil.rotateBitmap(bitmap, 180);
-        }
-
-        return bitmap;
-    }
-
     private CardShowTakenImage generateCardShowTakenImageFromCamera(File photoTaken, Activity activity){
         Bitmap bitmapImageFromIntentPath = FileUtil.createBitFromPath(photoTaken.getAbsolutePath());
-        String tempImagePath = createTempImageFile(bitmapImageFromIntentPath, activity);
+        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-        return new CardShowTakenImage(bitmapImageFromIntentPath, tempImagePath);
+        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 
-    private CardShowTakenImage generateCardShowTakenImageFromImageGallery(Intent data, Activity activity){
+    private CardShowTakenImage generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity){
 
         Uri selectedImageUri = data.getData();
 
@@ -326,12 +313,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         String realPathOfPhotoTaken = res;
         Bitmap bitmapImageFromIntentPath = FileUtil.createBitFromPath(realPathOfPhotoTaken);
-        String tempImagePath = createTempImageFile(bitmapImageFromIntentPath, activity);
+        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-        return new CardShowTakenImage(bitmapImageFromIntentPath, tempImagePath);
+        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 
-    private String createTempImageFile(Bitmap bitmap, Activity activity){
+    private String createTempImageFileToShow(Bitmap bitmap, Activity activity){
         String indexTempImage = mCardShowTakenPictureViewImagesAdapter.getItemCount()+1+"";
 
         return MediaStore.Images.Media.insertImage(activity.getContentResolver(),

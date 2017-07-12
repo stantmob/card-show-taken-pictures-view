@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            app:imgUrl="@{cardShowTakenImage.imageBitmap}"
+            app:imgUrl="@{cardShowTakenImage.tempImagePathToShow}"
             app:imgSize="@{`500`}"
             app:imgHolder="@{@drawable/stant_city}"
             tools:src="@drawable/ic_cam"/>

@@ -9,43 +9,53 @@ import android.graphics.Bitmap;
 public class CardShowTakenImage {
 
     private String identifier;
-    private Bitmap imageBitmap;
-    private String imagePath;
+    private String remoteImageUrl;
+    private String localImageFilename;
+    private String tempImagePathToShow;
+    private Bitmap bitmapImageFromIntentPath;
 
-    public CardShowTakenImage(Bitmap imageBitmap) {
-
-        this.imageBitmap = imageBitmap;
-        this.identifier = null;
-        this.imagePath = null;
+    public CardShowTakenImage(Bitmap bitmapImageFromIntentPath, String localImageFilename, String tempImagePathToShow) {
+        this.bitmapImageFromIntentPath = bitmapImageFromIntentPath;
+        this.localImageFilename = localImageFilename;
+        this.tempImagePathToShow = tempImagePathToShow;
     }
 
-    public CardShowTakenImage(String imagePath) {
-        this.imagePath = imagePath;
-        this.identifier = null;
-        this.imageBitmap = null;
-    }
-
-    public CardShowTakenImage(String identifier, Bitmap imageBitmap) {
+    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename) {
         this.identifier = identifier;
-        this.imageBitmap = imageBitmap;
-        this.imagePath = null;
+        this.remoteImageUrl = remoteImageUrl;
+        this.localImageFilename = localImageFilename;
     }
 
-    public CardShowTakenImage(Bitmap imageBitmap, String imagePath) {
-        this.imagePath = imagePath;
-        this.imageBitmap = imageBitmap;
-        this.identifier = null;
+    public CardShowTakenImage(String identifier, String remoteImageUrl) {
+        this.identifier = identifier;
+        this.remoteImageUrl = remoteImageUrl;
     }
 
     public String getIdentifier() {
         return identifier;
     }
 
-    public Bitmap getImageBitmap() {
-        return imageBitmap;
+    public String getRemoteImageUrl() {
+        return remoteImageUrl;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public String getLocalImageFilename() {
+        return localImageFilename;
+    }
+
+    public String getTempImagePathToShow() {
+        return tempImagePathToShow;
+    }
+
+    public Bitmap getBitmapImageFromIntentPath() {
+        return bitmapImageFromIntentPath;
+    }
+
+    public void setLocalImageFilename(String localImageFilename) {
+        this.localImageFilename = localImageFilename;
+    }
+
+    public void setTempImagePathToShow(String tempImagePathToShow) {
+        this.tempImagePathToShow = tempImagePathToShow;
     }
 }

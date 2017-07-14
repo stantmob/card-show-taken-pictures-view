@@ -315,6 +315,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         Bitmap bitmapImageFromIntentPath = FileUtil.createBitFromPath(realPathOfPhotoTaken);
         String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
+        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName());
+
         return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 

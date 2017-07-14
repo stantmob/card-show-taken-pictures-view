@@ -36,4 +36,36 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.0.0-beta2'
     testCompile 'junit:junit:4.12'
+
+    // Dependencies for local unit tests
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'com.squareup.retrofit2:retrofit:2.1.0'
+    testCompile 'io.reactivex:rxjava:1.1.8'
+
+    testCompile "org.powermock:powermock-module-junit4:1.6.5"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.5"
+    testCompile "org.powermock:powermock-api-mockito:1.6.5"
+    testCompile "org.powermock:powermock-classloading-xstream:1.6.5"
+
+    testCompile 'org.powermock:powermock-api-mockito:1.6.5'
+    // Espresso UI Testing
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.google.guava'
+        exclude module: 'espresso-idling-resource'
+    })
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2', {
+        exclude group: 'com.android.support', module: 'appcompat'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude module: 'recyclerview-v7'
+    })
+    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+
+    // Resolve conflicts between main and test APK:
+    androidTestCompile "com.android.support:support-annotations:26.0.0-beta2"
+    androidTestCompile 'com.android.support:appcompat-v7:26.0.0-beta2'
+    androidTestCompile 'com.android.support:design:26.0.0-beta2'
+    androidTestCompile 'com.android.support:support-v4:26.0.0-beta2'
+    androidTestCompile 'com.android.support:recyclerview-v7:26.0.0-beta2'
 }

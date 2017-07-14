@@ -13,10 +13,15 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
+import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 public class MainActivity extends AppCompatActivity {
+
+
+    public static final String KEY_GALLERY = "KEY_CHOSE_CONSTRUCTION_SITE_GUID";
 
     private ActivityMainBinding mBinding;
 
@@ -27,10 +32,15 @@ public class MainActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(
                 this, R.layout.activity_main);
 
+        Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
+
+
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
+        mBinding.cardShowViewTakenPicturesView.setExampleImages();
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
             @Override
-            public void onSaved(List<String> imagesAsAdded, List<String> imagesAsRemoved) {
+            public void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved) {
+
             }
 
             @Override
@@ -39,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        if(gallery != null)
+            mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
+
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
     }
 
@@ -46,5 +60,7 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mBinding.cardShowViewTakenPicturesView.addImageOnActivityResult(requestCode, resultCode, data);
     }
+
+
 
 }

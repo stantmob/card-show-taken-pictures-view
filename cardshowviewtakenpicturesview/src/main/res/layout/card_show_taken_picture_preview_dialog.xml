@@ -10,20 +10,19 @@
 
         <variable
             name="imageUrl"
-            type="java.lang.String"/>
+            type="String"/>
     </data>
     <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
         <ImageView
             android:id="@+id/preview_image"
             tools:src="@drawable/building"
             android:layout_centerInParent="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             app:imgUrl="@{imageUrl}"
             app:imgHolder="@{@drawable/stant_city}"/>
 

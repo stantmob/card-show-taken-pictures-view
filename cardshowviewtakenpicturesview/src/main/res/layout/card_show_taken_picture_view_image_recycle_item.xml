@@ -12,8 +12,8 @@
             type="br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter"/>
 
         <variable
-            name="imageUrl"
-            type="String"/>
+            name="cardShowTakenImage"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage"/>
 
         <variable
             name="cardStateEnum"
@@ -31,7 +31,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            app:imgUrl="@{imageUrl}"
+            app:imgUrl="@{cardShowTakenImage.tempImagePathToShow}"
             app:imgSize="@{`500`}"
             app:imgHolder="@{@drawable/stant_city}"
             tools:src="@drawable/ic_cam"/>
@@ -41,7 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="5dp"
-            android:onClick="@{(view)->handler.removeImage(view,imageUrl)}"
+            android:onClick="@{(view)->handler.removeImage(view, cardShowTakenImage)}"
             android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
 
             <LinearLayout

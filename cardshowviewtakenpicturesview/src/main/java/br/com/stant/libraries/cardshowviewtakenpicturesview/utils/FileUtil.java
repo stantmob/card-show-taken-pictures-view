@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.util.Base64;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
@@ -191,7 +192,7 @@ public class FileUtil {
         return file;
     }
 
-    public static void saveImage(Bitmap bitmap, String imageFileName) {
+    public static String saveImage(Bitmap bitmap, String imageFileName) {
         if(bitmap!= null){
             ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytearrayoutputstream);
@@ -204,8 +205,10 @@ public class FileUtil {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return file.getName();
         }
 
+        return null;
     }
 
     public static Bitmap rotateBitmap(Bitmap bitmap, int degree) {
@@ -225,5 +228,40 @@ public class FileUtil {
                 file.delete();
             }
         }
+    }
+
+    public static String convertBitmapToBase64(Bitmap bitmapImage){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmapImage.compress(Bitmap.CompressFormat.JPEG, 60, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream .toByteArray();
+
+        String encoded = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+        return encoded;
+    }
+
+    public static Bitmap convertBase64ToBitmap(String encondedBase64Image){
+        byte[] decodedString = Base64.decode(encondedBase64Image, Base64.DEFAULT);
+        Bitmap decodedByteImage = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+        return decodedByteImage;
+    }
+
+    private static Bitmap fixImageOrientation(Bitmap bitmap, String imageUrl){
+        ExifInterface exif = null;
+        try {
+            exif = new ExifInterface(imageUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("6")) {
+            bitmap = FileUtil.rotateBitmap(bitmap, 90);
+        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("8")) {
+            bitmap = FileUtil.rotateBitmap(bitmap, 270);
+        } else if (exif.getAttribute(ExifInterface.TAG_ORIENTATION).equalsIgnoreCase("3")) {
+            bitmap = FileUtil.rotateBitmap(bitmap, 180);
+        }
+
+        return bitmap;
     }
 }

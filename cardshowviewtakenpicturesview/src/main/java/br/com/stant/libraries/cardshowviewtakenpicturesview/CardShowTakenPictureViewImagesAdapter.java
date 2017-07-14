@@ -27,7 +27,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
     private List<CardShowTakenImage> mOriginalTempCardShowTakenImageList;
     private List<CardShowTakenImage> mCardShowTakenImageListAsAdded;
-    private List<CardShowTakenImage> mImagesAsRemoved;
+    private List<CardShowTakenImage> mCardShowTakenImageListAsRemoved;
     private Context mContext;
     private CardShowTakenPictureView mView;
 
@@ -38,7 +38,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         this.mView          = view;
         this.mOriginalTempCardShowTakenImageList = new ArrayList<>();
         this.mCardShowTakenImageListAsAdded = new ArrayList<>();
-        this.mImagesAsRemoved = new ArrayList<>();
+        this.mCardShowTakenImageListAsRemoved = new ArrayList<>();
     }
 
 
@@ -64,19 +64,33 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public List<CardShowTakenImage> getImagesAsRemoved() {
-        return mImagesAsRemoved;
+        return mCardShowTakenImageListAsRemoved;
     }
 
     void saveOriginalList(){
         mOriginalTempCardShowTakenImageList = ((List) ((ArrayList) mCurrentCardShowTakenImageList).clone());
         mCardShowTakenImageListAsAdded = new ArrayList<>();
-        mImagesAsRemoved = new ArrayList<>();
+        mCardShowTakenImageListAsRemoved = new ArrayList<>();
     }
 
     public void removeImage(View view, CardShowTakenImage cardShowTakenImage){
         mCurrentCardShowTakenImageList.remove(cardShowTakenImage);
-        mImagesAsRemoved.add(cardShowTakenImage);
+        mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
         replaceData(mCurrentCardShowTakenImageList);
+
+        if(hasCardShowTakenImageAsAdded(cardShowTakenImage))
+            mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+    }
+
+    private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage){
+        CardShowTakenImage cardShowTakenImageToRemove =
+                mCardShowTakenImageListAsAdded.stream()
+                        .filter(cardShowTakenImageAsAdded ->
+                                cardShowTakenImage.equals(cardShowTakenImageAsAdded))
+                        .findAny()
+                        .orElse(null);
+
+        return cardShowTakenImageToRemove != null;
     }
 
 

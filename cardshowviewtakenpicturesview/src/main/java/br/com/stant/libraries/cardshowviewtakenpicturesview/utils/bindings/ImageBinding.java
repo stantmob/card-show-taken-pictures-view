@@ -48,7 +48,6 @@ public class ImageBinding {
 
             Picasso.with(imageView.getContext())
                     .load(url)
-                    .fit()
                     .placeholder(holder)
                     .into(imageView);
         }

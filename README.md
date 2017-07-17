@@ -50,7 +50,7 @@ dependencies {
 ```java
     mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
         @Override
-        public void onSaved(List<String> imagesAsAdded, List<String> imagesAsRemoved) {
+        public void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved) {
         }
 
         @Override
@@ -76,4 +76,15 @@ Add Programmatically :
 ```java
     mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
 ```
+
+6. How setImages in the Card 
+- Mapper your Image  object into CardShowTakenImage model . ( You can set remoteImageUrl or LocalImageFilename)
+```
+    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename) 
+```
+- Set CardShowTakenImage List into view component. Use setCardImages method to 
+```java
+    mBinding.cardShowViewTakenPicturesView.setCardImages(cardShowTakenImagesList);
+```
+
 

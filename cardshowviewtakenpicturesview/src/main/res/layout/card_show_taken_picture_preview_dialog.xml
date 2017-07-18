@@ -23,8 +23,8 @@
             android:layout_centerInParent="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:imgUrl="@{imageUrl}"
-            app:imgHolder="@{@drawable/stant_city}"/>
+            app:cardImgUrl="@{imageUrl}"
+            app:cardImgHolder="@{@drawable/stant_city}"/>
 
         <ImageView
             android:id="@+id/close_preview_image"

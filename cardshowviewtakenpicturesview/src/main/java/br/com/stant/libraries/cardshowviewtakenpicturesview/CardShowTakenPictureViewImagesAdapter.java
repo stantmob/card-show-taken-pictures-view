@@ -93,7 +93,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         return cardShowTakenImageToRemove != null;
     }
 
-
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardShowTakenPictureViewImageRecycleItemBinding mCardShowTakenPictureViewImageRecycleItemBinding = DataBindingUtil.inflate(

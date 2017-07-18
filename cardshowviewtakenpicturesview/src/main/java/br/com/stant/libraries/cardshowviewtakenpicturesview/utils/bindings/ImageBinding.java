@@ -15,8 +15,8 @@ import java.io.File;
 
 public class ImageBinding {
 
-    @BindingAdapter({"imgUrl","imgSize","imgHolder"})
-    public static void loadImage(ImageView imageView, String url, String size, Drawable holder){
+    @BindingAdapter({"cardImgUrl","cardImgSize","cardImgHolder"})
+    public static void loadCardImage(ImageView imageView, String url, String size, Drawable holder){
         if (hasNoUlr(url)) return;
 
         try{
@@ -32,16 +32,8 @@ public class ImageBinding {
         }
     }
 
-    @BindingAdapter({"imgUrl","imgSize","imgHolder"})
-    public static void loadImage(ImageView imageView, Bitmap bitmap, String size, Drawable holder){
-        if(bitmap != null)
-            imageView.setImageBitmap(bitmap);
-        else
-            return;
-    }
-
-    @BindingAdapter({"imgUrl","imgHolder"})
-    public static void simpleLoadImage(ImageView imageView, String url, Drawable holder){
+    @BindingAdapter({"cardImgUrl","cardImgHolder"})
+    public static void loadPreviewImage(ImageView imageView, String url, Drawable holder){
         if (hasNoUlr(url)) return;
 
         try {

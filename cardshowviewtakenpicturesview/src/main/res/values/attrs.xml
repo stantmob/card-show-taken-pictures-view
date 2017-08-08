@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="CardShowTakenPictureView">
         <attr name="editModeOnly" format="boolean"></attr>
+        <attr name="showNoBorder" format="boolean"></attr>
     </declare-styleable>
 </resources>

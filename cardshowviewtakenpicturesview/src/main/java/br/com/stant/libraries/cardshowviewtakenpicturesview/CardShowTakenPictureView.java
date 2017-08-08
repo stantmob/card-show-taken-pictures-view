@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -82,7 +83,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setOrientation(HORIZONTAL);
 
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<CardShowTakenImage>(0), this);
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
@@ -101,6 +102,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
 
         setupEditMode();
+        setupLayoutOptions();
+    }
+
+    private void setupLayoutOptions() {
+        boolean showNoBorder = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_showNoBorder, false);
+
+        if (showNoBorder) {
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureContainer.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_rectangle_white));
+        }
     }
 
     private void setupEditMode() {
@@ -109,7 +119,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (editModeOnly) {
             mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelText.setVisibility(GONE);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitle.setVisibility(VISIBLE);
         }
     }
 

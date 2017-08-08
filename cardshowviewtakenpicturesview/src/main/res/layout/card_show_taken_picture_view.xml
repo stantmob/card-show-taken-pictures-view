@@ -76,8 +76,8 @@
                     android:textColor="@color/gray"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:layout_marginStart="13dp"/>
-                    <!--android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}"-->
+                    android:layout_marginStart="13dp"
+                    android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}"/>
 
                 <LinearLayout
                     android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"

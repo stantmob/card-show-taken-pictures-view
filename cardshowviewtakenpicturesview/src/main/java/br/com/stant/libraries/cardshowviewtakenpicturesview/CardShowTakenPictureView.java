@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -11,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -65,11 +67,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     File sdcardTempImagesDir = FileUtil.getFile();
     public boolean canEditState;
+    private boolean editModeOnly;
     private CardShowTakenPictureViewContract.OnSavedCardListener mOnSavedCardListener;
+    private TypedArray mStyledAttributes;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
+        this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
 
         mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.card_show_taken_picture_view, this, true);
         mCardShowTakenPictureViewBinding.setHandler(this);
@@ -78,7 +83,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setOrientation(HORIZONTAL);
 
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<CardShowTakenImage>(0), this);
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
@@ -96,6 +101,25 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
 
+        setupEditMode();
+        setupLayoutOptions();
+    }
+
+    private void setupLayoutOptions() {
+        boolean showNoBorder = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_showNoBorder, false);
+
+        if (showNoBorder) {
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureContainer.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_rectangle_white));
+        }
+    }
+
+    private void setupEditMode() {
+        editModeOnly = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_editModeOnly, false);
+
+        if (editModeOnly) {
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelText.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
+        }
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -114,7 +138,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void checkIfHasImages(){
-        if(mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
+        if(editModeOnly || mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
             showEditStateViewConfiguration(this);
         else
             showNormalStateViewConfiguration();

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
@@ -65,11 +66,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     File sdcardTempImagesDir = FileUtil.getFile();
     public boolean canEditState;
+    private boolean editModeOnly;
     private CardShowTakenPictureViewContract.OnSavedCardListener mOnSavedCardListener;
+    private TypedArray mStyledAttributes;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
+        this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
 
         mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.card_show_taken_picture_view, this, true);
         mCardShowTakenPictureViewBinding.setHandler(this);
@@ -96,6 +100,17 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
 
+        setupEditMode();
+    }
+
+    private void setupEditMode() {
+        editModeOnly = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_editModeOnly, false);
+
+        if (editModeOnly) {
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelText.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitle.setVisibility(VISIBLE);
+        }
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -114,7 +129,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void checkIfHasImages(){
-        if(mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
+        if(editModeOnly || mCardShowTakenPictureViewImagesAdapter.getItemCount() == 0)
             showEditStateViewConfiguration(this);
         else
             showNormalStateViewConfiguration();

@@ -29,6 +29,7 @@
     </data>
 
     <LinearLayout
+        android:id="@+id/card_show_taken_picture_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
@@ -47,6 +48,7 @@
                 android:padding="10dp">
 
                 <LinearLayout
+                    android:id="@+id/card_show_taken_picture_cancel_text_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -57,6 +59,7 @@
                     android:onClick="@{handler::cancelEditImagesStateViewConfiguration}">
 
                     <TextView
+                        android:id="@+id/card_show_taken_picture_cancel_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/card_show_taken_picture_view.btn_cancel"/>
@@ -64,6 +67,7 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/card_show_taken_picture_header_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="14sp"
@@ -72,8 +76,8 @@
                     android:textColor="@color/gray"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
-                    android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}"
                     android:layout_marginStart="13dp"/>
+                    <!--android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}"-->
 
                 <LinearLayout
                     android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"
@@ -106,6 +110,7 @@
                     android:onClick="@{handler::saveImageStateViewConfiguration}">
 
                     <TextView
+                        android:id="@+id/card_show_taken_picture_save_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/card_show_taken_picture_view.btn_save"/>

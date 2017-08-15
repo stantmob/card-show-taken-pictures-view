@@ -297,7 +297,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() == null) {
+        if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && (data == null || data.getData() == null)) {
 
             CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity);
             mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);

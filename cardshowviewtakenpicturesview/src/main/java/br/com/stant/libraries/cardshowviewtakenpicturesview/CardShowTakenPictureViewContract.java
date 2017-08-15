@@ -27,6 +27,7 @@ public interface CardShowTakenPictureViewContract {
     void blockEditStateViewConfiguration();
     void unblockEditStateViewConfiguration();
     void setCardStateEnum(CardShowTakenPictureStateEnum cardStateEnum);
+    void ifNoImagesShowEditStateViewConfigurationOnInit();
 
     interface OnSavedCardListener {
         void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);

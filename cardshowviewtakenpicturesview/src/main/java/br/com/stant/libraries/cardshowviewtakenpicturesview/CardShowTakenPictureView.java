@@ -37,17 +37,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
 /**
  * Created by denisvieira on 07/06/17.
  */
-//
-//@InverseBindingMethods(value = {
-//        @InverseBindingMethod(type = CardShowTakenPictureView.class,
-//                attribute = "bind:updatedAt",
-//                method = "getFilterValue",
-//                event = "android:filterStringValuetAttrChanged"),
-//        @InverseBindingMethod(type = CardShowTakenPictureView.class,
-//                attribute = "bind:updatedAt",
-//                method = "getFilterValue",
-//                event = "android:filterStringValuetAttrChanged"),
-//})
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -91,8 +80,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
-
-        checkIfHasImages();
 
         FileUtil.createTempDirectory(sdcardTempImagesDir);
 
@@ -178,35 +165,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
     }
 
-//    private List<CardShowTakenImage> updateLocalImageFilenameOfImagesAsAdded(List<CardShowTakenImage> cardShowTakenImages){
-//
-//        for (CardShowTakenImage cardShowTakenImage : cardShowTakenImages) {
-//            cardShowTakenImage.setLocalImageFilename(saveImageAndGetSavedImageFilename(cardShowTakenImage));
-//        }
-//
-//        return cardShowTakenImages;
-//    }
-//
-//    private String saveImageAndGetSavedImageFilename(CardShowTakenImage cardShowTakenImage){
-//        return FileUtil.saveImage(cardShowTakenImage.getBitmapImageFromIntentPath(), cardShowTakenImage.getLocalImageFilename());
-//    }
-
-//    private void updateSavedPathInCardShowTakenImage(CardShowTakenImage cardShowTakenImage){
-//        Integer cardShowTakenImageAdapterPosition = mCardShowTakenPictureViewImagesAdapter.getPosition(cardShowTakenImage);
-//        mCardShowTakenPictureViewImagesAdapter.updateCardShowTakenImagePath(cardShowTakenImageAdapterPosition, cardShowTakenImage);
-//        mCardShowTakenPictureViewImagesAdapter.notifyItemChanged(cardShowTakenImageAdapterPosition);
-//    }
-
-//    private List<String> convertImagesIntoBase64(List<CardShowTakenImage> cardShowTakenImages){
-//        List<String> base64Images = new ArrayList<>();
-//        for (CardShowTakenImage cardShowTakenImage : cardShowTakenImages) {
-//
-//            base64Images.add(FileUtil.convertBitmapToBase64(cardShowTakenImage.getImageBitmap()));
-//        }
-//
-//        return base64Images;
-//    }
-
     @Override
     public void cancelEditImagesStateViewConfiguration(View view) {
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
@@ -233,10 +191,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
+    public void ifNoImagesShowEditStateViewConfigurationOnInit() {
+        checkIfHasImages();
+    }
+
+    @Override
     public void setOnSavedCardListener(CardShowTakenPictureViewContract.OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
     }
-
+te
     public void setFragment(Fragment fragment){
         mFragment = fragment;
         mActivity = fragment.getActivity();
@@ -253,7 +216,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void setCardImages(List<CardShowTakenImage> cardShowTakenImages){
         if(cardShowTakenImages != null) {
             mCardShowTakenPictureViewImagesAdapter.replaceData(cardShowTakenImages);
-            checkIfHasImages();
         }
     }
 

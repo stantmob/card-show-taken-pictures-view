@@ -199,7 +199,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void setOnSavedCardListener(CardShowTakenPictureViewContract.OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
     }
-te
+
     public void setFragment(Fragment fragment){
         mFragment = fragment;
         mActivity = fragment.getActivity();

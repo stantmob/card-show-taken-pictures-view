@@ -60,7 +60,14 @@ dependencies {
     });
 ```
 
-4. Configure onActivityResult to set Image in Card with take picture success 
+4. If you want show Edit State when no has Images when on create in view
+```java
+ // put method where you wish verify 
+    mServiceInspectionFormFilledDetailFragBinding
+                .cardShowTakenPictureView.ifNoImagesShowEditStateViewConfigurationOnInit();
+```
+
+5. Configure onActivityResult to set Image in Card with take picture success 
 ```java
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -68,7 +75,7 @@ dependencies {
     }
 ```
 
-5. Optional component attributes 
+6. Optional component attributes 
 - app:pictureByName: `String`
 - app:updatedAt: `date`
 - app:showNoBorder: `boolean`, default value `false`
@@ -79,7 +86,7 @@ Add Programmatically :
     mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
 ```
 
-6. How setImages in the Card 
+7. How setImages in the Card 
 - Mapper your Image  object into CardShowTakenImage model . ( You can set remoteImageUrl or LocalImageFilename)
 ```
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename) 

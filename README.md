@@ -71,6 +71,8 @@ dependencies {
 5. Optional component attributes 
 - app:pictureByName: `String`
 - app:updatedAt: `date`
+- app:showNoBorder: `boolean`, default value `false`
+- app:editModeOnly: `boolean`, default value `false`
 
 Add Programmatically :
 ```java

@@ -15,8 +15,9 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
-import io.reactivex.Observable;
-import io.reactivex.internal.operators.observable.ObservableJust;
+import rx.Observable;
+import rx.observables.BlockingObservable;
+
 
 /**
  * Created by denisvieira on 08/06/17.
@@ -90,9 +91,9 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded ->
                 cardShowTakenImage.equals(cardShowTakenImageAsAdded));
 
-        Object cardShowTakenImageToRemove = ((ObservableJust) cardShowTakenImageObservable).call();
+        CardShowTakenImage cardShowTakenImageAsRemoved = cardShowTakenImageObservable.toBlocking().first();
 
-        return cardShowTakenImageToRemove != null;
+        return cardShowTakenImageAsRemoved != null;
     }
 
     @Override

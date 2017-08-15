@@ -11,13 +11,11 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.internal.operators.observable.ObservableJust;
 
 /**
@@ -87,12 +85,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
-        Observable<CardShowTakenImage> stream = Observable.just(cardShowTakenImage);
+        Observable<CardShowTakenImage> cardShowTakenImageObservable = Observable.just(cardShowTakenImage);
 
-        stream.filter(cardShowTakenImageAsAdded ->
+        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded ->
                 cardShowTakenImage.equals(cardShowTakenImageAsAdded));
 
-        Object cardShowTakenImageToRemove = ((ObservableJust) stream).call();
+        Object cardShowTakenImageToRemove = ((ObservableJust) cardShowTakenImageObservable).call();
 
         return cardShowTakenImageToRemove != null;
     }

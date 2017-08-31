@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Card Show Taken Pictures Library</string>
 
     <string name="card_show_taken_picture_view.image_taken_text">Por:</string>
     <string name="card_show_taken_picture_view.btn_save">Salvar</string>

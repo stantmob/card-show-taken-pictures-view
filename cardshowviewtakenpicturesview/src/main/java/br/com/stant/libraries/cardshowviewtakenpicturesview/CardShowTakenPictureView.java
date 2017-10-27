@@ -19,6 +19,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -59,6 +60,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private boolean editModeOnly;
     private CardShowTakenPictureViewContract.OnSavedCardListener mOnSavedCardListener;
     private TypedArray mStyledAttributes;
+    private Integer mImagesQuantityLimit;
+    private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -106,6 +109,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (editModeOnly) {
             mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelText.setVisibility(GONE);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
+            showEditStateViewConfiguration(this);
         }
     }
 
@@ -196,6 +200,17 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
+    public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
+        mImagesQuantityLimit = limitQuantity;
+        mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
+    }
+
+    @Override
+    public boolean hasImages() {
+        return mCardShowTakenPictureViewImagesAdapter.getItemCount() > 0;
+    }
+
+    @Override
     public void setOnSavedCardListener(CardShowTakenPictureViewContract.OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
     }
@@ -233,6 +248,19 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void pickPictureToFinishServiceInspectionFormFilled(View view) {
+        if(notAtTheImageCountLimit()){
+            openPickGalleryIntent();
+        }else {
+            if(mOnReachedOnTheImageCountLimit != null)
+                mOnReachedOnTheImageCountLimit.onReached();
+        }
+    }
+
+    private boolean notAtTheImageCountLimit() {
+        return mImagesQuantityLimit != null && mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
+    }
+
+    private void openPickGalleryIntent(){
         if (!AppPermissions.hasPermissions((mActivity))) {
             AppPermissions.requestPermissions(mActivity);
         } else {
@@ -320,7 +348,5 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public boolean hasPictureByName(){
         return mCardShowTakenPictureViewBinding.getPictureByName() != null;
     }
-
-
 
 }

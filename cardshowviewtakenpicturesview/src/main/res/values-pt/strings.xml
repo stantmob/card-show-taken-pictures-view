@@ -5,6 +5,8 @@
     <string name="card_show_taken_picture_view.btn_cancel">Cancelar</string>
     <string name="card_show_taken_picture_view.image_taken_updated_date">Atualizado em</string>
 
+    <string name="card_show_taken_picture_view.image_count_is_in_limit">Image count is limited .</string>
+
     <string name="card_show_taken_picture_view.date_hint">00/00/00</string>
     <string name="card_show_taken_picture_view.picture_title">Fotos</string>
     <string name="card_show_taken_picture_view.add_image_text">Adicionar Foto</string>

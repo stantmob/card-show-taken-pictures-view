@@ -28,10 +28,16 @@ public interface CardShowTakenPictureViewContract {
     void unblockEditStateViewConfiguration();
     void setCardStateEnum(CardShowTakenPictureStateEnum cardStateEnum);
     void ifNoImagesShowEditStateViewConfigurationOnInit();
+    void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit);
+    boolean hasImages();
 
     interface OnSavedCardListener {
         void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);
         void onCancel();
+    }
+
+    interface OnReachedOnTheImageCountLimit {
+        void onReached();
     }
 
     void setOnSavedCardListener(OnSavedCardListener mOnSavedCardListener);

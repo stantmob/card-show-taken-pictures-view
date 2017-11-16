@@ -290,8 +290,11 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && (data == null || data.getData() == null)) {
 
             CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity);
-            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount()-1);
+
+            if(cardShowTakenImage != null){
+                mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount()-1);
+            }
 
         }else if(requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
 
@@ -306,6 +309,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private CardShowTakenImage generateCardShowTakenImageFromCamera(File photoTaken, Activity activity){
+        if(photoTaken == null){
+            return null;
+        }
+
         Bitmap bitmapImageFromIntentPath = FileUtil.createBitFromPath(photoTaken.getAbsolutePath());
         String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 

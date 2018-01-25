@@ -211,6 +211,17 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
+    public boolean hasImageByIdentifier(String identifier) {
+        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getData();
+        for (CardShowTakenImage cardShowTakenImage :cardShowTakenPictures) {
+            if(identifier == cardShowTakenImage.getIdentifier())
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public void setOnSavedCardListener(CardShowTakenPictureViewContract.OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
     }
@@ -228,9 +239,17 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
        return mCardShowTakenPictureViewBinding.getCardStateEnum();
     }
 
+    @Override
     public void setCardImages(List<CardShowTakenImage> cardShowTakenImages){
         if(cardShowTakenImages != null) {
             mCardShowTakenPictureViewImagesAdapter.replaceData(cardShowTakenImages);
+        }
+    }
+
+    @Override
+    public void addCardImages(List<CardShowTakenImage> cardShowTakenImages) {
+        if(cardShowTakenImages != null) {
+            mCardShowTakenPictureViewImagesAdapter.addPictures(cardShowTakenImages);
         }
     }
 
@@ -250,14 +269,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void pickPictureToFinishServiceInspectionFormFilled(View view) {
         if(notAtTheImageCountLimit()){
             openPickGalleryIntent();
-        }else {
-            if(mOnReachedOnTheImageCountLimit != null)
-                mOnReachedOnTheImageCountLimit.onReached();
+        }else if(mOnReachedOnTheImageCountLimit != null && !notAtTheImageCountLimit()) {
+            mOnReachedOnTheImageCountLimit.onReached();
         }
     }
 
     private boolean notAtTheImageCountLimit() {
-        return mImagesQuantityLimit != null && mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
+        return mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
     }
 
     private void openPickGalleryIntent(){

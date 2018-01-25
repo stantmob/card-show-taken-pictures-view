@@ -129,6 +129,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         replaceData(mCurrentCardShowTakenImageList);
     }
 
+    public void addPictures(List<CardShowTakenImage> cardShowTakenImages){
+        mCurrentCardShowTakenImageList.addAll(cardShowTakenImages);
+        mCardShowTakenImageListAsAdded.addAll(cardShowTakenImages);
+        replaceData(mCurrentCardShowTakenImageList);
+    }
+
     private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage){
         if (hasOnlyRemoteImageUrl(cardShowTakenImage)) {
             return cardShowTakenImage.getRemoteImageUrl();

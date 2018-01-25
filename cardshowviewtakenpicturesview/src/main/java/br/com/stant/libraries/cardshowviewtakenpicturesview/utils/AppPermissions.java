@@ -100,7 +100,8 @@ public class AppPermissions {
         boolean result = true;
         List<String> deniedPermissions = new ArrayList<>();
         for (String permission : PERMISSIONS) {
-            if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+            int permissionStatus = ActivityCompat.checkSelfPermission(context, permission);
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
                 deniedPermissions.add(permission);
                 result = false;
             }

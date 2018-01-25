@@ -30,6 +30,9 @@ public interface CardShowTakenPictureViewContract {
     void ifNoImagesShowEditStateViewConfigurationOnInit();
     void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit);
     boolean hasImages();
+    boolean hasImageByIdentifier(String identifier);
+    void setCardImages(List<CardShowTakenImage> cardShowTakenImages);
+    void addCardImages(List<CardShowTakenImage> cardShowTakenImages);
 
     interface OnSavedCardListener {
         void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);

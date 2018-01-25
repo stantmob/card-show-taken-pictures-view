@@ -33,6 +33,9 @@ public interface CardShowTakenPictureViewContract {
     boolean hasImageByIdentifier(String identifier);
     void setCardImages(List<CardShowTakenImage> cardShowTakenImages);
     void addCardImages(List<CardShowTakenImage> cardShowTakenImages);
+    List<CardShowTakenImage> getCardImages();
+    List<CardShowTakenImage> getCardImagesAsAdded();
+    List<CardShowTakenImage> getCardImagesAsRemoved();
 
     interface OnSavedCardListener {
         void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);

@@ -257,6 +257,16 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         return mCardShowTakenPictureViewImagesAdapter.getData();
     }
 
+    @Override
+    public List<CardShowTakenImage> getCardImagesAsAdded() {
+        return mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded();
+    }
+
+    @Override
+    public List<CardShowTakenImage> getCardImagesAsRemoved() {
+        return mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
+    }
+
     public void setExampleImages(){
         List<CardShowTakenImage> images = new ArrayList<>();
         images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));

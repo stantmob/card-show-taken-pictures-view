@@ -9,6 +9,8 @@
     <string name="card_show_taken_picture_view.add_image_text">Add Picture</string>
     <string name="card_show_taken_picture_view.image_count_is_in_limit">Image count is limited .</string>
 
+    <string name="card_show_taken_picture_view.request_chooser_msg">Selecione ou tire uma nova foto.</string>
+
     <string name="permission_information_dialog.ok_hint">Ok</string>
     <string name="permission_information_dialog.settings">configurations</string>
     <string name="permission_information_dialog.message">You must accept the following permissions to use the application</string>

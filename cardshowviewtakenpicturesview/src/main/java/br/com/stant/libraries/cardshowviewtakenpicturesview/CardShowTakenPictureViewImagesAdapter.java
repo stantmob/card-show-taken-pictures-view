@@ -135,34 +135,29 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         replaceData(mCurrentCardShowTakenImageList);
     }
 
-    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage){
-        if (hasOnlyRemoteImageUrl(cardShowTakenImage)) {
-            return cardShowTakenImage.getRemoteImageUrl();
-        }else if(hasTempImagePathToShow(cardShowTakenImage)){
+    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage) {
+
+        if (hasTempImagePathToShow(cardShowTakenImage)) {
             return cardShowTakenImage.getTempImagePathToShow();
-        } else if (hasOnlyLocalImage(cardShowTakenImage)) {
+        } else if (hasRemoteImageUrl(cardShowTakenImage)) {
+            return cardShowTakenImage.getRemoteImageUrl();
+        } else if (hasLocalImage(cardShowTakenImage)) {
             return getTempImageFileToShowFromLocalImageFilename(cardShowTakenImage.getLocalImageFilename());
-        }else{
+        } else {
             return null;
         }
     }
 
-    private boolean hasTempImagePathToShow(CardShowTakenImage cardShowTakenImage){
-        return cardShowTakenImage.getTempImagePathToShow() != null &&
-                cardShowTakenImage.getLocalImageFilename() != null &&
-                cardShowTakenImage.getRemoteImageUrl() == null;
+    private boolean hasTempImagePathToShow(CardShowTakenImage cardShowTakenImage) {
+        return cardShowTakenImage.getTempImagePathToShow() != null;
     }
 
-    private boolean hasOnlyRemoteImageUrl(CardShowTakenImage cardShowTakenImage){
-        return cardShowTakenImage.getRemoteImageUrl() != null &&
-                cardShowTakenImage.getTempImagePathToShow() == null &&
-                cardShowTakenImage.getLocalImageFilename() == null;
+    private boolean hasRemoteImageUrl(CardShowTakenImage cardShowTakenImage) {
+        return cardShowTakenImage.getRemoteImageUrl() != null;
     }
 
-    private boolean hasOnlyLocalImage(CardShowTakenImage cardShowTakenImage){
-        return cardShowTakenImage.getLocalImageFilename() != null &&
-                cardShowTakenImage.getTempImagePathToShow() == null &&
-                cardShowTakenImage.getRemoteImageUrl() == null;
+    private boolean hasLocalImage(CardShowTakenImage cardShowTakenImage) {
+        return cardShowTakenImage.getLocalImageFilename() != null;
     }
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){

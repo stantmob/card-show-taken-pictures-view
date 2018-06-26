@@ -121,20 +121,20 @@ public class FileUtil {
         int targetW = imageView.getWidth();
         int targetH = imageView.getHeight();
 
-		/* Get the size of the image */
+        /* Get the size of the image */
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(pathName, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
-		/* Figure out which way needs to be reduced less */
+        /* Figure out which way needs to be reduced less */
         int scaleFactor = 1;
         if ((targetW > 0) || (targetH > 0)) {
             scaleFactor = Math.min(photoW / targetW, photoH / targetH);
         }
 
-		/* Set bitmap options to scale the image decode target */
+        /* Set bitmap options to scale the image decode target */
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
@@ -143,20 +143,20 @@ public class FileUtil {
 
     public static Bitmap createBitFromPath(String pathName) {
 
-		/* Get the size of the image */
+        /* Get the size of the image */
         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(pathName, bmOptions);
         int photoW = bmOptions.outWidth;
         int photoH = bmOptions.outHeight;
 
-		/* Figure out which way needs to be reduced less */
+        /* Figure out which way needs to be reduced less */
 //        int scaleFactor = 1;
 //        if ((targetW > 0) || (targetH > 0)) {
 //            scaleFactor = Math.min(photoW/targetW, photoH/targetH);
 //        }
 
-		/* Set bitmap options to scale the image decode target */
+        /* Set bitmap options to scale the image decode target */
         bmOptions.inJustDecodeBounds = false;
 //        bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
@@ -272,7 +272,7 @@ public class FileUtil {
 
     public static Bitmap getCompressedBitmap(String imagePath) {
         float maxHeight = 600.0f;
-        float maxWidth = 400.0f;
+        float maxWidth = 600.0f;
         Bitmap scaledBitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -376,3 +376,4 @@ public class FileUtil {
     }
 
 }
+

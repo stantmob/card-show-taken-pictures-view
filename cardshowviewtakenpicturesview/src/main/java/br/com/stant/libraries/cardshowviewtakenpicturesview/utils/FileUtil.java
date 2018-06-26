@@ -271,8 +271,8 @@ public class FileUtil {
     }
 
     public static Bitmap getCompressedBitmap(String imagePath) {
-        float maxHeight = 1920.0f;
-        float maxWidth = 1080.0f;
+        float maxHeight = 600.0f;
+        float maxWidth = 400.0f;
         Bitmap scaledBitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -347,7 +347,7 @@ public class FileUtil {
             e.printStackTrace();
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 85, out);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 95, out);
 
         byte[] byteArray = out.toByteArray();
 

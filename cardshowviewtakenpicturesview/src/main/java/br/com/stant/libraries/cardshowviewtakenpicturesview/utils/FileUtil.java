@@ -19,6 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -271,8 +272,8 @@ public class FileUtil {
     }
 
     public static Bitmap getCompressedBitmap(String imagePath) {
-        float maxHeight = 600.0f;
-        float maxWidth = 600.0f;
+        float maxHeight = 500.0f;
+        float maxWidth = 500.0f;
         Bitmap scaledBitmap = null;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
@@ -299,12 +300,12 @@ public class FileUtil {
             }
         }
 
-        options.inSampleSize = calculateInSampleSize(options, actualWidth, actualHeight);
+        options.inSampleSize = 10;
         options.inJustDecodeBounds = false;
         options.inDither = false;
         options.inPurgeable = true;
         options.inInputShareable = true;
-        options.inTempStorage = new byte[16 * 1024];
+        options.inTempStorage = new byte[16 * 900];
 
         try {
             bmp = BitmapFactory.decodeFile(imagePath, options);
@@ -347,13 +348,47 @@ public class FileUtil {
             e.printStackTrace();
         }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 95, out);
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
 
         byte[] byteArray = out.toByteArray();
 
         Bitmap updatedBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
 
         return updatedBitmap;
+    }
+
+    public static Bitmap compressBitmap(File file, int sampleSize, int quality) {
+        Bitmap bitmapCompressed = null;
+
+        try {
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = sampleSize;
+            FileInputStream inputStream = new FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, options);
+            inputStream.close();
+
+            FileOutputStream outputStream = new FileOutputStream("location to save");
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+            outputStream.close();
+
+            long lengthInKb = 1024; //in kb
+            if (lengthInKb > 1000) {
+                compressBitmap(file, (sampleSize * 2), (quality / 4));
+            }
+            selectedBitmap.recycle();
+
+            bitmapCompressed = selectedBitmap;
+
+            return bitmapCompressed;
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return bitmapCompressed;
+
     }
 
     private  static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {

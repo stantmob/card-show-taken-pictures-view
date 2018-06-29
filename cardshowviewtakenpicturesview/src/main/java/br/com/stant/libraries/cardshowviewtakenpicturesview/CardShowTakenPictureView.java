@@ -10,7 +10,12 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -21,8 +26,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -34,7 +41,12 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
-import rx.functions.Function;
+import id.zelory.compressor.Compressor;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.*;
 
 
 /**
@@ -56,11 +68,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private Dialog mPreviewPicDialog;
 
     private File mPhotoTaken;
+    File compressedImage = null;
 
     File sdcardTempImagesDir = FileUtil.getFile();
     public boolean canEditState;
     private boolean editModeOnly;
-    private CardShowTakenPictureViewContract.OnSavedCardListener mOnSavedCardListener;
+    private OnSavedCardListener mOnSavedCardListener;
     private TypedArray mStyledAttributes;
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
@@ -224,7 +237,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public void setOnSavedCardListener(CardShowTakenPictureViewContract.OnSavedCardListener onSavedCardListener) {
+    public void setOnSavedCardListener(OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
     }
 
@@ -319,13 +332,20 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && (data == null || data.getData() == null)) {
 
-            CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity);
+            generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity, new CardShowTakenCompressedCallback() {
+                @Override
+                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath);
 
-            if (cardShowTakenImage != null) {
-                mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-            }
+                    mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                    mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                }
 
+                @Override
+                public void onError() {
+
+                }
+            });
         } else if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
 
             CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity);
@@ -350,19 +370,89 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         return null;
     }
 
-    private CardShowTakenImage generateCardShowTakenImageFromCamera(File photoTaken, Activity activity) {
+    private void generateCardShowTakenImageFromCamera(File photoTaken, Activity activity, CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+        if (photoTaken == null) {
+            return;
+        }
+
+        getReadableFileSize(photoTaken.length());
+        Bitmap oii = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
+
+
+//        String originalLength = getReadableFileSize(photoTaken.length());
+//
+//        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(photoTaken.getAbsolutePath());
+//        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+//
+//        String AfterCompresslLength = getReadableFileSize(bitmapImageFromIntentPath.getByteCount());
+
+        new Compressor(mContext)
+                .setMaxHeight(600)
+                .setMaxWidth(600)
+                .setQuality(50)
+                .compressToFileAsFlowable(photoTaken)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(file -> {
+                    compressedImage = file;
+
+                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+
+                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+
+                }, throwable -> {
+                    throwable.printStackTrace();
+                });
+
+//        Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+//        //options.height = xxx;//some compression configuration.
+//        Tiny.getInstance().source("").asBitmap().withOptions(options).compress(new BitmapCallback() {
+//            @Override
+//            public void callback(boolean isSuccess, Bitmap bitmap, Throwable t) {
+//                //return the compressed bitmap object
+//            }
+//        });
+    }
+
+    /*private CardShowTakenImage generateCardShowTakenImageFromCamera(File photoTaken, Activity activity) {
         if (photoTaken == null) {
             return null;
         }
 
+        String originalLength = getReadableFileSize(photoTaken.length());
+
         Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(photoTaken.getAbsolutePath());
         String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
+        String AfterCompresslLength = getReadableFileSize(bitmapImageFromIntentPath.getByteCount());
+
+
+//        Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
+//        //options.height = xxx;//some compression configuration.
+//        Tiny.getInstance().source("").asBitmap().withOptions(options).compress(new BitmapCallback() {
+//            @Override
+//            public void callback(boolean isSuccess, Bitmap bitmap, Throwable t) {
+//                //return the compressed bitmap object
+//            }
+//        });
+
+
+
         return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+    }*/
+
+
+    public String getReadableFileSize(long size) {
+        if (size <= 0) {
+            return "0";
+        }
+        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     private CardShowTakenImage generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity) {
-
         Uri selectedImageUri = data.getData();
 
         String[] projection = {MediaStore.Images.Media.DATA};

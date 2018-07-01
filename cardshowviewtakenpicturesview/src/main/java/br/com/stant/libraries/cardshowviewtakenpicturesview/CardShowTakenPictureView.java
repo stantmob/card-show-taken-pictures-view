@@ -16,6 +16,7 @@ import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -375,21 +376,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             return;
         }
 
-        getReadableFileSize(photoTaken.length());
-        Bitmap oii = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
-
-
-//        String originalLength = getReadableFileSize(photoTaken.length());
-//
-//        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(photoTaken.getAbsolutePath());
-//        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-//
-//        String AfterCompresslLength = getReadableFileSize(bitmapImageFromIntentPath.getByteCount());
-
         new Compressor(mContext)
                 .setMaxHeight(600)
                 .setMaxWidth(600)
                 .setQuality(50)
+                .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
                 .compressToFileAsFlowable(photoTaken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -405,43 +398,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                     throwable.printStackTrace();
                 });
 
-//        Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-//        //options.height = xxx;//some compression configuration.
-//        Tiny.getInstance().source("").asBitmap().withOptions(options).compress(new BitmapCallback() {
-//            @Override
-//            public void callback(boolean isSuccess, Bitmap bitmap, Throwable t) {
-//                //return the compressed bitmap object
-//            }
-//        });
     }
-
-    /*private CardShowTakenImage generateCardShowTakenImageFromCamera(File photoTaken, Activity activity) {
-        if (photoTaken == null) {
-            return null;
-        }
-
-        String originalLength = getReadableFileSize(photoTaken.length());
-
-        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(photoTaken.getAbsolutePath());
-        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-
-        String AfterCompresslLength = getReadableFileSize(bitmapImageFromIntentPath.getByteCount());
-
-
-//        Tiny.BitmapCompressOptions options = new Tiny.BitmapCompressOptions();
-//        //options.height = xxx;//some compression configuration.
-//        Tiny.getInstance().source("").asBitmap().withOptions(options).compress(new BitmapCallback() {
-//            @Override
-//            public void callback(boolean isSuccess, Bitmap bitmap, Throwable t) {
-//                //return the compressed bitmap object
-//            }
-//        });
-
-
-
-        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
-    }*/
-
 
     public String getReadableFileSize(long size) {
         if (size <= 0) {
@@ -465,10 +422,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
 
         String realPathOfPhotoTaken = res;
+
         Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(realPathOfPhotoTaken);
+
         String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName());
+        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName(), mContext);
+
 
         return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }

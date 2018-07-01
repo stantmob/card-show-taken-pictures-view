@@ -33,7 +33,7 @@ public class FileUtil {
     private static final String JPEG_FILE_PREFIX = "IMG_";
     private static final String JPEG_FILE_SUFFIX = ".jpg";
     private static final String TEMP_IMAGE_NAME = "image_temp_stant";
-    private static String path = "/<br.com.stant>/temp";
+    private static String path = "/Pictures";
 
     public static File getFile() {
         return new File(
@@ -198,7 +198,7 @@ public class FileUtil {
         return file;
     }
 
-    public static String saveImage(Bitmap bitmap, String imageFileName) {
+    public static String saveImage(Bitmap bitmap, String imageFileName, Context context) {
         if (bitmap != null) {
             ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytearrayoutputstream);

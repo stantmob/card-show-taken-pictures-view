@@ -1,6 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.view.View;
 
 import java.util.List;
@@ -47,5 +48,10 @@ public interface CardShowTakenPictureViewContract {
     }
 
     void setOnSavedCardListener(OnSavedCardListener mOnSavedCardListener);
+
+    interface CardShowTakenCompressedCallback {
+        void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath);
+        void onError();
+    }
 
 }

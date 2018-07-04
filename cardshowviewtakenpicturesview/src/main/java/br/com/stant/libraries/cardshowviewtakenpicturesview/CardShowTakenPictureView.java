@@ -347,11 +347,22 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
                 }
             });
-        } else if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
 
-            CardShowTakenImage cardShowTakenImage = generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity);
-            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+        } else if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
+             generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
+                @Override
+                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath);
+
+                    mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                    mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                }
+
+                @Override
+                public void onError() {
+
+                }
+            });
 
         } else {
             mPhotoTaken = null;
@@ -377,27 +388,88 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
 
         new Compressor(mContext)
-                .setMaxHeight(600)
-                .setMaxWidth(600)
-                .setQuality(50)
-                .setCompressFormat(Bitmap.CompressFormat.WEBP)
                 .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
                         Environment.DIRECTORY_PICTURES).getAbsolutePath())
                 .compressToFileAsFlowable(photoTaken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(file -> {
-                    compressedImage = file;
 
-                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+                .subscribe(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) {
+                        compressedImage = file;
 
-                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-                }, throwable -> {
-                    throwable.printStackTrace();
-                });
+                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+                    }
+                }, Throwable::printStackTrace);
 
+//        new Compressor(mContext)
+//                .setMaxHeight(600)
+//                .setMaxWidth(600)
+//                .setQuality(50)
+//                .setCompressFormat(Bitmap.CompressFormat.WEBP)
+//                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+//                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
+//                .compressToFileAsFlowable(photoTaken)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(file -> {
+//                    compressedImage = file;
+//
+//                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+//                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+//
+//                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+//
+//                }, throwable -> {
+//                    throwable.printStackTrace();
+//                });
+
+    }
+
+
+    private void generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity, CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+        try {
+            mPhotoTaken = FileUtil.from(mContext, data.getData());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        new Compressor(mContext)
+                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                .compressToFileAsFlowable(mPhotoTaken)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+
+                .subscribe(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) {
+                        compressedImage = file;
+
+                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+
+                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+
+                        FileUtil.saveImage(bitmapImageFromIntentPath, mPhotoTaken.getName(), mContext);
+
+                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+                    }
+                }, Throwable::printStackTrace);
+
+
+//
+//        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(realPathOfPhotoTaken);
+//
+//        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+//
+//        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName(), mContext);
+
+
+//        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 
     public String getReadableFileSize(long size) {
@@ -407,30 +479,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
-    }
-
-    private CardShowTakenImage generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity) {
-        Uri selectedImageUri = data.getData();
-
-        String[] projection = {MediaStore.Images.Media.DATA};
-        String res = "";
-        Cursor cursor = getContext().getContentResolver().query(selectedImageUri, projection, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            res = cursor.getString(column_index);
-            cursor.close();
-        }
-
-        String realPathOfPhotoTaken = res;
-
-        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(realPathOfPhotoTaken);
-
-        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-
-        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName(), mContext);
-
-
-        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 
     private String createTempImageFileToShow(Bitmap bitmap, Activity activity) {

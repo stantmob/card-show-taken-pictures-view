@@ -406,27 +406,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                     }
                 }, Throwable::printStackTrace);
 
-//        new Compressor(mContext)
-//                .setMaxHeight(600)
-//                .setMaxWidth(600)
-//                .setQuality(50)
-//                .setCompressFormat(Bitmap.CompressFormat.WEBP)
-//                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-//                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
-//                .compressToFileAsFlowable(photoTaken)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(file -> {
-//                    compressedImage = file;
-//
-//                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-//                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-//
-//                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
-//
-//                }, throwable -> {
-//                    throwable.printStackTrace();
-//                });
 
     }
 
@@ -439,8 +418,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
 
         new Compressor(mContext)
-                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                .setDestinationDirectoryPath(FileUtil.getFile().getAbsolutePath())
                 .compressToFileAsFlowable(mPhotoTaken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -450,26 +428,28 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                     public void accept(File file) {
                         compressedImage = file;
 
-                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                        new Compressor(mContext)
+                                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                                .compressToFileAsFlowable(compressedImage)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
 
-                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+                                .subscribe(new Consumer<File>() {
+                                    @Override
+                                    public void accept(File file) {
+                                        compressedImage = file;
 
-                        FileUtil.saveImage(bitmapImageFromIntentPath, mPhotoTaken.getName(), mContext);
+                                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
+                                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, mPhotoTaken.getName(), tempImagePathToShow);
+                                    }
+                                }, Throwable::printStackTrace);
+
                     }
                 }, Throwable::printStackTrace);
 
-
-//
-//        Bitmap bitmapImageFromIntentPath = FileUtil.getCompressedBitmap(realPathOfPhotoTaken);
-//
-//        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-//
-//        FileUtil.saveImage(bitmapImageFromIntentPath, photoTaken.getName(), mContext);
-
-
-//        return new CardShowTakenImage(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
     }
 
     public String getReadableFileSize(long size) {

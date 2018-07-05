@@ -206,9 +206,10 @@ public class FileUtil {
         return file;
     }
 
-    public static String saveImage(Bitmap bitmap, String imageFileName, Context context) {
+    public static String saveImage(Bitmap bitmap, String imageFileName) {
         if (bitmap != null) {
             ByteArrayOutputStream bytearrayoutputstream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 60, bytearrayoutputstream);
             File file = new File(getFile(), imageFileName);
             try {
                 file.createNewFile();
@@ -234,6 +235,8 @@ public class FileUtil {
         return Bitmap.createBitmap(bitmap, 0, 0, w, h, mtx, true);
     }
 
+
+
     public static void deleteFile(String localImage) {
         if (localImage != null) {
             File[] files = getFiles(localImage, getFile());
@@ -242,6 +245,8 @@ public class FileUtil {
             }
         }
     }
+
+
 
     public static String convertBitmapToBase64(Bitmap bitmapImage) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

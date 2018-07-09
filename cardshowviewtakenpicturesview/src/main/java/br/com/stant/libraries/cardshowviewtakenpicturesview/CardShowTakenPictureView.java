@@ -5,17 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.media.ExifInterface;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -27,7 +20,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -46,8 +38,6 @@ import id.zelory.compressor.Compressor;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.*;
 
 
 /**
@@ -301,7 +291,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private boolean notAtTheImageCountLimit() {
-        return mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
+        if (mImagesQuantityLimit != null) {
+            return mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
+        }
+        return true;
     }
 
     private void openPickGalleryIntent() {
@@ -349,7 +342,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             });
 
         } else if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
-             generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
+            generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
                 @Override
                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                     CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath);

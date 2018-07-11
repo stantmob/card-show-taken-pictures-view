@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
         <variable
             name="handler"
-            type="br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView"/>
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView" />
 
         <variable
             name="updatedAt"
@@ -33,8 +34,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:orientation="vertical"
-        android:background="@drawable/shape_rounded_white">
+        android:background="@drawable/shape_rounded_white"
+        android:orientation="vertical">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -42,27 +43,27 @@
             android:background="@android:color/transparent">
 
             <RelativeLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:padding="10dp">
 
                 <LinearLayout
                     android:id="@+id/card_show_taken_picture_cancel_text_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
+                    android:onClick="@{handler::cancelEditImagesStateViewConfiguration}"
+                    android:orientation="horizontal"
                     android:padding="5dp"
-                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
-                    android:onClick="@{handler::cancelEditImagesStateViewConfiguration}">
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
 
                     <TextView
                         android:id="@+id/card_show_taken_picture_cancel_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/card_show_taken_picture_view.btn_cancel"/>
+                        android:text="@string/card_show_taken_picture_view.btn_cancel" />
 
                 </LinearLayout>
 
@@ -70,14 +71,14 @@
                     android:id="@+id/card_show_taken_picture_header_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:text="@string/card_show_taken_picture_view.picture_title"
-                    android:textStyle="bold"
-                    android:textColor="@color/gray"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="13dp"
-                    android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}"/>
+                    android:text="@string/card_show_taken_picture_view.picture_title"
+                    android:textColor="@color/gray"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}" />
 
                 <LinearLayout
                     android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"
@@ -85,16 +86,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
+                    android:onClick="@{handler::showEditStateViewConfiguration}"
                     android:orientation="horizontal"
                     android:padding="5dp"
-                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}"
-                    android:onClick="@{handler::showEditStateViewConfiguration}">
+                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}">
 
                     <com.github.siyamed.shapeimageview.CircularImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/ic_edit_inspection_form_filled"
-                        />
+                        android:src="@drawable/ic_edit_inspection_form_filled" />
 
                 </LinearLayout>
 
@@ -102,18 +102,18 @@
                     android:id="@+id/card_show_taken_picture_save_text_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
+                    android:onClick="@{handler::saveImageStateViewConfiguration}"
+                    android:orientation="horizontal"
                     android:padding="5dp"
-                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
-                    android:onClick="@{handler::saveImageStateViewConfiguration}">
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
 
                     <TextView
                         android:id="@+id/card_show_taken_picture_save_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/card_show_taken_picture_view.btn_save"/>
+                        android:text="@string/card_show_taken_picture_view.btn_save" />
 
                 </LinearLayout>
 
@@ -126,16 +126,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:paddingStart="20dp"
             android:paddingEnd="20dp"
-            android:gravity="center">
+            android:paddingStart="20dp">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/card_show_taken_picture_image_list_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center" />
 
         </LinearLayout>
 
@@ -143,10 +143,10 @@
             android:id="@+id/card_show_taken_picture_add_picture_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginTop="4dp"
-            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
-            android:onClick="@{handler::pickPictureToFinishServiceInspectionFormFilled}">
+            android:onClick="@{handler::pickPictureToFinishServiceInspectionFormFilled}"
+            android:orientation="vertical"
+            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
 
             <com.github.siyamed.shapeimageview.CircularImageView
                 android:layout_width="50dp"
@@ -159,12 +159,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/gray"
-                android:textSize="12sp"
                 android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="@string/card_show_taken_picture_view.add_image_text"
                 android:textAllCaps="true"
-                android:text="@string/card_show_taken_picture_view.add_image_text" />
+                android:textColor="@color/gray"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <RelativeLayout
@@ -173,22 +173,22 @@
             android:background="@android:color/transparent">
 
             <RelativeLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:padding="10dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_alignParentEnd="true">
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal">
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="20dp"
+                        android:orientation="horizontal"
 
                         android:visibility="@{handler.hasUpdatedAt() ? View.VISIBLE : View.GONE}">
 
@@ -196,56 +196,48 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="3dp"
-                            android:textSize="12sp"
-                            android:textColor="@color/gray"
                             android:text="@string/card_show_taken_picture_view.image_taken_updated_date"
-                            />
+                            android:textColor="@color/gray"
+                            android:textSize="12sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp"
-                            android:textColor="@color/gray"
                             android:text="@{updatedAt}"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp"
                             tools:text="@string/card_show_taken_picture_view.date_hint" />
 
                     </LinearLayout>
 
                     <LinearLayout
-                        android:orientation="horizontal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal"
                         android:visibility="@{handler.hasPictureByName() ? View.VISIBLE : View.GONE}">
 
                         <TextView
-                            android:layout_height="wrap_content"
                             android:layout_width="wrap_content"
-                            android:textSize="12sp"
+                            android:layout_height="wrap_content"
                             android:textColor="@color/gray"
+                            android:textSize="12sp"
                             tools:text="@string/card_show_taken_picture_view.image_taken_text" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="12sp"
-                            android:textColor="@color/gray"
                             android:text="@{pictureByName}"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp"
                             tools:text="Teste" />
 
                     </LinearLayout>
 
-
-
-
-
                 </LinearLayout>
-
 
             </RelativeLayout>
 
-
         </RelativeLayout>
-
 
     </LinearLayout>
 

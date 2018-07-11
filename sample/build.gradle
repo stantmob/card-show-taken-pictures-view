@@ -50,6 +50,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     implementation 'com.android.support:design:27.1.1'
     implementation 'com.google.guava:guava:25.0-android'
+    implementation 'com.github.siyamed:android-shape-imageview:0.9.3@aar'
     testImplementation 'junit:junit:4.12'
 
     // Dependencies for local unit tests

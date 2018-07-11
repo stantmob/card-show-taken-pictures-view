@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "br.com.stant.libraries.card_show_taken_pictures_view"
         minSdkVersion 17
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -22,50 +22,65 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile project(":cardshowviewtakenpicturesview")
+    implementation project(":cardshowviewtakenpicturesview")
 
-    compile 'com.android.support:appcompat-v7:26.0.0-beta2'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.0.0-beta2'
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.google.guava:guava:25.0-android'
+    testImplementation 'junit:junit:4.12'
 
     // Dependencies for local unit tests
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.squareup.retrofit2:retrofit:2.1.0'
-    testCompile 'io.reactivex:rxjava:1.1.8'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    testImplementation 'io.reactivex:rxjava:1.1.8'
 
-    testCompile "org.powermock:powermock-module-junit4:1.6.5"
-    testCompile "org.powermock:powermock-module-junit4-rule:1.6.5"
-    testCompile "org.powermock:powermock-api-mockito:1.6.5"
-    testCompile "org.powermock:powermock-classloading-xstream:1.6.5"
+    testImplementation "org.powermock:powermock-module-junit4:1.6.5"
+    testImplementation "org.powermock:powermock-module-junit4-rule:1.6.5"
+    testImplementation "org.powermock:powermock-api-mockito:1.6.5"
+    testImplementation "org.powermock:powermock-classloading-xstream:1.6.5"
 
-    testCompile 'org.powermock:powermock-api-mockito:1.6.5'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.5'
     // Espresso UI Testing
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.google.guava'
         exclude module: 'espresso-idling-resource'
     })
-    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2', {
+    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:2.2.2', {
         exclude group: 'com.android.support', module: 'appcompat'
         exclude group: 'com.android.support', module: 'support-v4'
         exclude module: 'recyclerview-v7'
     })
-    androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:2.2.2'
 
     // Resolve conflicts between main and test APK:
-    androidTestCompile "com.android.support:support-annotations:26.0.0-beta2"
-    androidTestCompile 'com.android.support:appcompat-v7:26.0.0-beta2'
-    androidTestCompile 'com.android.support:design:26.0.0-beta2'
-    androidTestCompile 'com.android.support:support-v4:26.0.0-beta2'
-    androidTestCompile 'com.android.support:recyclerview-v7:26.0.0-beta2'
+    androidTestImplementation "com.android.support:support-annotations:27.1.1"
+    androidTestImplementation 'com.android.support:appcompat-v7:27.1.1'
+    androidTestImplementation 'com.android.support:design:27.1.1'
+    androidTestImplementation 'com.android.support:support-v4:27.1.1'
+    androidTestImplementation 'com.android.support:recyclerview-v7:27.1.1'
 }

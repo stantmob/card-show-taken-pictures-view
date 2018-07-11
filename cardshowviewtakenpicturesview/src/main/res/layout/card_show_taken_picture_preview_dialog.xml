@@ -12,6 +12,7 @@
             name="imageUrl"
             type="String"/>
     </data>
+
     <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -39,4 +40,5 @@
             android:onClick="@{handler::closePreviewPicDialog}"/>
 
     </RelativeLayout>
+
 </layout>

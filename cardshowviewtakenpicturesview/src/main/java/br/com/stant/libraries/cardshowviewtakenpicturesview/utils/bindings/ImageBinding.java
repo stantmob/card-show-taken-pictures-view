@@ -1,13 +1,10 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.bindings;
 
 import android.databinding.BindingAdapter;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-
-import java.io.File;
 
 /**
  * Created by stant on 13/01/17.

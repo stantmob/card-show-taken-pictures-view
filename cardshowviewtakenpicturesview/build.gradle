@@ -32,6 +32,11 @@ android {
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
 }
 
 dependencies {

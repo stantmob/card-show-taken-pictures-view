@@ -33,7 +33,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShow
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.FileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardShowTakenPictureViewFileUtil;
 import id.zelory.compressor.Compressor;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -61,7 +61,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private File mPhotoTaken;
     File compressedImage = null;
 
-    File sdcardTempImagesDir = FileUtil.getFile();
+    File sdcardTempImagesDir = CardShowTakenPictureViewFileUtil.getFile();
     public boolean canEditState;
     private boolean editModeOnly;
     private OnSavedCardListener mOnSavedCardListener;
@@ -90,7 +90,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
 
-        FileUtil.createTempDirectory(sdcardTempImagesDir);
+        CardShowTakenPictureViewFileUtil.createTempDirectory(sdcardTempImagesDir);
 
         mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
@@ -315,7 +315,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
 
         if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
-            mPhotoTaken = FileUtil.prepareFile(takePhotoIntent);
+            mPhotoTaken = CardShowTakenPictureViewFileUtil.prepareFile(takePhotoIntent);
             if (mFragment != null)
                 mFragment.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
             else if (mActivity != null)
@@ -402,13 +402,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     private void generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity, CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         try {
-            mPhotoTaken = FileUtil.from(mContext, data.getData());
+            mPhotoTaken = CardShowTakenPictureViewFileUtil.from(mContext, data.getData());
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         new Compressor(mContext)
-                .setDestinationDirectoryPath(FileUtil.getFile().getAbsolutePath())
+                .setDestinationDirectoryPath(CardShowTakenPictureViewFileUtil.getFile().getAbsolutePath())
                 .compressToFileAsFlowable(mPhotoTaken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

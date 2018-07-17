@@ -275,8 +275,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public void setExampleImages() {
         List<CardShowTakenImage> images = new ArrayList<>();
-        images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));
-        images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+        images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
+        images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png", new Date(), new Date()));
 
         setCardImages(images);
     }
@@ -329,7 +329,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity, new CardShowTakenCompressedCallback() {
                 @Override
                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath);
+                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
 
                     mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                     mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
@@ -345,7 +345,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
                 @Override
                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath);
+                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
 
                     mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                     mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
@@ -387,16 +387,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) {
-                        compressedImage = file;
+                .subscribe(file -> {
+                    compressedImage = file;
 
-                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
-                    }
+                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
                 }, Throwable::printStackTrace);
 
 

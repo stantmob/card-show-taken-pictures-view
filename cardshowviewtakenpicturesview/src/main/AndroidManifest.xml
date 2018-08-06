@@ -12,6 +12,8 @@
     <application
         android:allowBackup="true"
         android:supportsRtl="true">
+
+        <activity android:name=".camera.CameraActivity"/>
     </application>
 
 </manifest>

@@ -19,6 +19,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
@@ -314,13 +316,24 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         Intent chooserIntent = Intent.createChooser(galleryPickIntent, pickTitle);
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
 
-        if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
-            mPhotoTaken = CardShowTakenPictureViewFileUtil.prepareFile(takePhotoIntent);
-            if (mFragment != null)
-                mFragment.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
-            else if (mActivity != null)
-                mActivity.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
-        }
+
+        //TODO Implementar a camera personalizada aqui
+//        if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
+//            mPhotoTaken = CardShowTakenPictureViewFileUtil.prepareFile(takePhotoIntent);
+//            if (mFragment != null)
+//                mFragment.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
+//            else if (mActivity != null)
+//                mActivity.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
+//        }
+
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureAddPictureContainer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(mContext, "camera personalizada", Toast.LENGTH_SHORT).show();
+                mActivity.startActivityForResult(new Intent(mActivity, CameraActivity.class), REQUEST_CHOOSER_IMAGE);
+            }
+        });
+
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
+import android.graphics.Bitmap;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -29,6 +30,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -51,17 +53,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraFragment extends Fragment implements CameraContract {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
+    private File localTempImagesDir = PhotoViewFileUtil.getFile();
+    private File mPhotoTaken;
     private ImageButton mButtonCapture;
     private TextureView mTextureView;
     private String mCameraId;
@@ -70,11 +77,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     private CaptureRequest.Builder mCaptureRequestBuilder;
     private Size mImageDimension;
     private ImageReader imageReader;
-    private File file;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private boolean mFlashSupported;
     private Handler mBackgroundHandler;
     private HandlerThread mBackgroundThread;
+    private ImageGenerator mImageGenerator;
 
     //Check state orientation of output image
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
@@ -135,6 +142,8 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraFragmentBinding.cameraPhotosRecyclerView.setFocusable(false);
         mCameraFragmentBinding.cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
 
+        PhotoViewFileUtil.createTempDirectory(localTempImagesDir);
+
         return mCameraFragmentBinding.getRoot();
     }
 
@@ -170,10 +179,23 @@ public class CameraFragment extends Fragment implements CameraContract {
         getActivity().finish();
     }
 
+    @Override
+    public void setPhotos(ArrayList<CameraPhoto> photos) {
+        if (photos != null) {
+            mCameraPhotosAdapter.replaceData(photos);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mCameraPhotosAdapter.getItemCount();
+    }
+
     private void takePicture() {
         if (mCameraDevice == null)
             return;
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
+
         try {
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(mCameraDevice.getId());
             Size[] jpegSizes = null;
@@ -201,11 +223,11 @@ public class CameraFragment extends Fragment implements CameraContract {
             int rotation = getActivity().getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, ORIENTATIONS.get(rotation));
 
-            file = new File(Environment.getExternalStorageDirectory() + "/" + UUID.randomUUID().toString() + ".jpg");
             ImageReader.OnImageAvailableListener readerListener = new ImageReader.OnImageAvailableListener() {
                 @Override
                 public void onImageAvailable(ImageReader imageReader) {
                     Image image = null;
+
                     try {
                         image = reader.acquireLatestImage();
                         ByteBuffer buffer = image.getPlanes()[0].getBuffer();
@@ -227,9 +249,30 @@ public class CameraFragment extends Fragment implements CameraContract {
 
                 private void save(byte[] bytes) throws IOException {
                     OutputStream outputStream = null;
+
                     try {
-                        outputStream = new FileOutputStream(file);
+                        outputStream = new FileOutputStream(localTempImagesDir);
                         outputStream.write(bytes);
+
+                        mImageGenerator = new ImageGenerator(getContext(), mPhotoTaken, CameraFragment.this);
+
+                        mImageGenerator.generateCardShowTakenImageFromCamera(mPhotoTaken, getActivity(),
+                                new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                            @Override
+                            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                                CameraPhoto cameraPhoto = new CameraPhoto(bitmap, imageFilename, tempImagePath);
+
+                                mCameraPhotosAdapter.addPicture(cameraPhoto);
+                                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
+                            }
+
+                            @Override
+                            public void onError() {
+                                Log.d("Error To Save", "onError: ");
+                            }
+                        });
+
+
                     } finally {
                         if (outputStream != null)
                             outputStream.close();
@@ -238,11 +281,12 @@ public class CameraFragment extends Fragment implements CameraContract {
             };
 
             reader.setOnImageAvailableListener(readerListener, mBackgroundHandler);
+
             final CameraCaptureSession.CaptureCallback captureListener = new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(getContext(), "Saved " + file, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Saved: " + localTempImagesDir + request.getTag(), Toast.LENGTH_SHORT).show();
                     createCameraPreview();
                 }
             };
@@ -378,13 +422,6 @@ public class CameraFragment extends Fragment implements CameraContract {
         images.add(new CameraPhoto(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
 
         setPhotos(images);
-    }
-
-    @Override
-    public void setPhotos(ArrayList<CameraPhoto> photos) {
-        if (photos != null) {
-            mCameraPhotosAdapter.replaceData(photos);
-        }
     }
 
 

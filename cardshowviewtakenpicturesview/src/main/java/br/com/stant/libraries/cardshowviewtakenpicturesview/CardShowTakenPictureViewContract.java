@@ -8,12 +8,13 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardContract;
 
 /**
  * Created by denisvieira on 08/06/17.
  */
 
-public interface CardShowTakenPictureViewContract {
+public interface CardShowTakenPictureViewContract extends CardContract {
 
     void pickPictureToFinishServiceInspectionFormFilled(View view);
     void dispatchTakePictureOrPickGalleryIntent();

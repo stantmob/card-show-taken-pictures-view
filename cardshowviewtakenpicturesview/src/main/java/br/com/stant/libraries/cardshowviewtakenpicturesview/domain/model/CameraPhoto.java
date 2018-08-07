@@ -12,6 +12,12 @@ public class CameraPhoto {
     private String tempImagePathToShow;
     private Bitmap bitmapImageFromIntentPath;
 
+    public CameraPhoto(Bitmap bitmapImageFromIntentPath, String localImageFilename, String tempImagePathToShow) {
+        this.bitmapImageFromIntentPath = bitmapImageFromIntentPath;
+        this.localImageFilename        = localImageFilename;
+        this.tempImagePathToShow       = tempImagePathToShow;
+    }
+
     public CameraPhoto(String identifier, String remoteImageUrl, String localImageFilename, String tempImagePathToShow, Bitmap bitmapImageFromIntentPath) {
         this.identifier                = identifier;
         this.remoteImageUrl            = remoteImageUrl;

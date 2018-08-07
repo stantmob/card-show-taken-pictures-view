@@ -1,5 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -35,7 +36,8 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShow
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardShowTakenPictureViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 import id.zelory.compressor.Compressor;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
@@ -48,10 +50,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
-    private static final String TEMP_IMAGE_BASE_NAME = "card_show_taken_picture_temp_image";
-
-    private static final int REQUEST_CHOOSER_IMAGE = 1;
-
+    public boolean canEditState;
+    File sdcardTempImagesDir = PhotoViewFileUtil.getFile();
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;
     private Context mContext;
@@ -59,17 +59,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private CardShowTakenPictureViewImagesAdapter mCardShowTakenPictureViewImagesAdapter;
     private Fragment mFragment;
     private Dialog mPreviewPicDialog;
-
     private File mPhotoTaken;
-    File compressedImage = null;
-
-    File sdcardTempImagesDir = CardShowTakenPictureViewFileUtil.getFile();
-    public boolean canEditState;
     private boolean editModeOnly;
     private OnSavedCardListener mOnSavedCardListener;
     private TypedArray mStyledAttributes;
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
+    private static final int REQUEST_CHOOSER_IMAGE = 1;
+    private ImageGenerator imageGenerator;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -92,7 +89,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
 
-        CardShowTakenPictureViewFileUtil.createTempDirectory(sdcardTempImagesDir);
+        PhotoViewFileUtil.createTempDirectory(sdcardTempImagesDir);
 
         mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
@@ -234,6 +231,11 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mOnSavedCardListener = onSavedCardListener;
     }
 
+    @Override
+    public int getItemCount() {
+        return mCardShowTakenPictureViewImagesAdapter.getItemCount();
+    }
+
     public void setFragment(Fragment fragment) {
         mFragment = fragment;
         mActivity = fragment.getActivity();
@@ -317,29 +319,30 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
 
 
-        //TODO Implementar a camera personalizada aqui
+//        //TODO Implementar a camera personalizada aqui
 //        if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
-//            mPhotoTaken = CardShowTakenPictureViewFileUtil.prepareFile(takePhotoIntent);
+//            mPhotoTaken = PhotoViewFileUtil.prepareFile(takePhotoIntent);
 //            if (mFragment != null)
 //                mFragment.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
 //            else if (mActivity != null)
 //                mActivity.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
 //        }
 
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureAddPictureContainer.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(mContext, "camera personalizada", Toast.LENGTH_SHORT).show();
-                mActivity.startActivityForResult(new Intent(mActivity, CameraActivity.class), REQUEST_CHOOSER_IMAGE);
-            }
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureAddPictureContainer.setOnClickListener(view -> {
+            Toast.makeText(mContext, "camera personalizada", Toast.LENGTH_SHORT).show();
+            mActivity.startActivityForResult(new Intent(mActivity, CameraActivity.class), REQUEST_CHOOSER_IMAGE);
         });
 
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && (data == null || data.getData() == null)) {
+        imageGenerator = new ImageGenerator(getContext(), mPhotoTaken, this);
 
-            generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity, new CardShowTakenCompressedCallback() {
+        if (requestCode == REQUEST_CHOOSER_IMAGE
+                && resultCode == Activity.RESULT_OK
+                && (data == null || data.getData() == null)) {
+
+            imageGenerator.generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity, new CardShowTakenCompressedCallback() {
                 @Override
                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                     CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
@@ -354,8 +357,11 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                 }
             });
 
-        } else if (requestCode == REQUEST_CHOOSER_IMAGE && resultCode == Activity.RESULT_OK && data.getData() != null) {
-            generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
+        } else if (requestCode == REQUEST_CHOOSER_IMAGE
+                && resultCode == Activity.RESULT_OK
+                && data.getData() != null) {
+
+            imageGenerator.generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
                 @Override
                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                     CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
@@ -388,73 +394,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         return null;
     }
 
-    private void generateCardShowTakenImageFromCamera(File photoTaken, Activity activity, CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        if (photoTaken == null) {
-            return;
-        }
-
-        new Compressor(mContext)
-                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
-                .compressToFileAsFlowable(photoTaken)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(file -> {
-                    compressedImage = file;
-
-                    Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-                    String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-
-                    cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow);
-                }, Throwable::printStackTrace);
-
-
-    }
-
-
-    private void generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity, CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        try {
-            mPhotoTaken = CardShowTakenPictureViewFileUtil.from(mContext, data.getData());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        new Compressor(mContext)
-                .setDestinationDirectoryPath(CardShowTakenPictureViewFileUtil.getFile().getAbsolutePath())
-                .compressToFileAsFlowable(mPhotoTaken)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) {
-                        compressedImage = file;
-
-                        new Compressor(mContext)
-                                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
-                                .compressToFileAsFlowable(compressedImage)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-
-                                .subscribe(new Consumer<File>() {
-                                    @Override
-                                    public void accept(File file) {
-                                        compressedImage = file;
-
-                                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-                                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
-
-                                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, mPhotoTaken.getName(), tempImagePathToShow);
-                                    }
-                                }, Throwable::printStackTrace);
-
-                    }
-                }, Throwable::printStackTrace);
-
-    }
-
     public String getReadableFileSize(long size) {
         if (size <= 0) {
             return "0";
@@ -462,13 +401,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
-    }
-
-    private String createTempImageFileToShow(Bitmap bitmap, Activity activity) {
-        String indexTempImage = mCardShowTakenPictureViewImagesAdapter.getItemCount() + 1 + "";
-
-        return MediaStore.Images.Media.insertImage(activity.getContentResolver(),
-                bitmap, TEMP_IMAGE_BASE_NAME + indexTempImage, null);
     }
 
     public boolean hasUpdatedAt() {

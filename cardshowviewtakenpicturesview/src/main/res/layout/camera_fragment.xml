@@ -74,8 +74,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="5dp"
-                android:paddingEnd="20dp"
-                android:paddingStart="20dp" />
+                android:paddingEnd="0dp"
+                android:paddingStart="0dp" />
 
             <RelativeLayout
                 android:id="@+id/camera_fragment_capture_relative_layout"

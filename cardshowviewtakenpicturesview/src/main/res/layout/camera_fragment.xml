@@ -17,7 +17,8 @@
         <TextureView
             android:id="@+id/camera_fragment_texture_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:scaleType="fitXY" />
 
         <RelativeLayout
             android:id="@+id/flash_container"
@@ -59,38 +60,55 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/camera_fragment_capture_relative_layout"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/cam_widget_margin_bottom"
-            android:background="@drawable/circle_opaque"
-            android:padding="@dimen/cam_content_inset_primary">
+            android:layout_marginBottom="@dimen/cam_widget_margin_bottom">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/camera_photos_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:paddingEnd="20dp"
+                android:paddingStart="20dp" />
 
             <RelativeLayout
-                android:id="@+id/capture_button_secondary_container"
+                android:id="@+id/camera_fragment_capture_relative_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@drawable/circle_white"
-                android:padding="1dp">
+                android:layout_gravity="center"
+                android:background="@drawable/circle_opaque"
+                android:padding="@dimen/cam_content_inset_primary">
 
-                <ImageButton
-                    android:id="@+id/camera_fragment_capture_image_button"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_gravity="center"
-                    android:background="@drawable/cam_circle_selector"
-                    android:padding="@dimen/cam_content_inset_secondary"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/cam_action_stillshot"
-                    tools:ignore="ContentDescription" />
+                <RelativeLayout
+                    android:id="@+id/capture_button_secondary_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/circle_white"
+                    android:padding="1dp">
+
+                    <ImageButton
+                        android:id="@+id/camera_fragment_capture_image_button"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/cam_circle_selector"
+                        android:padding="@dimen/cam_content_inset_secondary"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/cam_action_stillshot"
+                        tools:ignore="ContentDescription" />
+
+                </RelativeLayout>
 
             </RelativeLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
     </RelativeLayout>
 

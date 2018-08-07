@@ -27,6 +27,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.LayoutInflater;
@@ -45,16 +47,21 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraFragment extends Fragment implements CameraContract {
 
     private CameraFragmentBinding mCameraFragmentBinding;
+    private CameraPhotosAdapter mCameraPhotosAdapter;
     private ImageButton mButtonCapture;
     private TextureView mTextureView;
     private String mCameraId;
@@ -102,6 +109,13 @@ public class CameraFragment extends Fragment implements CameraContract {
         return new CameraFragment();
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), new ArrayList<>());
+        setExampleImages();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -113,6 +127,13 @@ public class CameraFragment extends Fragment implements CameraContract {
         mTextureView.setSurfaceTextureListener(textureListener);
         mButtonCapture = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
         mButtonCapture.setOnClickListener(view -> takePicture());
+
+        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutManager(layout);
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setNestedScrollingEnabled(true);
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setFocusable(false);
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
 
         return mCameraFragmentBinding.getRoot();
     }
@@ -347,5 +368,24 @@ public class CameraFragment extends Fragment implements CameraContract {
         mBackgroundThread.start();
         mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
+
+    public void setExampleImages() {
+        ArrayList<CameraPhoto> images = new ArrayList<>();
+        images.add(new CameraPhoto(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));
+        images.add(new CameraPhoto(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+        images.add(new CameraPhoto(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+        images.add(new CameraPhoto(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+        images.add(new CameraPhoto(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png"));
+
+        setPhotos(images);
+    }
+
+    @Override
+    public void setPhotos(ArrayList<CameraPhoto> photos) {
+        if (photos != null) {
+            mCameraPhotosAdapter.replaceData(photos);
+        }
+    }
+
 
 }

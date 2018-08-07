@@ -154,7 +154,6 @@
                 android:layout_gravity="center"
                 android:src="@drawable/ic_cam" />
 
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -165,6 +164,7 @@
                 android:textAllCaps="true"
                 android:textColor="@color/gray"
                 android:textSize="12sp" />
+
         </LinearLayout>
 
         <RelativeLayout

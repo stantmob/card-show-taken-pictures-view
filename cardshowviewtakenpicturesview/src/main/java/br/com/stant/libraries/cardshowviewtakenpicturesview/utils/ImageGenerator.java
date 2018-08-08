@@ -26,15 +26,15 @@ public class ImageGenerator {
     private File mPhoto;
 
     public ImageGenerator(Context context, File photo, CardContract cardContract) {
-        this.mPhoto        = photo;
-        this.mContext      = context;
+        this.mPhoto = photo;
+        this.mContext = context;
         this.mCardContract = cardContract;
     }
 
     @SuppressLint("CheckResult")
     public void generateCardShowTakenImageFromCamera(File photoTaken,
-                                                      Activity activity,
-                                                      CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+                                                     Activity activity,
+                                                     CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         if (photoTaken == null) {
             return;
         }
@@ -58,7 +58,10 @@ public class ImageGenerator {
     }
 
     @SuppressLint("CheckResult")
-    public void generateCardShowTakenImageFromImageGallery(File photoTaken, Intent data, Activity activity, CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+    public void generateCardShowTakenImageFromImageGallery(File photoTaken,
+                                                           Intent data,
+                                                           Activity activity,
+                                                           CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         try {
             mPhoto = PhotoViewFileUtil.from(mContext, data.getData());
         } catch (IOException e) {

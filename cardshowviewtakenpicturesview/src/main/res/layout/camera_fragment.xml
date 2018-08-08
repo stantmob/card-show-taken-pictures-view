@@ -25,7 +25,7 @@
 
             <!--Optionally add tap to focus-->
             <io.fotoapparat.view.FocusView
-                android:id="@+id/focusView"
+                android:id="@+id/camera_fragment_focus_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 

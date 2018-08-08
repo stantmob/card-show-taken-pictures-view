@@ -94,13 +94,17 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     public void addPicture(CameraPhoto cardShowTakenImage){
         mPhotos.add(cardShowTakenImage);
-        replaceData(mPhotos);
+        notifyDataSetChanged();
     }
 
     public void addPictures(ArrayList<CameraPhoto> photos){
         mPhotos.addAll(photos);
         mPhotosAsAdded.addAll(photos);
         replaceData(mPhotos);
+    }
+
+    public ArrayList<CameraPhoto> getList() {
+        return mPhotos;
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {

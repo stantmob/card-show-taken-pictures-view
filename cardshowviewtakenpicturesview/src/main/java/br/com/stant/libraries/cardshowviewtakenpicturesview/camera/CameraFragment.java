@@ -38,21 +38,27 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.BitmapPhoto;
 import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
+import io.reactivex.Observable;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
@@ -61,10 +67,11 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
-    private File mPath = new File(Environment.getExternalStorageDirectory() + "/stantOccurrences/temp/");
+    private File mPath = new File(Environment.getExternalStorageDirectory() + "/<br.com.stant>/temp");
     private ImageButton mButtonCapture;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private Fotoapparat mFotoapparat;
+    private ImageGenerator mImageGenerator;
 
     public static CameraFragment newInstance() {
         return new CameraFragment();
@@ -74,8 +81,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PhotoViewFileUtil.createTempDirectory(mPath);
+
         mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), new ArrayList<>());
         setExampleImages();
+
     }
 
     @Nullable
@@ -139,12 +148,47 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void takePicture() {
+
         PhotoResult photoResult = mFotoapparat.takePicture();
 
-        File photoPath = new File(mPath.toString() + UUID.randomUUID().toString());
+        String uuid = UUID.randomUUID().toString();
+
+        File photoPath = new File(mPath.toString() + "/" + uuid + ".jpg");
         photoResult.saveToFile(photoPath);
+
+        photoResult.toBitmap().whenDone(bitmapPhoto -> {
+            File fileName = new File(uuid);
+
+            assert bitmapPhoto != null;
+            CameraPhoto cameraPhoto = new CameraPhoto(bitmapPhoto.bitmap, fileName.toString(), photoPath.toString());
+
+            mCameraPhotosAdapter.addPicture(cameraPhoto);
+            mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(getItemCount() - 1);
+
+        });
+
     }
 
+    private void sendImagesToAdapter(File file){
+        mImageGenerator = new ImageGenerator(getContext(), file, this);
+
+        mImageGenerator.generateCardShowTakenImageFromCamera(file, getActivity(), new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+            @Override
+            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                CameraPhoto cameraPhoto = new CameraPhoto(bitmap, imageFilename, tempImagePath);
+
+                mCameraPhotosAdapter.addPicture(cameraPhoto);
+                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
+                mCameraPhotosAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(getContext(), "Erro to add photo", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
 
     public void setExampleImages() {
         ArrayList<CameraPhoto> images = new ArrayList<>();

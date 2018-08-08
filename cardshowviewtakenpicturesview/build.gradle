@@ -48,5 +48,7 @@ dependencies {
     compile 'id.zelory:compressor:2.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
+    compile 'io.fotoapparat.fotoapparat:library:2.3.1'
+
     compile 'com.github.siyamed:android-shape-imageview:0.9.3@aar'
 }

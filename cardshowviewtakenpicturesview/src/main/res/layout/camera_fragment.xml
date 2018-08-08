@@ -14,11 +14,22 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextureView
-            android:id="@+id/camera_fragment_texture_view"
+        <io.fotoapparat.view.CameraView
+            android:id="@+id/camera_fragment_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY" />
+            android:visibility="visible"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp"
+            tools:visibility="visible">
+
+            <!--Optionally add tap to focus-->
+            <io.fotoapparat.view.FocusView
+                android:id="@+id/focusView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </io.fotoapparat.view.CameraView>
 
         <RelativeLayout
             android:id="@+id/flash_container"

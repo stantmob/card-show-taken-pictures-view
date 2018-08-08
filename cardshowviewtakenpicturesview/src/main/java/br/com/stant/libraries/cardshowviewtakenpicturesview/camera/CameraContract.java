@@ -8,4 +8,5 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardContract;
 public interface CameraContract extends CardContract{
     void closeCamera();
     void setPhotos(ArrayList<CameraPhoto> photos);
+    void takePicture();
 }

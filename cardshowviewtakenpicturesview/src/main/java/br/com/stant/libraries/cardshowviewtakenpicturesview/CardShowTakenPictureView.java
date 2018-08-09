@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivit
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
@@ -50,6 +52,12 @@ import io.reactivex.schedulers.Schedulers;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
+    public static String KEY_LIMIT_IMAGES = "limit_images";
+    public static String KEY_IMAGE_LIST_SIZE = "image_list_size";
+    public static String KEY_IMAGE_CAMERA_LIST = "image_camera_list";
+    public static final int REQUEST_IMAGE_LIST_RESULT = 2;
+    private static final int REQUEST_CHOOSER_IMAGE = 1;
+
     public boolean canEditState;
     File sdcardTempImagesDir = PhotoViewFileUtil.getFile();
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
@@ -65,7 +73,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private TypedArray mStyledAttributes;
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
-    private static final int REQUEST_CHOOSER_IMAGE = 1;
     private ImageGenerator imageGenerator;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
@@ -319,7 +326,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
 
 
-//        //TODO Implementar a camera personalizada aqui
+        //TODO Implementar a camera personalizada aqui
 //        if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
 //            mPhotoTaken = PhotoViewFileUtil.prepareFile(takePhotoIntent);
 //            if (mFragment != null)
@@ -329,16 +336,46 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 //        }
 
         mCardShowTakenPictureViewBinding.cardShowTakenPictureAddPictureContainer.setOnClickListener(view -> {
-            Toast.makeText(mContext, "camera personalizada", Toast.LENGTH_SHORT).show();
-            mActivity.startActivityForResult(new Intent(mActivity, CameraActivity.class), REQUEST_CHOOSER_IMAGE);
+            Toast.makeText(mContext, "Camera Personalizada", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(mActivity, CameraActivity.class);
+            intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
+            intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
+            mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
         });
 
     }
 
+
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
         imageGenerator = new ImageGenerator(getContext(), mPhotoTaken, this);
 
-        if (requestCode == REQUEST_CHOOSER_IMAGE
+        if (requestCode == REQUEST_IMAGE_LIST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
+
+            ArrayList<CameraPhoto> cameraPhotos = (ArrayList<CameraPhoto>) data.getSerializableExtra(KEY_IMAGE_CAMERA_LIST);
+
+            for (CameraPhoto cameraPhoto : cameraPhotos) {
+                File mPhotoDirectory = new File(Environment.getExternalStorageDirectory() + "/<br.com.stant>/temp/" + cameraPhoto.getLocalImageFilename() + ".jpg");
+
+                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory, mActivity, new CardShowTakenCompressedCallback() {
+                    @Override
+                    public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                        CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
+
+                        mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                    }
+
+                    @Override
+                    public void onError() {
+
+                    }
+                });
+            }
+
+            mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
+
+        } else if (requestCode == REQUEST_CHOOSER_IMAGE
                 && resultCode == Activity.RESULT_OK
                 && (data == null || data.getData() == null)) {
 

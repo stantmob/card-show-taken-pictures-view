@@ -1,90 +1,74 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
-import android.Manifest;
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraDevice;
-import android.hardware.camera2.CameraManager;
-import android.hardware.camera2.CaptureRequest;
-import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.ImageReader;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.provider.MediaStore;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.util.Size;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
-import android.view.Surface;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
-import io.fotoapparat.Fotoapparat;
-import io.fotoapparat.result.BitmapPhoto;
-import io.fotoapparat.result.PendingResult;
 import io.fotoapparat.result.PhotoResult;
-import io.reactivex.Observable;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
+
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraFragment extends Fragment implements CameraContract {
+
+    private static Integer mPhotosLimit;
+    private static Integer mImageListSize;
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
     private File mPath = new File(Environment.getExternalStorageDirectory() + "/<br.com.stant>/temp");
     private ImageButton mButtonCapture;
     private static final int REQUEST_CAMERA_PERMISSION = 200;
-    private Fotoapparat mFotoapparat;
+    private CameraSetup mCameraSetup;
     private ImageGenerator mImageGenerator;
+    private ImageView mButtonReturnPhotos;
 
-    public static CameraFragment newInstance() {
+
+    public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
+        mPhotosLimit   = limitOfImages;
+        mImageListSize = imageListSize;
+
         return new CameraFragment();
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         PhotoViewFileUtil.createTempDirectory(mPath);
 
-        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), new ArrayList<>());
-        setExampleImages();
-
+        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext());
     }
 
     @Nullable
@@ -93,7 +77,10 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraFragmentBinding = DataBindingUtil.inflate(inflater, R.layout.camera_fragment, container, false);
 
         mButtonCapture = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
+        mButtonReturnPhotos = mCameraFragmentBinding.cameraFragmentSaveImageView;
+
         mButtonCapture.setOnClickListener(view -> takePicture());
+        mButtonReturnPhotos.setOnClickListener(view -> returnImagesToCardShowTakenPicturesView());
 
         RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 
@@ -102,7 +89,13 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraFragmentBinding.cameraPhotosRecyclerView.setFocusable(false);
         mCameraFragmentBinding.cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
 
-        mFotoapparat = new Fotoapparat(getContext(), mCameraFragmentBinding.cameraFragmentView);
+        mCameraSetup = CameraSetup.getInstance(getContext(),
+                mCameraFragmentBinding.cameraFragmentView,
+                mCameraFragmentBinding.cameraFragmentFocusView);
+
+        mCameraSetup.toggleTorchOnSwitch(mCameraFragmentBinding.cameraContentLightSwitch);
+        mCameraSetup.zoomSeekBar(mCameraFragmentBinding.cameraFragmentZoomSeekBar);
+        mCameraSetup.switchCameraOnClick(mCameraFragmentBinding.cameraFragmentSwitchLens);
 
         return mCameraFragmentBinding.getRoot();
     }
@@ -120,13 +113,13 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void onResume() {
         super.onResume();
-        mFotoapparat.start();
+        mCameraSetup.getFotoapparat().start();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mFotoapparat.stop();
+        mCameraSetup.getFotoapparat().stop();
     }
 
     @Override
@@ -149,53 +142,44 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void takePicture() {
 
-        PhotoResult photoResult = mFotoapparat.takePicture();
+        if (isLimitReached()) {
+            PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
 
-        String uuid = UUID.randomUUID().toString();
+            String uuid = UUID.randomUUID().toString();
 
-        File photoPath = new File(mPath.toString() + "/" + uuid + ".jpg");
-        photoResult.saveToFile(photoPath);
+            File photoPath = new File(mPath.toString() + "/" + uuid + ".jpg");
+            photoResult.saveToFile(photoPath);
 
-        photoResult.toBitmap().whenDone(bitmapPhoto -> {
-            File fileName = new File(uuid);
+            photoResult.toBitmap().whenDone(bitmapPhoto -> {
+                File fileName = new File(uuid);
 
-            assert bitmapPhoto != null;
-            CameraPhoto cameraPhoto = new CameraPhoto(bitmapPhoto.bitmap, fileName.toString(), photoPath.toString());
-
-            mCameraPhotosAdapter.addPicture(cameraPhoto);
-            mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(getItemCount() - 1);
-
-        });
-
-    }
-
-    private void sendImagesToAdapter(File file){
-        mImageGenerator = new ImageGenerator(getContext(), file, this);
-
-        mImageGenerator.generateCardShowTakenImageFromCamera(file, getActivity(), new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
-            @Override
-            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                CameraPhoto cameraPhoto = new CameraPhoto(bitmap, imageFilename, tempImagePath);
+                assert bitmapPhoto != null;
+                CameraPhoto cameraPhoto = new CameraPhoto(
+                        fileName.toString(),
+                        photoPath.toString(),
+                        new Date(),
+                        new Date());
 
                 mCameraPhotosAdapter.addPicture(cameraPhoto);
-                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
-                mCameraPhotosAdapter.notifyDataSetChanged();
-            }
+                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(getItemCount() - 1);
+            });
 
-            @Override
-            public void onError() {
-                Toast.makeText(getContext(), "Erro to add photo", Toast.LENGTH_SHORT).show();
-            }
-        });
+        } else {
+            Toast.makeText(getContext(), "Limite de fotos atingido", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
-    public void setExampleImages() {
-        ArrayList<CameraPhoto> images = new ArrayList<>();
-        images.add(new CameraPhoto(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg"));
-
-        setPhotos(images);
+    @Override
+    public void returnImagesToCardShowTakenPicturesView() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(KEY_IMAGE_CAMERA_LIST, (Serializable) mCameraPhotosAdapter.getList());
+        getActivity().setResult(Activity.RESULT_OK , returnIntent);
+        getActivity().finish();
     }
 
+    public boolean isLimitReached() {
+        return mPhotosLimit == -1 || (mImageListSize + getItemCount()) < mPhotosLimit;
+    }
 
 }

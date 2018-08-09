@@ -1,42 +1,22 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model;
 
-import android.graphics.Bitmap;
-
+import java.io.Serializable;
 import java.util.Date;
 
-public class CameraPhoto {
-
-    private String identifier;
-    private String remoteImageUrl;
+public class CameraPhoto implements Serializable{
     private String localImageFilename;
     private String tempImagePathToShow;
-    private Bitmap bitmapImageFromIntentPath;
+    private Date createdAt;
+    private Date updatedAt;
 
-    public CameraPhoto(Bitmap bitmapImageFromIntentPath, String localImageFilename, String tempImagePathToShow) {
-        this.bitmapImageFromIntentPath = bitmapImageFromIntentPath;
-        this.localImageFilename        = localImageFilename;
-        this.tempImagePathToShow       = tempImagePathToShow;
-    }
-
-    public CameraPhoto(String identifier, String remoteImageUrl, String localImageFilename, String tempImagePathToShow, Bitmap bitmapImageFromIntentPath) {
-        this.identifier                = identifier;
-        this.remoteImageUrl            = remoteImageUrl;
-        this.localImageFilename        = localImageFilename;
-        this.tempImagePathToShow       = tempImagePathToShow;
-        this.bitmapImageFromIntentPath = bitmapImageFromIntentPath;
-    }
-
-    public CameraPhoto(String identifier, String remoteImageUrl) {
-        this.identifier = identifier;
-        this.remoteImageUrl = remoteImageUrl;
-    }
-
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public String getRemoteImageUrl() {
-        return remoteImageUrl;
+    public CameraPhoto(String localImageFilename,
+                       String tempImagePathToShow,
+                       Date createdAt,
+                       Date updatedAt) {
+        this.localImageFilename  = localImageFilename;
+        this.tempImagePathToShow = tempImagePathToShow;
+        this.createdAt           = createdAt;
+        this.updatedAt           = updatedAt;
     }
 
     public String getLocalImageFilename() {
@@ -47,12 +27,16 @@ public class CameraPhoto {
         return tempImagePathToShow;
     }
 
-    public Bitmap getBitmapImageFromIntentPath() {
-        return bitmapImageFromIntentPath;
-    }
 
     public void setTempImagePathToShow(String tempImagePathToShow) {
         this.tempImagePathToShow = tempImagePathToShow;
     }
 
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
 }

@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
         Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
 
-
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setExampleImages();
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
 
         if(gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());

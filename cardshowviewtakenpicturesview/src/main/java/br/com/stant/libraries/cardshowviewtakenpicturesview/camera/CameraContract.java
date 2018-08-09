@@ -9,4 +9,5 @@ public interface CameraContract extends CardContract{
     void closeCamera();
     void setPhotos(ArrayList<CameraPhoto> photos);
     void takePicture();
+    void returnImagesToCardShowTakenPicturesView();
 }

@@ -33,8 +33,6 @@ import static io.fotoapparat.selector.SensorSensitivitySelectorsKt.highestSensor
 
 public class CameraSetup {
 
-    private static CameraSetup INSTANCE;
-
     private Context mContext;
     private Fotoapparat mFotoapparat;
     private CameraConfiguration mCameraConfiguration;
@@ -47,10 +45,7 @@ public class CameraSetup {
     }
 
     public static CameraSetup getInstance(Context context, CameraView cameraView, FocusView focusView) {
-        if (INSTANCE == null) {
-            INSTANCE = new CameraSetup(context, focusView, cameraView);
-        }
-        return INSTANCE;
+        return new CameraSetup(context, focusView, cameraView);
     }
 
     private Fotoapparat createCamera(FocusView focusView, CameraView cameraView) {

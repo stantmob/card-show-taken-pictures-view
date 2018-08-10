@@ -408,36 +408,32 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
 
         new Compressor(mContext)
+                .setQuality(50)
                 .setDestinationDirectoryPath(CardShowTakenPictureViewFileUtil.getFile().getAbsolutePath())
                 .compressToFileAsFlowable(mPhotoTaken)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-                .subscribe(new Consumer<File>() {
-                    @Override
-                    public void accept(File file) {
-                        compressedImage = file;
+                .subscribe(file -> {
+                    compressedImage = file;
 
-                        new Compressor(mContext)
-                                .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-                                        Environment.DIRECTORY_PICTURES).getAbsolutePath())
-                                .compressToFileAsFlowable(compressedImage)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
+                    new Compressor(mContext)
+                            .setQuality(50)
+                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                            .compressToFileAsFlowable(compressedImage)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
 
-                                .subscribe(new Consumer<File>() {
-                                    @Override
-                                    public void accept(File file) {
-                                        compressedImage = file;
+                            .subscribe(file1 -> {
+                                compressedImage = file1;
 
-                                        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
-                                        String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
+                                Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(compressedImage.getAbsolutePath());
+                                String tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, activity);
 
-                                        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, mPhotoTaken.getName(), tempImagePathToShow);
-                                    }
-                                }, Throwable::printStackTrace);
+                                cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, mPhotoTaken.getName(), tempImagePathToShow);
+                            }, Throwable::printStackTrace);
 
-                    }
                 }, Throwable::printStackTrace);
 
     }

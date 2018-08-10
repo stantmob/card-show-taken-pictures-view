@@ -408,7 +408,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
 
         new Compressor(mContext)
-                .setQuality(50)
+                .setQuality(80)
                 .setDestinationDirectoryPath(CardShowTakenPictureViewFileUtil.getFile().getAbsolutePath())
                 .compressToFileAsFlowable(mPhotoTaken)
                 .subscribeOn(Schedulers.io())
@@ -418,7 +418,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                     compressedImage = file;
 
                     new Compressor(mContext)
-                            .setQuality(50)
+                            .setQuality(80)
                             .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
                                     Environment.DIRECTORY_PICTURES).getAbsolutePath())
                             .compressToFileAsFlowable(compressedImage)

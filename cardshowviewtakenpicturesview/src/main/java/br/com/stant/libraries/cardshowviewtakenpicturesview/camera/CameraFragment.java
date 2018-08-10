@@ -56,7 +56,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private LinearLayout mNavigationCamera;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
-        mPhotosLimit = limitOfImages;
+        mPhotosLimit   = limitOfImages;
         mImageListSize = imageListSize;
 
         return new CameraFragment();
@@ -76,11 +76,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mCameraFragmentBinding = DataBindingUtil.inflate(inflater, R.layout.camera_fragment, container, false);
 
-        mButtonClose = mCameraFragmentBinding.cameraFragmentClose;
-        mButtonCapture = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
+        mButtonClose        = mCameraFragmentBinding.cameraFragmentClose;
+        mButtonCapture      = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
         mButtonReturnPhotos = mCameraFragmentBinding.cameraFragmentSaveImageView;
         mPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
-        mNavigationCamera = mCameraFragmentBinding.cameraFragmentBottomLinearLayout;
+        mNavigationCamera   = mCameraFragmentBinding.cameraFragmentBottomLinearLayout;
 
         if (hasNavigationBar()) {
             setNavigationCameraControlsPadding();
@@ -100,7 +100,9 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mCameraSetup.toggleTorchOnSwitch(mCameraFragmentBinding.cameraFragmentSwitchFlash);
         mCameraSetup.zoomSeekBar(mCameraFragmentBinding.cameraFragmentZoomSeekBar);
-        mCameraSetup.switchCameraOnClick(mCameraFragmentBinding.cameraFragmentSwitchLens);
+        mCameraSetup.switchCameraOnClick(
+                mCameraFragmentBinding.cameraFragmentSwitchLens,
+                mCameraFragmentBinding.cameraFragmentSwitchFlash);
 
         return mCameraFragmentBinding.getRoot();
     }
@@ -109,7 +111,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), getResources().getString(R.string.camera_no_permission), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.camera_no_permission), Toast.LENGTH_SHORT).show();
                 getActivity().finish();
             }
         }
@@ -170,7 +172,7 @@ public class CameraFragment extends Fragment implements CameraContract {
             });
 
         } else {
-            Toast.makeText(getContext(), getResources().getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
         }
 
     }

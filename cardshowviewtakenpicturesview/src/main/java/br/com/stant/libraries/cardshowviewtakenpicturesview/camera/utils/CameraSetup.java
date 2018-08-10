@@ -121,7 +121,7 @@ public class CameraSetup {
         });
     }
 
-    public void switchCameraOnClick(View switchCameraView) {
+    public void switchCameraOnClick(View switchCameraView, View flashView) {
         boolean hasFrontCamera = mFotoapparat.isAvailable(front());
 
         switchCameraView.setVisibility(
@@ -129,13 +129,16 @@ public class CameraSetup {
         );
 
         if (hasFrontCamera) {
-            switchCameraOnClickVerify(switchCameraView);
+            switchCameraOnClickVerify(switchCameraView, flashView);
         }
     }
 
-    private void switchCameraOnClickVerify(View view) {
+    private void switchCameraOnClickVerify(View view, View flashView) {
         view.setOnClickListener(
                 (v) -> {
+                    mIsChecked = false;
+                    changeViewImageResource((ImageView) flashView, R.drawable.ic_flash_no);
+
                     mFotoapparat.switchTo(
                             mActiveCameraBack ? back() : front(),
                             mCameraConfiguration

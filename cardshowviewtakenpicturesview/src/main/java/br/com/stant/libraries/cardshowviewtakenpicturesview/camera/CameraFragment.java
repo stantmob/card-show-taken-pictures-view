@@ -3,23 +3,24 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Parcelable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.File;
@@ -28,35 +29,34 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 import io.fotoapparat.result.PhotoResult;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
 
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraFragment extends Fragment implements CameraContract {
 
     private static Integer mPhotosLimit;
     private static Integer mImageListSize;
+    private static final int REQUEST_CAMERA_PERMISSION = 200;
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
-    private File mPath = new File(Environment.getExternalStorageDirectory() + "/<br.com.stant>/temp");
+    private File mPath = PhotoViewFileUtil.getFile();
     private ImageButton mButtonCapture;
-    private static final int REQUEST_CAMERA_PERMISSION = 200;
     private CameraSetup mCameraSetup;
-    private ImageGenerator mImageGenerator;
     private ImageView mButtonReturnPhotos;
-
+    private ImageView mButtonClose;
+    private RecyclerView mPhotosRecyclerView;
+    private LinearLayout mNavigationCamera;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
-        mPhotosLimit   = limitOfImages;
+        mPhotosLimit = limitOfImages;
         mImageListSize = imageListSize;
 
         return new CameraFragment();
@@ -76,24 +76,29 @@ public class CameraFragment extends Fragment implements CameraContract {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mCameraFragmentBinding = DataBindingUtil.inflate(inflater, R.layout.camera_fragment, container, false);
 
+        mButtonClose = mCameraFragmentBinding.cameraFragmentClose;
         mButtonCapture = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
         mButtonReturnPhotos = mCameraFragmentBinding.cameraFragmentSaveImageView;
+        mPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
+        mNavigationCamera = mCameraFragmentBinding.cameraFragmentBottomLinearLayout;
 
+        if (hasNavigationBar()) {
+            setNavigationCameraControlsPadding();
+        }
+
+        mButtonClose.setOnClickListener(view -> closeCamera());
         mButtonCapture.setOnClickListener(view -> takePicture());
         mButtonReturnPhotos.setOnClickListener(view -> returnImagesToCardShowTakenPicturesView());
 
-        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mPhotosRecyclerView.setNestedScrollingEnabled(true);
+        mPhotosRecyclerView.setFocusable(false);
+        mPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
 
-        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutManager(layout);
-        mCameraFragmentBinding.cameraPhotosRecyclerView.setNestedScrollingEnabled(true);
-        mCameraFragmentBinding.cameraPhotosRecyclerView.setFocusable(false);
-        mCameraFragmentBinding.cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
-
-        mCameraSetup = CameraSetup.getInstance(getContext(),
+        mCameraSetup = new CameraSetup(getContext(),
                 mCameraFragmentBinding.cameraFragmentView,
                 mCameraFragmentBinding.cameraFragmentFocusView);
 
-        mCameraSetup.toggleTorchOnSwitch(mCameraFragmentBinding.cameraContentLightSwitch);
+        mCameraSetup.toggleTorchOnSwitch(mCameraFragmentBinding.cameraFragmentSwitchFlash);
         mCameraSetup.zoomSeekBar(mCameraFragmentBinding.cameraFragmentZoomSeekBar);
         mCameraSetup.switchCameraOnClick(mCameraFragmentBinding.cameraFragmentSwitchLens);
 
@@ -104,7 +109,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "You can't use camera without permission", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getResources().getString(R.string.camera_no_permission), Toast.LENGTH_SHORT).show();
                 getActivity().finish();
             }
         }
@@ -147,7 +152,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
             String uuid = UUID.randomUUID().toString();
 
-            File photoPath = new File(mPath.toString() + "/" + uuid + ".jpg");
+            File photoPath = new File(mPath.toString() + "/" + uuid + JPEG_FILE_SUFFIX);
             photoResult.saveToFile(photoPath);
 
             photoResult.toBitmap().whenDone(bitmapPhoto -> {
@@ -165,7 +170,7 @@ public class CameraFragment extends Fragment implements CameraContract {
             });
 
         } else {
-            Toast.makeText(getContext(), "Limite de fotos atingido", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), getResources().getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -174,12 +179,31 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void returnImagesToCardShowTakenPicturesView() {
         Intent returnIntent = new Intent();
         returnIntent.putExtra(KEY_IMAGE_CAMERA_LIST, (Serializable) mCameraPhotosAdapter.getList());
-        getActivity().setResult(Activity.RESULT_OK , returnIntent);
+        getActivity().setResult(Activity.RESULT_OK, returnIntent);
         getActivity().finish();
     }
 
     public boolean isLimitReached() {
         return mPhotosLimit == -1 || (mImageListSize + getItemCount()) < mPhotosLimit;
+    }
+
+    public void setNavigationCameraControlsPadding() {
+        mNavigationCamera.setPadding(
+                mNavigationCamera.getPaddingLeft(),
+                mNavigationCamera.getPaddingTop(),
+                mNavigationCamera.getPaddingRight(),
+                mNavigationCamera.getBottom() + convertDpToPixels(60));
+    }
+
+    public boolean hasNavigationBar() {
+        int id = getResources().getIdentifier("config_showNavigationBar", "bool", "android");
+        return id > 0 && getResources().getBoolean(id);
+    }
+
+    private int convertDpToPixels(int dpValue) {
+        float roundingValue = 0.5f;
+        float scale = getContext().getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + roundingValue);
     }
 
 }

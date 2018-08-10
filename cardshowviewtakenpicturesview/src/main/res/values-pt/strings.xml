@@ -18,4 +18,7 @@
     <string name="permission_information_dialog.message">É necessário aceitar as permissões a seguir para utilizar o aplicativo</string>
     <string name="permission_information_dialog.never_checked_message">Ao clicar no botão você será redirecionado para a tela de detalhes do aplicativo, lá você deve clicar em permissões e aceitar as permissões para utilizar o aplicativo</string>
 
+    <string name="camera.photo_reached_limit">Limite de fotos atingido</string>
+    <string name="camera.no_permission">Você não pode utilizar a câmera sem a permissão</string>
+
 </resources>

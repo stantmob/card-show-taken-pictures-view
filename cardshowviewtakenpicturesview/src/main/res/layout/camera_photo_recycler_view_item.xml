@@ -31,21 +31,29 @@
             app:cardImgUrl="@{photo.tempImagePathToShow}"
             tools:src="@drawable/ic_cam" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp">
 
-        <LinearLayout
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
-            android:background="@drawable/shape_round_gray"
-            android:gravity="center">
 
-            <ImageView
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_close_dialog" />
+            <LinearLayout
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/shape_round_gray"
+                android:gravity="center"
+                android:onClick="@{(view) -> handler.removePhoto(view, photo)}">
 
-        </LinearLayout>
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_close_dialog" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

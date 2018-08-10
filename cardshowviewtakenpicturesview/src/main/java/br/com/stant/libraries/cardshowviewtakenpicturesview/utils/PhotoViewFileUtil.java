@@ -25,8 +25,8 @@ import java.util.Date;
 
 public class PhotoViewFileUtil {
 
+    public static final String JPEG_FILE_SUFFIX = ".jpg";
     private static final String JPEG_FILE_PREFIX = "IMG_";
-    private static final String JPEG_FILE_SUFFIX = ".jpg";
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     private static final int EOF                 = -1;
     private static final String TEMP_IMAGE_NAME  = "image_temp_stant";

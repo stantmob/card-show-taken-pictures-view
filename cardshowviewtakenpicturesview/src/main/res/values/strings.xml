@@ -16,4 +16,7 @@
     <string name="permission_information_dialog.message">You must accept the following permissions to use the application</string>
     <string name="permission_information_dialog.never_checked_message">You must go to settings click on permissions and allow the following permissions to use the application</string>
 
+    <string name="camera.photo_reached_limit">Photo limit reached</string>
+    <string name="camera.no_permission">You can\'t use camera without permission</string>
+    
 </resources>

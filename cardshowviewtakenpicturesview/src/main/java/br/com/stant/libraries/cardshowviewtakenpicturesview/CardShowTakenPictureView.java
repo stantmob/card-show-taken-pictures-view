@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -24,7 +23,6 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,10 +38,8 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
-import id.zelory.compressor.Compressor;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
 
 
 /**
@@ -59,7 +55,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private static final int REQUEST_CHOOSER_IMAGE = 1;
 
     public boolean canEditState;
-    File sdcardTempImagesDir = PhotoViewFileUtil.getFile();
+    private File mSdcardTempImagesDirectory = PhotoViewFileUtil.getFile();
+    private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;
     private Context mContext;
@@ -67,7 +64,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private CardShowTakenPictureViewImagesAdapter mCardShowTakenPictureViewImagesAdapter;
     private Fragment mFragment;
     private Dialog mPreviewPicDialog;
-    private File mPhotoTaken;
     private boolean editModeOnly;
     private OnSavedCardListener mOnSavedCardListener;
     private TypedArray mStyledAttributes;
@@ -96,7 +92,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
 
-        PhotoViewFileUtil.createTempDirectory(sdcardTempImagesDir);
+        PhotoViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
 
         mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
@@ -335,14 +331,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 //                mActivity.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
 //        }
 
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureAddPictureContainer.setOnClickListener(view -> {
-            Toast.makeText(mContext, "Camera Personalizada", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "Camera Personalizada", Toast.LENGTH_SHORT).show();
 
-            Intent intent = new Intent(mActivity, CameraActivity.class);
-            intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-            intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
-            mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
-        });
+        Intent intent = new Intent(mActivity, CameraActivity.class);
+        intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
+        intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
+        mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
 
     }
 
@@ -355,7 +349,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             ArrayList<CameraPhoto> cameraPhotos = (ArrayList<CameraPhoto>) data.getSerializableExtra(KEY_IMAGE_CAMERA_LIST);
 
             for (CameraPhoto cameraPhoto : cameraPhotos) {
-                File mPhotoDirectory = new File(Environment.getExternalStorageDirectory() + "/<br.com.stant>/temp/" + cameraPhoto.getLocalImageFilename() + ".jpg");
+                String localImage = cameraPhoto.getLocalImageFilename();
+
+                File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage + JPEG_FILE_SUFFIX);
 
                 imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory, mActivity, new CardShowTakenCompressedCallback() {
                     @Override

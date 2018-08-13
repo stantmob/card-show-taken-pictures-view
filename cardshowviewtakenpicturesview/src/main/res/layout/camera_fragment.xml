@@ -47,6 +47,43 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:animateLayoutChanges="true"
+            android:gravity="center"
+            android:background="@drawable/rectangle_shape"
+            app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
+            app:layout_constraintStart_toEndOf="@+id/camera_fragment_close"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/camera_fragment_current_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:layout_gravity="center"
+                tools:text="0" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/camera_fragment_limit_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                tools:text="0" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/camera_fragment_top_linear_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

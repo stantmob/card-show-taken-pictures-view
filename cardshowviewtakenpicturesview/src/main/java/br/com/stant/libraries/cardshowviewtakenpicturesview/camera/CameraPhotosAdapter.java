@@ -28,13 +28,15 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoVi
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
+    private CameraFragment mCameraFragment;
     private ItemViewHolder mViewHolder;
     private Context mContext;
     private List<CameraPhoto> mPhotos;
 
-    public CameraPhotosAdapter(Context context) {
-        this.mContext = context;
-        this.mPhotos  = new ArrayList<>();
+    public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
+        this.mContext        = context;
+        this.mCameraFragment = cameraFragment;
+        this.mPhotos         = new ArrayList<>();
     }
 
     @Override
@@ -77,6 +79,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename() + JPEG_FILE_SUFFIX);
         if(file.delete()){
             Toast.makeText(mContext, "Imagem deletada", Toast.LENGTH_SHORT).show();
+            mCameraFragment.updateCounters();
         }
         replaceData(mPhotos);
     }

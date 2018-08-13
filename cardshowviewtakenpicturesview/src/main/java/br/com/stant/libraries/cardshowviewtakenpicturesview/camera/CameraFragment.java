@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.Serializable;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -68,7 +69,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         super.onCreate(savedInstanceState);
         PhotoViewFileUtil.createTempDirectory(mPath);
 
-        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext());
+        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);
     }
 
     @Nullable
@@ -103,6 +104,8 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraSetup.switchCameraOnClick(
                 mCameraFragmentBinding.cameraFragmentSwitchLens,
                 mCameraFragmentBinding.cameraFragmentSwitchFlash);
+
+        updateCounters();
 
         return mCameraFragmentBinding.getRoot();
     }
@@ -161,14 +164,13 @@ public class CameraFragment extends Fragment implements CameraContract {
                 File fileName = new File(uuid);
 
                 assert bitmapPhoto != null;
-                CameraPhoto cameraPhoto = new CameraPhoto(
-                        fileName.toString(),
-                        photoPath.toString(),
-                        new Date(),
+                CameraPhoto cameraPhoto = new CameraPhoto(fileName.toString(), photoPath.toString(), new Date(),
                         new Date());
 
                 mCameraPhotosAdapter.addPicture(cameraPhoto);
                 mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(getItemCount() - 1);
+
+                updateCounters();
             });
 
         } else {
@@ -200,6 +202,17 @@ public class CameraFragment extends Fragment implements CameraContract {
     public boolean hasNavigationBar() {
         int id = getResources().getIdentifier("config_showNavigationBar", "bool", "android");
         return id > 0 && getResources().getBoolean(id);
+    }
+
+    public void updateCounters(){
+        getActivity().runOnUiThread(() -> {
+            mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(mImageListSize + getItemCount()));
+            if (mPhotosLimit == -1) {
+                mCameraFragmentBinding.cameraFragmentLimitValue.setText(DecimalFormatSymbols.getInstance().getInfinity());
+            } else {
+                mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(mPhotosLimit));
+            }
+        });
     }
 
     private int convertDpToPixels(int dpValue) {

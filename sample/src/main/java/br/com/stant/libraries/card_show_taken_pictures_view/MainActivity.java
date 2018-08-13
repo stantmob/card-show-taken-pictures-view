@@ -48,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
-
         if(gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 

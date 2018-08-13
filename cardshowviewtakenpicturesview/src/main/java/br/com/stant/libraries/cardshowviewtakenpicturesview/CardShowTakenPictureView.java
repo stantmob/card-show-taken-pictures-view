@@ -340,7 +340,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     }
 
-
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
         imageGenerator = new ImageGenerator(getContext(), mPhotoTaken, this);
 

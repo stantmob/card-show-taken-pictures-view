@@ -1,5 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -352,20 +353,22 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
                 File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage + JPEG_FILE_SUFFIX);
 
-                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory, mActivity, new CardShowTakenCompressedCallback() {
-                    @Override
-                    public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                        CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
+                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory, mActivity,
+                        mCardShowTakenPictureViewImagesAdapter,
+                        new CardShowTakenCompressedCallback() {
+                            @Override
+                            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
 
-                        mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-                    }
+                                mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                                mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                            }
 
-                    @Override
-                    public void onError() {
+                            @Override
+                            public void onError() {
 
-                    }
-                });
+                            }
+                        });
             }
 
             mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
@@ -374,39 +377,42 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                 && resultCode == Activity.RESULT_OK
                 && (data == null || data.getData() == null)) {
 
-            imageGenerator.generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity, new CardShowTakenCompressedCallback() {
-                @Override
-                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
+            imageGenerator.generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity,
+                    mCardShowTakenPictureViewImagesAdapter,
+                    new CardShowTakenCompressedCallback() {
+                        @Override
+                        public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                            CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
 
-                    mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                    mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-                }
+                            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                        }
 
-                @Override
-                public void onError() {
+                        @Override
+                        public void onError() {
 
-                }
-            });
+                        }
+                    });
 
         } else if (requestCode == REQUEST_CHOOSER_IMAGE
                 && resultCode == Activity.RESULT_OK
                 && data.getData() != null) {
 
-            imageGenerator.generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity, new CardShowTakenCompressedCallback() {
-                @Override
-                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                    CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
+            imageGenerator.generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity,
+                    mCardShowTakenPictureViewImagesAdapter, new CardShowTakenCompressedCallback() {
+                        @Override
+                        public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                            CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
 
-                    mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                    mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-                }
+                            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
+                            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
+                        }
 
-                @Override
-                public void onError() {
+                        @Override
+                        public void onError() {
 
-                }
-            });
+                        }
+                    });
 
         } else {
             mPhotoTaken = null;

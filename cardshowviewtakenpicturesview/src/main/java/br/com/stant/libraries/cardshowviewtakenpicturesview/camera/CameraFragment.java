@@ -205,14 +205,14 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateCounters(){
-        getActivity().runOnUiThread(() -> {
-            mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(mImageListSize + getItemCount()));
-            if (mPhotosLimit == -1) {
-                mCameraFragmentBinding.cameraFragmentLimitValue.setText(DecimalFormatSymbols.getInstance().getInfinity());
-            } else {
+        if (mPhotosLimit == -1) {
+            mCameraFragmentBinding.cameraFragmentChip.setVisibility(View.GONE);
+        } else {
+            getActivity().runOnUiThread(() -> {
+                mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(mImageListSize + getItemCount()));
                 mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(mPhotosLimit));
-            }
-        });
+            });
+        }
     }
 
     private int convertDpToPixels(int dpValue) {

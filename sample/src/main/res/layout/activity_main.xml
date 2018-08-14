@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="br.com.stant.libraries.card_show_taken_pictures_view.MainActivity">
 
@@ -10,12 +8,12 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:padding="20dp"
-        android:background="@android:color/darker_gray">
+        android:background="@android:color/white">
 
         <br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView
             android:id="@+id/card_show_view_taken_pictures_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </RelativeLayout>
 

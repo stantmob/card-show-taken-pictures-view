@@ -29,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = DataBindingUtil.setContentView(
-                this, R.layout.activity_main);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
 
@@ -52,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
+        mBinding.cardShowViewTakenPicturesView.setColor(R.color.colorPrimary);
     }
 
     @Override

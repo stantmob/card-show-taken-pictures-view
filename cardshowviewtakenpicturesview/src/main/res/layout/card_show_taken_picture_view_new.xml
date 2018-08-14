@@ -31,8 +31,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/shape_rounded_white"
+        android:background="@drawable/shape_rectangle_white"
         android:orientation="vertical">
 
         <LinearLayout
@@ -45,15 +44,14 @@
                 android:id="@+id/card_show_taken_picture_add_picture_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="4dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="10dp"
                 android:onClick="@{handler::pickPictureToFinishServiceInspectionFormFilled}"
-                android:orientation="vertical"
-                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
+                android:orientation="vertical">
 
                 <com.github.siyamed.shapeimageview.CircularImageView
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="55dp"
+                    android:layout_height="55dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_cam" />
 
@@ -63,16 +61,7 @@
                 android:id="@+id/card_show_taken_picture_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/shape_rounded_white"
                 android:orientation="vertical">
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@android:color/transparent">
-
-                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/card_show_taken_picture_images_general_container_linear_layout"
@@ -80,9 +69,8 @@
                     android:layout_height="0dp"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingEnd="20dp"
-                    android:paddingStart="20dp">
+                    android:paddingEnd="10dp"
+                    android:paddingStart="10dp">
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/card_show_taken_picture_image_list_recycler_view"

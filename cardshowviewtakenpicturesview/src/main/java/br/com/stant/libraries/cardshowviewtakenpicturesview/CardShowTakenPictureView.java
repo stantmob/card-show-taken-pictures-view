@@ -10,6 +10,8 @@ import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -86,9 +88,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
 
-        RecyclerView.LayoutManager layout = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setLayoutManager(layout);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
@@ -120,6 +119,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
             showEditStateViewConfiguration(this);
         }
+    }
+
+    public void setColor(int color) {
+        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainer.getBackground().mutate();
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitle.setTextColor(ContextCompat.getColor(getContext(), color));
+        drawable.setStroke(3, ContextCompat.getColor(getContext(), color));
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -448,5 +453,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public boolean hasPictureByName() {
         return mCardShowTakenPictureViewBinding.getPictureByName() != null;
     }
+
 
 }

@@ -47,12 +47,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
+            android:id="@+id/camera_fragment_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="35dp"
             android:animateLayoutChanges="true"
             android:gravity="center"
-            android:background="@drawable/rectangle_shape"
+            android:background="@drawable/shape_rectangle_chip"
             app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
             app:layout_constraintStart_toEndOf="@+id/camera_fragment_close"
             app:layout_constraintTop_toTopOf="parent">

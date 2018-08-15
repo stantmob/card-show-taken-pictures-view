@@ -21,4 +21,6 @@
     <string name="camera.photo_reached_limit">Limite de fotos atingido</string>
     <string name="camera.no_permission">Você não pode utilizar a câmera sem a permissão</string>
 
+    <string name="gallery.select_pictures">Selecione as Fotos</string>
+
 </resources>

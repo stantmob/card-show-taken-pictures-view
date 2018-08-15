@@ -75,18 +75,26 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     }
 
     public void removePhoto(View view, CameraPhoto cameraPhoto){
+        int position = mPhotos.indexOf(cameraPhoto);
         mPhotos.remove(cameraPhoto);
-        File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename() + JPEG_FILE_SUFFIX);
+        File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
             Toast.makeText(mContext, "Imagem deletada", Toast.LENGTH_SHORT).show();
             mCameraFragment.updateCounters();
         }
-        replaceData(mPhotos);
+        notifyItemRemoved(position);
     }
 
-    public void replaceData(List<CameraPhoto> photos) {
-        mPhotos = photos;
-        notifyDataSetChanged();
+    public void addPhoto(CameraPhoto cameraPhoto){
+        mPhotos.add(cameraPhoto);
+        notifyItemInserted(mPhotos.size());
+    }
+
+    public void addAllPhotos(List<CameraPhoto> photos) {
+        for (CameraPhoto photo:
+             photos) {
+            addPhoto(photo);
+        }
     }
 
     private String getImage(CameraPhoto cameraPhoto) {

@@ -320,34 +320,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void dispatchTakePictureOrPickGalleryIntent() {
-        Intent galleryPickIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        Intent takePhotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        String pickTitle = getResources().getString(R.string.card_show_taken_picture_view_request_chooser_msg);
-        Intent chooserIntent = Intent.createChooser(galleryPickIntent, pickTitle);
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takePhotoIntent});
-
-
-        //TODO Implementar a camera personalizada aqui
-//        if (chooserIntent.resolveActivity(getContext().getPackageManager()) != null) {
-//            mPhotoTaken = PhotoViewFileUtil.prepareFile(takePhotoIntent);
-//            if (mFragment != null)
-//                mFragment.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
-//            else if (mActivity != null)
-//                mActivity.startActivityForResult(chooserIntent, REQUEST_CHOOSER_IMAGE);
-//        }
-
-        Toast.makeText(mContext, "Camera Personalizada", Toast.LENGTH_SHORT).show();
-
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
         intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
         mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
-
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
-        imageGenerator = new ImageGenerator(getContext(), mPhotoTaken, this);
+        imageGenerator = new ImageGenerator(getContext(), this);
 
         if (requestCode == REQUEST_IMAGE_LIST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
 
@@ -358,8 +338,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
                 File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage + JPEG_FILE_SUFFIX);
 
-                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory, mActivity,
-                        mCardShowTakenPictureViewImagesAdapter,
+                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory,
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
@@ -377,47 +356,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             }
 
             mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
-
-        } else if (requestCode == REQUEST_CHOOSER_IMAGE
-                && resultCode == Activity.RESULT_OK
-                && (data == null || data.getData() == null)) {
-
-            imageGenerator.generateCardShowTakenImageFromCamera(mPhotoTaken, mActivity,
-                    mCardShowTakenPictureViewImagesAdapter,
-                    new CardShowTakenCompressedCallback() {
-                        @Override
-                        public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                            CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
-
-                            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
-
-        } else if (requestCode == REQUEST_CHOOSER_IMAGE
-                && resultCode == Activity.RESULT_OK
-                && data.getData() != null) {
-
-            imageGenerator.generateCardShowTakenImageFromImageGallery(mPhotoTaken, data, mActivity,
-                    mCardShowTakenPictureViewImagesAdapter, new CardShowTakenCompressedCallback() {
-                        @Override
-                        public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                            CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
-
-                            mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
-                            mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
-                        }
-
-                        @Override
-                        public void onError() {
-
-                        }
-                    });
 
         } else {
             mPhotoTaken = null;

@@ -26,9 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            app:cardImgHolder="@{@drawable/stant_city}"
-            app:cardImgSize="@{`500`}"
-            app:cardImgUrl="@{photo.tempImagePathToShow}"
+            android:src="@drawable/stant_city"
             tools:src="@drawable/ic_cam" />
 
         <RelativeLayout

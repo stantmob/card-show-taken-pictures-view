@@ -25,6 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
@@ -55,16 +56,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
         mViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
 
-        Observable.fromCallable(
-                () -> {
-                    cameraPhoto.setTempImagePathToShow(getImage(cameraPhoto));
-                    return cameraPhoto;
-                }
-        ).observeOn(Schedulers.newThread())
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-                (photo) -> mViewHolder.mCameraPhotosRecyclerViewBinding.setPhoto(photo)
-        );
+        mViewHolder.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getImage(cameraPhoto));
+
+        mViewHolder.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
 
         mViewHolder.mCameraPhotosRecyclerViewBinding.executePendingBindings();
     }
@@ -97,9 +91,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         }
     }
 
-    private String getImage(CameraPhoto cameraPhoto) {
+    private Bitmap getImage(CameraPhoto cameraPhoto) {
         if (hasLocalImage(cameraPhoto)) {
-            return getTempImageFileToShowFromLocalImageFilename(cameraPhoto.getLocalImageFilename());
+            return PhotoViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), PhotoViewFileUtil.getFile());
         }
 
         return null;
@@ -107,16 +101,6 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     private boolean hasLocalImage(CameraPhoto cameraPhoto) {
         return cameraPhoto.getLocalImageFilename() != null;
-    }
-
-    private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
-        String tempImageFilePath;
-        Bitmap bitmap = PhotoViewFileUtil.getBitMapFromFile(localImageFilename, PhotoViewFileUtil.getFile());
-
-        tempImageFilePath = MediaStore.Images.Media.insertImage(mContext.getContentResolver(),
-                bitmap, "temp_image_stant", null);
-
-        return tempImageFilePath;
     }
 
     public void addPicture(CameraPhoto cardShowTakenImage){

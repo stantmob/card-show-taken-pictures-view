@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 import io.reactivex.Observable;
@@ -81,8 +82,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
         Observable<CardShowTakenImage> cardShowTakenImageObservable = Observable.just(cardShowTakenImage);
 
-        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded ->
-                cardShowTakenImage.equals(cardShowTakenImageAsAdded));
+        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded -> cardShowTakenImage.equals(cardShowTakenImageAsAdded));
 
         CardShowTakenImage cardShowTakenImageAsRemoved = cardShowTakenImageObservable.blockingFirst();
 
@@ -134,14 +134,29 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage) {
 
         if (hasTempImagePathToShow(cardShowTakenImage)) {
-            return cardShowTakenImage.getTempImagePathToShow();
+            if (cardShowTakenImage.getLocalImageFilename() != null) {
+                mViewHolder
+                        .mServiceInspectionsFormFilledRecycleItemBinding
+                        .cardShowTakenPictureViewGeneralCircularImageView
+                        .setImageBitmap(getImage(cardShowTakenImage));
+            } else {
+                return cardShowTakenImage.getTempImagePathToShow();
+            }
         } else if (hasRemoteImageUrl(cardShowTakenImage)) {
             return cardShowTakenImage.getRemoteImageUrl();
         } else if (hasLocalImage(cardShowTakenImage)) {
             return getTempImageFileToShowFromLocalImageFilename(cardShowTakenImage.getLocalImageFilename());
-        } else {
-            return null;
         }
+        return null;
+
+    }
+
+    private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
+        if (hasLocalImage(cardShowTakenImage)) {
+            return PhotoViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), PhotoViewFileUtil.getFile());
+        }
+
+        return null;
     }
 
     private boolean hasTempImagePathToShow(CardShowTakenImage cardShowTakenImage) {

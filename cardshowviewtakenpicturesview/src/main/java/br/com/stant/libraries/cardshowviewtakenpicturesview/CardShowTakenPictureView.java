@@ -334,9 +334,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             ArrayList<CameraPhoto> cameraPhotos = (ArrayList<CameraPhoto>) data.getSerializableExtra(KEY_IMAGE_CAMERA_LIST);
 
             for (CameraPhoto cameraPhoto : cameraPhotos) {
+
                 String localImage = cameraPhoto.getLocalImageFilename();
 
-                File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage + JPEG_FILE_SUFFIX);
+                File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage);
 
                 imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory,
                         new CardShowTakenCompressedCallback() {

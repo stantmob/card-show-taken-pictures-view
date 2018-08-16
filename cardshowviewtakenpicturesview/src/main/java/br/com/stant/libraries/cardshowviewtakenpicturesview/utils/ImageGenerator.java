@@ -31,6 +31,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
 
 public class ImageGenerator {
 
@@ -58,9 +59,10 @@ public class ImageGenerator {
         }
 
         Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
-        File tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath);
 
-        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), tempImagePathToShow.toString());
+        File file = new File(getFile() + "/" + photoTaken.getName());
+
+        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), file.toString());
     }
 
     public void generateCardShowTakenImageFromImageGallery(Uri data,

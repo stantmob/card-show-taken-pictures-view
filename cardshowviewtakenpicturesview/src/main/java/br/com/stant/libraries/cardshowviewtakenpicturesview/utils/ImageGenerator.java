@@ -35,6 +35,9 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoVi
 
 public class ImageGenerator {
 
+    public static Integer fromCamera = 1;
+    public static Integer fromGallery = 2;
+
     private CardContract mCardContract;
     private Context mContext;
     private File mCompressedImage = null;
@@ -44,10 +47,10 @@ public class ImageGenerator {
         this.mCardContract = cardContract;
     }
 
-    public void generateCardShowTakenImageFromCamera(Bitmap bitmap,
+    public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType,
                                                      CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
 
-        File tempImagePathToShow = createTempImageFileToShow(bitmap);
+        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType);
 
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
@@ -65,7 +68,7 @@ public class ImageGenerator {
         cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), file.toString());
     }
 
-    public void generateCardShowTakenImageFromImageGallery(Uri data,
+    public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
                                                            CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         File photoTaken = new File(PhotoViewFileUtil.getFile().toString());
 
@@ -76,18 +79,22 @@ public class ImageGenerator {
         }
 
         Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
-        File tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath);
+        File tempImagePathToShow = createTempImageFileToShow(bitmapImageFromIntentPath, photoType);
 
         cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
-    private File createTempImageFileToShow(Bitmap bitmap) {
+    private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto) {
         String uuid = UUID.randomUUID().toString();
         File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+            if (typePhoto.equals(fromCamera)) {
+                rotateImage(bitmap, 90).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            } else if (typePhoto.equals(fromGallery)){
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -95,5 +102,10 @@ public class ImageGenerator {
         return file;
     }
 
+    private Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
 
 }

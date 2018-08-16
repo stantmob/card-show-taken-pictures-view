@@ -1,12 +1,11 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,17 +32,15 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
-import io.fotoapparat.result.BitmapPhoto;
 import io.fotoapparat.result.PhotoResult;
-import io.fotoapparat.result.WhenDoneListener;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function1;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCamera;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
+import static io.fotoapparat.result.transformer.ResolutionTransformersKt.scaled;
 
 public class CameraFragment extends Fragment implements CameraContract {
 
@@ -103,7 +99,13 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mButtonClose.setOnClickListener(view -> closeCamera());
         mButtonCapture.setOnClickListener(view -> takePicture());
-        mButtonReturnPhotos.setOnClickListener(view -> returnImagesToCardShowTakenPicturesView());
+        mButtonReturnPhotos.setOnClickListener(view -> {
+            if (isLimitLimitUpper()) {
+                Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
+            } else {
+                returnImagesToCardShowTakenPicturesView();
+            }
+        });
         mButtonOpenGallery.setOnClickListener(view -> openGallery());
 
         mPhotosRecyclerView.setNestedScrollingEnabled(true);
@@ -126,11 +128,15 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.gallery_select_pictures)), REQUEST_IMAGE_LIST_GALLERY_RESULT);
+        if (isLimitReached()) {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.gallery_select_pictures)), REQUEST_IMAGE_LIST_GALLERY_RESULT);
+        } else {
+            Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -143,7 +149,8 @@ public class CameraFragment extends Fragment implements CameraContract {
 
                     Uri imageUri = data.getData();
 
-                    mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                    mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, fromGallery,
+                            new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                                 @Override
                                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                     CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
@@ -166,7 +173,8 @@ public class CameraFragment extends Fragment implements CameraContract {
 
                         Uri imageUri = data.getClipData().getItemAt(i).getUri();
 
-                        mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                        mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, fromGallery,
+                                new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                                     @Override
                                     public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                         CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
@@ -184,6 +192,8 @@ public class CameraFragment extends Fragment implements CameraContract {
                     }
 
                 }
+
+                updateCounters();
 
             }
 
@@ -240,9 +250,11 @@ public class CameraFragment extends Fragment implements CameraContract {
 
             photoResult.saveToFile(photoPath);
 
-            photoResult.toBitmap().whenAvailable(
+            photoResult.toBitmap(scaled(0.20f)).whenDone(
                     bitmapPhoto -> {
-                        mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                        assert bitmapPhoto != null;
+                        mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, fromCamera,
+                                new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
@@ -260,8 +272,6 @@ public class CameraFragment extends Fragment implements CameraContract {
 
                             }
                         });
-
-                        return null;
                     }
             );
 
@@ -279,8 +289,16 @@ public class CameraFragment extends Fragment implements CameraContract {
         getActivity().finish();
     }
 
+    private int getColor(int color){
+        return getResources().getColor(color);
+    }
+
     public boolean isLimitReached() {
         return mPhotosLimit == -1 || (mImageListSize + getItemCount()) < mPhotosLimit;
+    }
+
+    private boolean isLimitLimitUpper(){
+        return mPhotosLimit == -1 || (mImageListSize + getItemCount()) > mPhotosLimit;
     }
 
     public void setNavigationCameraControlsPadding() {
@@ -305,12 +323,39 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(mPhotosLimit));
             });
         }
+
+        if (isLimitLimitUpper()){
+            setDesignPhotoLimitIsTrue();
+        } else {
+            setDesignPhotoLimitIsFalse();
+        }
+    }
+
+    private void setDesignPhotoLimitIsTrue(){
+        mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(R.color.white));
+        mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(R.color.white));
+        mCameraFragmentBinding.cameraFragmentTextChipDivisor.setTextColor(getColor(R.color.white));
+        mCameraFragmentBinding.cameraFragmentChip.setBackground(getResources().getDrawable(R.drawable.shape_rectangle_red));
+    }
+
+    private void setDesignPhotoLimitIsFalse(){
+        mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(R.color.black));
+        mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(R.color.black));
+        mCameraFragmentBinding.cameraFragmentTextChipDivisor.setTextColor(getColor(R.color.black));
+        mCameraFragmentBinding.cameraFragmentChip.setBackground(getResources().getDrawable(R.drawable.shape_rectangle_chip));
     }
 
     private int convertDpToPixels(int dpValue) {
         float roundingValue = 0.5f;
         float scale = getContext().getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + roundingValue);
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
 }

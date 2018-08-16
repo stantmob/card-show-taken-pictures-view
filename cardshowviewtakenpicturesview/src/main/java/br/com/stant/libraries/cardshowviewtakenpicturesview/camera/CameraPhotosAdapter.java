@@ -73,7 +73,6 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         mPhotos.remove(cameraPhoto);
         File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
-            Toast.makeText(mContext, "Imagem deletada", Toast.LENGTH_SHORT).show();
             mCameraFragment.updateCounters();
         }
         notifyItemRemoved(position);

@@ -71,12 +71,15 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void removeImage(View view, CardShowTakenImage cardShowTakenImage){
+        int position = mCurrentCardShowTakenImageList.indexOf(cardShowTakenImage);
+
         mCurrentCardShowTakenImageList.remove(cardShowTakenImage);
         mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
-        replaceData(mCurrentCardShowTakenImageList);
 
         if(hasCardShowTakenImageAsAdded(cardShowTakenImage))
             mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+
+        notifyItemRemoved(position);
     }
 
     private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
@@ -122,13 +125,16 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     public void addPicture(CardShowTakenImage cardShowTakenImage){
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
-        replaceData(mCurrentCardShowTakenImageList);
+        notifyItemInserted(mCurrentCardShowTakenImageList.size());
     }
 
     public void addPictures(List<CardShowTakenImage> cardShowTakenImages){
-        mCurrentCardShowTakenImageList.addAll(cardShowTakenImages);
+        for (CardShowTakenImage cardShowTakenImage:
+                cardShowTakenImages) {
+            addPicture(cardShowTakenImage);
+        }
+
         mCardShowTakenImageListAsAdded.addAll(cardShowTakenImages);
-        replaceData(mCurrentCardShowTakenImageList);
     }
 
     private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage) {

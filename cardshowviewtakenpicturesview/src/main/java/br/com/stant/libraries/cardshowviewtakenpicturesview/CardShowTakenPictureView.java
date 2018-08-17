@@ -43,6 +43,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
 
 
 /**
@@ -181,6 +182,20 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+
+        List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
+
+        if (imagesAsRemoved.size() > 0){
+            for (CardShowTakenImage cardShowTakenImage :
+                    imagesAsRemoved) {
+                if (cardShowTakenImage.getLocalImageFilename() != null) {
+                    File file = new File(getFile() + "/" + cardShowTakenImage.getLocalImageFilename());
+                    if (file.exists()) {
+                        file.delete();
+                    }
+                }
+            }
+        }
     }
 
     @Override

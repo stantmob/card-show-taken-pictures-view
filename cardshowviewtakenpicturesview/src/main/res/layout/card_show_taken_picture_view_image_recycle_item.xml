@@ -40,6 +40,7 @@
             tools:src="@drawable/ic_cam" />
 
         <RelativeLayout
+            android:id="@+id/card_show_taken_picture_view_remove_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="@{(view)->handler.removeImage(view, cardShowTakenImage)}"

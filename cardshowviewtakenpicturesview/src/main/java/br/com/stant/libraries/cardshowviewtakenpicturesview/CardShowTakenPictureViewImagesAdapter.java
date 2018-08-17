@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +19,10 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
 import io.reactivex.Observable;
 
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
+
 public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder> {
 
-    private ItemViewHolder mViewHolder;
     private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
     private List<CardShowTakenImage> mOriginalTempCardShowTakenImageList;
     private List<CardShowTakenImage> mCardShowTakenImageListAsAdded;
@@ -30,12 +32,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
 
     public CardShowTakenPictureViewImagesAdapter(Context context, List<CardShowTakenImage> imageUrlsList, CardShowTakenPictureView view){
-        this.mCurrentCardShowTakenImageList = imageUrlsList;
-        this.mContext       = context;
-        this.mView          = view;
+        this.mCurrentCardShowTakenImageList      = imageUrlsList;
+        this.mContext                            = context;
+        this.mView                               = view;
         this.mOriginalTempCardShowTakenImageList = new ArrayList<>();
-        this.mCardShowTakenImageListAsAdded = new ArrayList<>();
-        this.mCardShowTakenImageListAsRemoved = new ArrayList<>();
+        this.mCardShowTakenImageListAsAdded      = new ArrayList<>();
+        this.mCardShowTakenImageListAsRemoved    = new ArrayList<>();
     }
 
 
@@ -106,20 +108,11 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        mViewHolder = holder;
-
         CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
 
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
+        holder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
 
-        cardShowTakenImage.setTempImagePathToShow(getCorrectImageUrlToShow(cardShowTakenImage));
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.
-                cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
-                        v -> mView.showPreviewPicDialog(cardShowTakenImage));
-
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
+        holder.updateView(cardShowTakenImage);
     }
 
     public void addPicture(CardShowTakenImage cardShowTakenImage){
@@ -137,11 +130,11 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mCardShowTakenImageListAsAdded.addAll(cardShowTakenImages);
     }
 
-    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage) {
+    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage, ItemViewHolder itemViewHolder) {
 
         if (hasTempImagePathToShow(cardShowTakenImage)) {
             if (cardShowTakenImage.getLocalImageFilename() != null) {
-                mViewHolder
+                itemViewHolder
                         .mServiceInspectionsFormFilledRecycleItemBinding
                         .cardShowTakenPictureViewGeneralCircularImageView
                         .setImageBitmap(getImage(cardShowTakenImage));
@@ -159,7 +152,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
         if (hasLocalImage(cardShowTakenImage)) {
-            return PhotoViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), PhotoViewFileUtil.getFile());
+            return PhotoViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile());
         }
 
         return null;
@@ -179,7 +172,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
         String tempImageFilePath;
-        Bitmap bitmap = PhotoViewFileUtil.getBitMapFromFile(localImageFilename, PhotoViewFileUtil.getFile());
+        Bitmap bitmap = PhotoViewFileUtil.getBitMapFromFile(localImageFilename, getFile());
 
         tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
                 bitmap, "temp_image_stant", null);
@@ -199,6 +192,18 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         public ItemViewHolder(CardShowTakenPictureViewImageRecycleItemBinding serviceInspectionsFormFilledRecycleItemBinding) {
             super(serviceInspectionsFormFilledRecycleItemBinding.getRoot());
             this.mServiceInspectionsFormFilledRecycleItemBinding = serviceInspectionsFormFilledRecycleItemBinding;
+        }
+
+        public void updateView(CardShowTakenImage cardShowTakenImage) {
+            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
+
+            cardShowTakenImage.setTempImagePathToShow(getCorrectImageUrlToShow(cardShowTakenImage, this));
+            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
+            this.mServiceInspectionsFormFilledRecycleItemBinding.
+                    cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+                    v -> mView.showPreviewPicDialog(cardShowTakenImage));
+
+            this.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
         }
     }
 }

@@ -65,7 +65,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private String[] filePathColumn;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
-        mPhotosLimit   = limitOfImages;
+        mPhotosLimit = limitOfImages;
         mImageListSize = imageListSize;
 
         return new CameraFragment();
@@ -99,6 +99,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mButtonClose.setOnClickListener(view -> closeCamera());
         mButtonCapture.setOnClickListener(view -> takePicture());
+        mButtonOpenGallery.setOnClickListener(view -> openGallery());
         mButtonReturnPhotos.setOnClickListener(view -> {
             if (isLimitLimitUpper()) {
                 Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
@@ -106,7 +107,6 @@ public class CameraFragment extends Fragment implements CameraContract {
                 returnImagesToCardShowTakenPicturesView();
             }
         });
-        mButtonOpenGallery.setOnClickListener(view -> openGallery());
 
         mPhotosRecyclerView.setNestedScrollingEnabled(true);
         mPhotosRecyclerView.setFocusable(false);
@@ -143,11 +143,35 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-            if (requestCode == REQUEST_IMAGE_LIST_GALLERY_RESULT && resultCode == Activity.RESULT_OK && data != null) {
+        if (requestCode == REQUEST_IMAGE_LIST_GALLERY_RESULT && resultCode == Activity.RESULT_OK && data != null) {
 
-                if(data.getData() != null) {
+            if (data.getData() != null) {
 
-                    Uri imageUri = data.getData();
+                Uri imageUri = data.getData();
+
+                mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, fromGallery,
+                        new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                            @Override
+                            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                                CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
+
+                                mCameraPhotosAdapter.addPicture(cameraPhoto);
+                                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
+                            }
+
+                            @Override
+                            public void onError() {
+
+                            }
+                        });
+
+            } else if (data.getClipData() != null) {
+
+                int count = data.getClipData().getItemCount();
+
+                for (int i = 0; i < count; i++) {
+
+                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
 
                     mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, fromGallery,
                             new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
@@ -165,39 +189,15 @@ public class CameraFragment extends Fragment implements CameraContract {
                                 }
                             });
 
-                } else if(data.getClipData() != null) {
-
-                    int count = data.getClipData().getItemCount();
-
-                    for(int i = 0; i < count; i++) {
-
-                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
-
-                        mImageGenerator.generateCardShowTakenImageFromImageGallery(imageUri, fromGallery,
-                                new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
-                                    @Override
-                                    public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                        CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
-
-                                        mCameraPhotosAdapter.addPicture(cameraPhoto);
-                                        mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
-                                    }
-
-                                    @Override
-                                    public void onError() {
-
-                                    }
-                                });
-
-                    }
-
                 }
-
-                updateCounters();
 
             }
 
+            updateCounters();
+
         }
+
+    }
 
     @Override
     public void onResume() {
@@ -241,43 +241,38 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void takePicture() {
 
-        if (isLimitReached()) {
-            PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
+        PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
 
-            String uuid = UUID.randomUUID().toString();
+        String uuid = UUID.randomUUID().toString();
 
-            File photoPath = new File(mPath.toString() + "/" + uuid + JPEG_FILE_SUFFIX);
+        File photoPath = new File(mPath.toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
-            photoResult.saveToFile(photoPath);
+        photoResult.saveToFile(photoPath);
 
-            photoResult.toBitmap(scaled(0.20f)).whenDone(
-                    bitmapPhoto -> {
-                        assert bitmapPhoto != null;
-                        mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, fromCamera,
-                                new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
-                            @Override
-                            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
+        photoResult.toBitmap(scaled(0.20f)).whenDone(
+                bitmapPhoto -> {
+                    assert bitmapPhoto != null;
+                    mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, fromCamera,
+                            new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                                @Override
+                                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                                    CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
 
-                                mCameraPhotosAdapter.addPicture(cameraPhoto);
-                                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
+                                    mCameraPhotosAdapter.addPicture(cameraPhoto);
+                                    mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
 
-                                photoPath.delete();
+                                    photoPath.delete();
 
-                                updateCounters();
-                            }
+                                    updateCounters();
+                                }
 
-                            @Override
-                            public void onError() {
+                                @Override
+                                public void onError() {
 
-                            }
-                        });
-                    }
-            );
-
-        } else {
-            Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
-        }
+                                }
+                            });
+                }
+        );
 
     }
 
@@ -289,7 +284,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         getActivity().finish();
     }
 
-    private int getColor(int color){
+    private int getColor(int color) {
         return getResources().getColor(color);
     }
 
@@ -297,7 +292,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         return mPhotosLimit == -1 || (mImageListSize + getItemCount()) < mPhotosLimit;
     }
 
-    private boolean isLimitLimitUpper(){
+    private boolean isLimitLimitUpper() {
         return mPhotosLimit == -1 || (mImageListSize + getItemCount()) > mPhotosLimit;
     }
 
@@ -314,7 +309,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         return id > 0 && getResources().getBoolean(id);
     }
 
-    public void updateCounters(){
+    public void updateCounters() {
         if (mPhotosLimit == -1) {
             mCameraFragmentBinding.cameraFragmentChip.setVisibility(View.GONE);
         } else {
@@ -324,21 +319,21 @@ public class CameraFragment extends Fragment implements CameraContract {
             });
         }
 
-        if (isLimitLimitUpper()){
+        if (isLimitLimitUpper()) {
             setDesignPhotoLimitIsTrue();
         } else {
             setDesignPhotoLimitIsFalse();
         }
     }
 
-    private void setDesignPhotoLimitIsTrue(){
+    private void setDesignPhotoLimitIsTrue() {
         mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(R.color.white));
         mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(R.color.white));
         mCameraFragmentBinding.cameraFragmentTextChipDivisor.setTextColor(getColor(R.color.white));
         mCameraFragmentBinding.cameraFragmentChip.setBackground(getResources().getDrawable(R.drawable.shape_rectangle_red));
     }
 
-    private void setDesignPhotoLimitIsFalse(){
+    private void setDesignPhotoLimitIsFalse() {
         mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(R.color.black));
         mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(R.color.black));
         mCameraFragmentBinding.cameraFragmentTextChipDivisor.setTextColor(getColor(R.color.black));

@@ -59,7 +59,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private static final int REQUEST_CHOOSER_IMAGE = 1;
 
     public boolean canEditState;
-    private File mSdcardTempImagesDirectory = PhotoViewFileUtil.getFile();
+    private File mSdcardTempImagesDirectory = getFile();
     private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;

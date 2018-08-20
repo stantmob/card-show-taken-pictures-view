@@ -15,6 +15,8 @@ import io.fotoapparat.parameter.ScaleType;
 import io.fotoapparat.view.CameraView;
 import io.fotoapparat.view.FocusView;
 
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCameraBack;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCameraFront;
 import static io.fotoapparat.log.LoggersKt.fileLogger;
 import static io.fotoapparat.log.LoggersKt.logcat;
 import static io.fotoapparat.log.LoggersKt.loggers;
@@ -40,11 +42,13 @@ public class CameraSetup {
     private CameraConfiguration mCameraConfiguration;
     private boolean mActiveCameraBack;
     private boolean mIsChecked;
+    private static Integer mLensPosition;
 
     public CameraSetup(Context context, CameraView cameraView, FocusView focusView) {
         this.mContext             = context;
         this.mFotoapparat         = createCamera(focusView, cameraView);
         this.mCameraConfiguration = createSettings();
+        this.mLensPosition        = fromCameraBack;
     }
 
     private Fotoapparat createCamera(FocusView focusView, CameraView cameraView) {
@@ -139,10 +143,13 @@ public class CameraSetup {
                     mIsChecked = false;
                     changeViewImageResource((ImageView) flashView, R.drawable.ic_flash_no);
 
-                    mFotoapparat.switchTo(
-                            mActiveCameraBack ? back() : front(),
-                            mCameraConfiguration
-                    );
+                    if (mActiveCameraBack){
+                        mFotoapparat.switchTo(back(), mCameraConfiguration);
+                        mLensPosition = fromCameraBack;
+                    } else {
+                        mFotoapparat.switchTo(front(), mCameraConfiguration);
+                        mLensPosition = fromCameraFront;
+                    }
 
                     mActiveCameraBack = !mActiveCameraBack;
                 }
@@ -151,6 +158,10 @@ public class CameraSetup {
 
     private void changeViewImageResource(final ImageView imageView, @DrawableRes final int resId) {
         imageView.postDelayed(() -> imageView.setImageResource(resId), 120);
+    }
+
+    public static Integer getLensPosition(){
+        return mLensPosition;
     }
 
 

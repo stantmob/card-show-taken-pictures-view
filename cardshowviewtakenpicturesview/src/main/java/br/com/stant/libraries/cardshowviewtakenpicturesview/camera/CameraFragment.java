@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -38,7 +37,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileU
 import io.fotoapparat.result.PhotoResult;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCamera;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
 import static io.fotoapparat.result.transformer.ResolutionTransformersKt.scaled;
@@ -244,7 +243,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         photoResult.toBitmap(scaled(0.20f)).whenDone(
                 bitmapPhoto -> {
                     assert bitmapPhoto != null;
-                    mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, fromCamera,
+                    mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),
                             new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                                 @Override
                                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {

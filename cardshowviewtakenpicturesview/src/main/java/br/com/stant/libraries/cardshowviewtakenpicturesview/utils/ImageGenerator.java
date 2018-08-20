@@ -19,8 +19,9 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 
 public class ImageGenerator {
 
-    public static final Integer fromCamera  = 1;
-    public static final Integer fromGallery = 2;
+    public static final Integer fromCameraBack  = 1;
+    public static final Integer fromGallery     = 2;
+    public static final Integer fromCameraFront = 3;
 
     private CardContract mCardContract;
     private Context mContext;
@@ -73,10 +74,12 @@ public class ImageGenerator {
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            if (typePhoto.equals(fromCamera)) {
+            if (typePhoto.equals(fromCameraBack)) {
                 rotateImage(bitmap, 90).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             } else if (typePhoto.equals(fromGallery)){
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+            } else if (typePhoto.equals(fromCameraFront)){
+                rotateImage(bitmap, -90).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

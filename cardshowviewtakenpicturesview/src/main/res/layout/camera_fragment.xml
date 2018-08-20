@@ -42,7 +42,7 @@
             android:layout_marginTop="40dp"
             android:animateLayoutChanges="true"
             android:padding="5dp"
-            android:src="@drawable/ic_close"
+            android:src="@drawable/ic_close_camera"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

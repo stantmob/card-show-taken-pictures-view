@@ -80,7 +80,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         ImageViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
 
         setupDialog();
-        setupEditMode();
         setupLayoutOptions();
     }
 
@@ -107,12 +106,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
     }
 
-    private void setupEditMode() {
-        editModeOnly = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_editModeOnly, false);
+    public void setupEditMode(Boolean editMode) {
+        editModeOnly = editMode;
 
-        if (editModeOnly) {
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelTextView.setVisibility(GONE);
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveTextView.setVisibility(GONE);
+        if (editMode) {
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveEditIconContainerLinearLayout.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureEditIconContainerLinearLayout.setVisibility(GONE);
             showEditStateViewConfiguration(this);
         }
     }
@@ -337,7 +336,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
         intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
-        mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
+
+        if (mFragment != null) {
+            mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
+        } else if (mActivity != null) {
+            mActivity.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
+        }
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {

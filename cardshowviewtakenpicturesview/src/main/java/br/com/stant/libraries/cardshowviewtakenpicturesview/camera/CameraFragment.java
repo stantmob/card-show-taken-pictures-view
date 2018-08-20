@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -60,9 +61,6 @@ public class CameraFragment extends Fragment implements CameraContract {
     private LinearLayout mNavigationCamera;
     private ImageView mButtonOpenGallery;
     private ImageGenerator mImageGenerator;
-    private ArrayList<String> imagesEncodedList;
-    private String imageEncoded;
-    private String[] filePathColumn;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
         mPhotosLimit   = limitOfImages;
@@ -76,6 +74,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ImageViewFileUtil.createTempDirectory(mPath);
+
+        getActivity().getWindow().setFlags(
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
         mImageGenerator      = new ImageGenerator(getContext(), this);
         mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);

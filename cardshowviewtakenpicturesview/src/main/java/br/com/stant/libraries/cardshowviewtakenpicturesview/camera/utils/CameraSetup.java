@@ -42,8 +42,8 @@ public class CameraSetup {
     private boolean mIsChecked;
 
     public CameraSetup(Context context, CameraView cameraView, FocusView focusView) {
-        this.mContext = context;
-        this.mFotoapparat = createCamera(focusView, cameraView);
+        this.mContext             = context;
+        this.mFotoapparat         = createCamera(focusView, cameraView);
         this.mCameraConfiguration = createSettings();
     }
 
@@ -91,7 +91,9 @@ public class CameraSetup {
 
     public void toggleTorchOnSwitch(View view) {
         view.setOnClickListener(v -> {
-            if (!mIsChecked) {
+            boolean isNotChecked = !mIsChecked;
+
+            if (isNotChecked) {
                 mFotoapparat.updateConfiguration(UpdateConfiguration.builder().flash(torch()).build());
                 changeViewImageResource((ImageView) view, R.drawable.ic_flash_yes);
                 mIsChecked = true;
@@ -104,7 +106,6 @@ public class CameraSetup {
     }
 
     public void zoomSeekBar(SeekBar seekBar) {
-
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

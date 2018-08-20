@@ -52,12 +52,10 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoVi
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
-    public static String KEY_LIMIT_IMAGES = "limit_images";
-    public static String KEY_IMAGE_LIST_SIZE = "image_list_size";
-    public static String KEY_IMAGE_CAMERA_LIST = "image_camera_list";
+    public static final String KEY_LIMIT_IMAGES       = "limit_images";
+    public static final String KEY_IMAGE_LIST_SIZE    = "image_list_size";
+    public static final String KEY_IMAGE_CAMERA_LIST  = "image_camera_list";
     public static final int REQUEST_IMAGE_LIST_RESULT = 2;
-    private static final int REQUEST_CHOOSER_IMAGE = 1;
-
     public boolean canEditState;
     private File mSdcardTempImagesDirectory = getFile();
     private File mPhotoTaken;
@@ -77,31 +75,39 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.mContext = context;
+        this.mContext          = context;
         this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
 
         mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.card_show_taken_picture_view, this, true);
         mCardShowTakenPictureViewBinding.setHandler(this);
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
+
         unblockEditStateViewConfiguration();
 
         setOrientation(HORIZONTAL);
 
+        setAdapter();
+
+        PhotoViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
+
+        setupDialog();
+        setupEditMode();
+        setupLayoutOptions();
+    }
+
+    private void setupDialog() {
+        mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
+        mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
+        mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
+    }
+
+    private void setAdapter() {
         mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
 
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
-
-        PhotoViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
-
-        mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
-        mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
-        mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
-
-        setupEditMode();
-        setupLayoutOptions();
     }
 
     private void setupLayoutOptions() {
@@ -185,6 +191,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
 
+        deleteFromFileImageAsRemoved(imagesAsRemoved);
+    }
+
+    private void deleteFromFileImageAsRemoved(List<CardShowTakenImage> imagesAsRemoved) {
         if (imagesAsRemoved.size() > 0){
             for (CardShowTakenImage cardShowTakenImage :
                     imagesAsRemoved) {
@@ -230,7 +240,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
-        mImagesQuantityLimit = limitQuantity;
+        mImagesQuantityLimit           = limitQuantity;
         mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
     }
 
@@ -377,27 +387,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             mPhotoTaken = null;
         }
 
-    }
-
-    private static Bitmap getImage(String from) throws IOException {
-        File file = new File(from);
-
-        if (file.exists()) {
-            BitmapFactory.Options op = new BitmapFactory.Options();
-            op.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap bufferedImage = BitmapFactory.decodeFile(from, op);
-            return bufferedImage;
-        }
-        return null;
-    }
-
-    public String getReadableFileSize(long size) {
-        if (size <= 0) {
-            return "0";
-        }
-        final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
-        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
-        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     public boolean hasUpdatedAt() {

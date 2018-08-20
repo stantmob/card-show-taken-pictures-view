@@ -55,11 +55,8 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         final CameraPhoto cameraPhoto = mPhotos.get(position);
 
         mViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
-
         mViewHolder.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getImage(cameraPhoto));
-
         mViewHolder.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
-
         mViewHolder.mCameraPhotosRecyclerViewBinding.executePendingBindings();
     }
 

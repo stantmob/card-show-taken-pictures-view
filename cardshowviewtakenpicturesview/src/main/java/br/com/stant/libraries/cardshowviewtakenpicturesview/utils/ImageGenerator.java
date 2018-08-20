@@ -14,13 +14,13 @@ import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class ImageGenerator {
 
-    public static Integer fromCamera = 1;
-    public static Integer fromGallery = 2;
+    public static final Integer fromCamera  = 1;
+    public static final Integer fromGallery = 2;
 
     private CardContract mCardContract;
     private Context mContext;
@@ -53,10 +53,10 @@ public class ImageGenerator {
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
                                                            CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        File photoTaken = new File(PhotoViewFileUtil.getFile().toString());
+        File photoTaken = new File(ImageViewFileUtil.getFile().toString());
 
         try {
-            photoTaken = PhotoViewFileUtil.from(mContext, data);
+            photoTaken = ImageViewFileUtil.from(mContext, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class ImageGenerator {
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto) {
         String uuid = UUID.randomUUID().toString();
-        File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
+        File file = new File(ImageViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -90,5 +90,6 @@ public class ImageGenerator {
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
+
 
 }

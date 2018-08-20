@@ -4,12 +4,10 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,14 +16,7 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
@@ -55,9 +46,8 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         final CameraPhoto cameraPhoto = mPhotos.get(position);
 
         mViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
-        mViewHolder.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getImage(cameraPhoto));
-        mViewHolder.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
-        mViewHolder.mCameraPhotosRecyclerViewBinding.executePendingBindings();
+
+        holder.updateView(cameraPhoto);
     }
 
     @Override
@@ -68,7 +58,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     public void removePhoto(View view, CameraPhoto cameraPhoto){
         int position = mPhotos.indexOf(cameraPhoto);
         mPhotos.remove(cameraPhoto);
-        File file = new File(PhotoViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
+        File file = new File(ImageViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
             mCameraFragment.updateCounters();
         }
@@ -87,9 +77,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         }
     }
 
-    private Bitmap getImage(CameraPhoto cameraPhoto) {
+    private Bitmap getLocalImage(CameraPhoto cameraPhoto) {
         if (hasLocalImage(cameraPhoto)) {
-            return PhotoViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), PhotoViewFileUtil.getFile());
+            return ImageViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile());
         }
 
         return null;
@@ -114,6 +104,12 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         ItemViewHolder(CameraPhotoRecyclerViewItemBinding cameraPhotosRecyclerViewBinding) {
             super(cameraPhotosRecyclerViewBinding.getRoot());
             this.mCameraPhotosRecyclerViewBinding = cameraPhotosRecyclerViewBinding;
+        }
+
+        void updateView(CameraPhoto cameraPhoto) {
+            this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getLocalImage(cameraPhoto));
+            this.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
+            this.mCameraPhotosRecyclerViewBinding.executePendingBindings();
         }
     }
 }

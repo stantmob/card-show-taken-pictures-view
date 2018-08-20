@@ -125,12 +125,11 @@ public class CameraSetup {
     public void switchCameraOnClick(View switchCameraView, View flashView) {
         boolean hasFrontCamera = mFotoapparat.isAvailable(front());
 
-        switchCameraView.setVisibility(
-                hasFrontCamera ? View.VISIBLE : View.GONE
-        );
-
         if (hasFrontCamera) {
+            switchCameraView.setVisibility(View.VISIBLE);
             switchCameraOnClickVerify(switchCameraView, flashView);
+        } else {
+            switchCameraView.setVisibility(View.GONE);
         }
     }
 

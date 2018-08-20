@@ -9,10 +9,7 @@ public class CameraPhoto implements Serializable{
     private Date createdAt;
     private Date updatedAt;
 
-    public CameraPhoto(String localImageFilename,
-                       String tempImagePathToShow,
-                       Date createdAt,
-                       Date updatedAt) {
+    public CameraPhoto(String localImageFilename, String tempImagePathToShow, Date createdAt, Date updatedAt) {
         this.localImageFilename  = localImageFilename;
         this.tempImagePathToShow = tempImagePathToShow;
         this.createdAt           = createdAt;
@@ -27,7 +24,6 @@ public class CameraPhoto implements Serializable{
         return tempImagePathToShow;
     }
 
-
     public void setTempImagePathToShow(String tempImagePathToShow) {
         this.tempImagePathToShow = tempImagePathToShow;
     }
@@ -39,4 +35,6 @@ public class CameraPhoto implements Serializable{
     public Date getUpdatedAt() {
         return updatedAt;
     }
+
+
 }

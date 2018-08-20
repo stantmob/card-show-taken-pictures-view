@@ -20,8 +20,8 @@ public class VerticalSeekBar extends android.support.v7.widget.AppCompatSeekBar 
         super(context, attrs);
     }
 
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(h, w, oldh, oldw);
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(height, width, oldHeight, oldWidth);
     }
 
     @Override
@@ -43,20 +43,18 @@ public class VerticalSeekBar extends android.support.v7.widget.AppCompatSeekBar 
             return false;
         }
 
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_MOVE:
-            case MotionEvent.ACTION_UP:
-                int i = 0;
-                i = getMax() - (int) (getMax() * event.getY() / getHeight());
-                setProgress(i);
-                Log.i("Progress", getProgress() + "");
-                onSizeChanged(getWidth(), getHeight(), 0, 0);
-                break;
+        int action = event.getAction();
 
-            case MotionEvent.ACTION_CANCEL:
-                break;
+        if (action == MotionEvent.ACTION_DOWN
+                || action == MotionEvent.ACTION_MOVE
+                || action == MotionEvent.ACTION_UP){
+
+            int i = 0;
+            i = getMax() - (int) (getMax() * event.getY() / getHeight());
+            setProgress(i);
+            onSizeChanged(getWidth(), getHeight(), 0, 0);
         }
+
         return true;
     }
 

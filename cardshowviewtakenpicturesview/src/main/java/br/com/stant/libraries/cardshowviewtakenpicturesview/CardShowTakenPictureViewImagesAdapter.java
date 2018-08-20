@@ -9,17 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.reactivex.Observable;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder> {
 
@@ -146,13 +144,13 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         } else if (hasLocalImage(cardShowTakenImage)) {
             return getTempImageFileToShowFromLocalImageFilename(cardShowTakenImage.getLocalImageFilename());
         }
-        return null;
 
+        return null;
     }
 
     private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
         if (hasLocalImage(cardShowTakenImage)) {
-            return PhotoViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile());
+            return ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile());
         }
 
         return null;
@@ -172,7 +170,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
         String tempImageFilePath;
-        Bitmap bitmap = PhotoViewFileUtil.getBitMapFromFile(localImageFilename, getFile());
+        Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(localImageFilename, getFile());
 
         tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
                 bitmap, "temp_image_stant", null);

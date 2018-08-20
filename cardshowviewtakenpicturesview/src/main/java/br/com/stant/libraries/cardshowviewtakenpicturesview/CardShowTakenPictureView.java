@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -9,24 +8,15 @@ import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,10 +30,9 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraP
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.JPEG_FILE_SUFFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.PhotoViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 
 /**
@@ -88,7 +77,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setAdapter();
 
-        PhotoViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
+        ImageViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
 
         setupDialog();
         setupEditMode();
@@ -114,7 +103,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         boolean showNoBorder = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_showNoBorder, false);
 
         if (showNoBorder) {
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureContainer.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_rectangle_white));
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.setBackground(ContextCompat.getDrawable(mContext, R.drawable.shape_rectangle_white));
         }
     }
 
@@ -122,15 +111,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         editModeOnly = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_editModeOnly, false);
 
         if (editModeOnly) {
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelText.setVisibility(GONE);
-            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveText.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureCancelTextView.setVisibility(GONE);
+            mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveTextView.setVisibility(GONE);
             showEditStateViewConfiguration(this);
         }
     }
 
     public void setColor(int color) {
-        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainer.getBackground().mutate();
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitle.setTextColor(ContextCompat.getColor(getContext(), color));
+        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitleTextView.setTextColor(ContextCompat.getColor(getContext(), color));
         drawable.setStroke(3, ContextCompat.getColor(getContext(), color));
     }
 
@@ -320,7 +309,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public void pickPictureToFinishServiceInspectionFormFilled(View view) {
+    public void pickPictureToFinishAction(View view) {
         if (notAtTheImageCountLimit()) {
             openPickGalleryIntent();
         } else if (mOnReachedOnTheImageCountLimit != null && !notAtTheImageCountLimit()) {

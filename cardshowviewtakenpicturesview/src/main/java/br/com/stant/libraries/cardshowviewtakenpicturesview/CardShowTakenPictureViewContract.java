@@ -16,7 +16,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardContract;
 
 public interface CardShowTakenPictureViewContract extends CardContract {
 
-    void pickPictureToFinishServiceInspectionFormFilled(View view);
+    void pickPictureToFinishAction(View view);
     void dispatchTakePictureOrPickGalleryIntent();
     void addImageOnActivityResult(int requestCode, int resultCode, Intent data);
     void checkIfHasImages();

@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -26,7 +25,6 @@ public class CameraActivity extends AppCompatActivity {
         CameraFragment mCameraFragment = CameraFragment.newInstance(limitImages, image_list_size);
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
     }
-
 
 
 }

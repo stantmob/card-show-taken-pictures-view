@@ -51,7 +51,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/card_show_taken_picture_cancel_text"
+                    android:id="@+id/card_show_taken_picture_cancel_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:onClick="@{handler::cancelEditImagesStateViewConfiguration}"
@@ -59,7 +59,7 @@
                     android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 
                 <TextView
-                    android:id="@+id/card_show_taken_picture_header_title"
+                    android:id="@+id/card_show_taken_picture_header_title_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif"
@@ -88,7 +88,7 @@
                     android:visibility="@{canEditState ? View.VISIBLE : View.GONE}" />
 
                 <TextView
-                    android:id="@+id/card_show_taken_picture_save_text"
+                    android:id="@+id/card_show_taken_picture_save_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="5dp"
@@ -103,7 +103,7 @@
         </android.support.constraint.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/card_show_taken_picture_container"
+            android:id="@+id/card_show_taken_picture_container_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/shape_rectangle_mutable"
@@ -115,7 +115,7 @@
                 android:layout_height="55dp"
                 android:layout_gravity="center"
                 android:layout_margin="9dp"
-                android:onClick="@{handler::pickPictureToFinishServiceInspectionFormFilled}"
+                android:onClick="@{handler::pickPictureToFinishAction}"
                 android:src="@drawable/ic_cam"
                 android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 

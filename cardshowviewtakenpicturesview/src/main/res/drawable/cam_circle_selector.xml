@@ -3,11 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:color="#b0b9c3"
     tools:ignore="NewApi">
+
     <item
-        android:id="@android:id/mask"
-        tools:targetApi="lollipop">
+        android:id="@android:id/mask">
+
         <shape android:shape="oval">
             <solid android:color="#55687e" />
         </shape>
+
     </item>
+
 </ripple>

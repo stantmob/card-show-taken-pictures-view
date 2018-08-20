@@ -34,7 +34,7 @@
         </io.fotoapparat.view.CameraView>
 
         <ImageView
-            android:id="@+id/camera_fragment_close"
+            android:id="@+id/camera_fragment_close_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -47,28 +47,28 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
-            android:id="@+id/camera_fragment_chip"
+            android:id="@+id/camera_fragment_chip_linear_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:gravity="center"
             android:background="@drawable/shape_rectangle_chip"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@+id/camera_fragment_close_image_view"
             app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
-            app:layout_constraintStart_toEndOf="@+id/camera_fragment_close"
-            app:layout_constraintBottom_toBottomOf="@+id/camera_fragment_close"
-            app:layout_constraintTop_toTopOf="@+id/camera_fragment_close">
+            app:layout_constraintStart_toEndOf="@+id/camera_fragment_close_image_view"
+            app:layout_constraintTop_toTopOf="@+id/camera_fragment_close_image_view">
 
             <TextView
                 android:id="@+id/camera_fragment_current_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:textColor="@color/black"
                 android:textSize="15sp"
-                android:layout_gravity="center"
                 tools:text="0" />
 
             <TextView
-                android:id="@+id/camera_fragment_text_chip_divisor"
+                android:id="@+id/camera_fragment_chip_divisor_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="/"
@@ -96,7 +96,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/camera_fragment_switch_flash"
+                android:id="@+id/camera_fragment_switch_flash_image_view"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="30dp"
@@ -107,8 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_invert"
-                tools:ignore="RtlHardcoded" />
+                android:src="@drawable/ic_invert" />
 
         </LinearLayout>
 
@@ -155,7 +154,7 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/camera_fragment_gallery"
+                    android:id="@+id/camera_fragment_gallery_image_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
@@ -172,7 +171,7 @@
                     android:padding="@dimen/cam_content_inset_primary">
 
                     <RelativeLayout
-                        android:id="@+id/capture_button_secondary_container"
+                        android:id="@+id/capture_button_secondary_container_relative_layout"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
@@ -201,8 +200,7 @@
                     android:layout_gravity="right|center_vertical"
                     android:layout_marginEnd="35dp"
                     android:padding="20dp"
-                    android:src="@drawable/ic_save"
-                    tools:ignore="RtlHardcoded" />
+                    android:src="@drawable/ic_save" />
 
             </FrameLayout>
 

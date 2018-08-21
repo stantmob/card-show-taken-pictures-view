@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -32,9 +35,12 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.fotoapparat.result.PhotoResult;
+import io.fotoapparat.view.CameraView;
+import io.fotoapparat.view.Preview;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
@@ -48,6 +54,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     private static Integer mImageListSize;
     private static final int REQUEST_CAMERA_PERMISSION        = 200;
     public static final int REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
+    public static final String BUNDLE_PHOTOS                  = "photos";
+    private static ArrayList<CameraPhoto> mCameraPhotos;
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
@@ -60,10 +68,15 @@ public class CameraFragment extends Fragment implements CameraContract {
     private LinearLayout mNavigationCamera;
     private ImageView mButtonOpenGallery;
     private ImageGenerator mImageGenerator;
+    private DialogLoader mDialogLoader;
 
-    public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize) {
+    public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Bundle bundlePhotos) {
         mPhotosLimit   = limitOfImages;
         mImageListSize = imageListSize;
+
+        if (bundlePhotos != null){
+            mCameraPhotos = (ArrayList<CameraPhoto>) bundlePhotos.getSerializable(BUNDLE_PHOTOS);
+        }
 
         return new CameraFragment();
     }
@@ -78,6 +91,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
 
+        mDialogLoader        = new DialogLoader(getContext());
         mImageGenerator      = new ImageGenerator(getContext(), this);
         mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);
     }
@@ -129,6 +143,10 @@ public class CameraFragment extends Fragment implements CameraContract {
         mPhotosRecyclerView.setNestedScrollingEnabled(true);
         mPhotosRecyclerView.setFocusable(false);
         mPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
+
+        if (mCameraPhotos != null){
+            mCameraPhotosAdapter.addAllPhotos(mCameraPhotos);
+        }
     }
 
     private void setCameraSetup() {
@@ -139,7 +157,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraSetup.toggleTorchOnSwitch(mCameraFragmentBinding.cameraFragmentSwitchFlashImageView);
         mCameraSetup.zoomSeekBar(mCameraFragmentBinding.cameraFragmentZoomSeekBar);
         mCameraSetup.switchCameraOnClick(
-                mCameraFragmentBinding.cameraFragmentSwitchLens,
+                mCameraFragmentBinding.cameraFragmentSwitchLensImageView,
                 mCameraFragmentBinding.cameraFragmentSwitchFlashImageView);
     }
 
@@ -160,9 +178,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                 Uri imageUri = data.getData();
 
                 generateImageCallback(imageUri);
-
             } else if (data.getClipData() != null) {
-
                 int count = data.getClipData().getItemCount();
 
                 for (int i = 0; i < count; i++) {
@@ -173,8 +189,14 @@ public class CameraFragment extends Fragment implements CameraContract {
             }
 
             updateCounters();
-        }
 
+            Bundle bundle = new Bundle();
+            bundle.putSerializable(BUNDLE_PHOTOS, (Serializable) mCameraPhotosAdapter.getList());
+
+            FragmentTransaction tr = getFragmentManager().beginTransaction();
+            tr.replace(R.id.camera_content_frame, CameraFragment.newInstance(mPhotosLimit, mImageListSize, bundle));
+            tr.commit();
+        }
     }
 
     private void generateImageCallback(Uri imageUri) {
@@ -194,8 +216,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
         mCameraSetup.getFotoapparat().start();
     }
 
@@ -218,6 +240,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void closeCamera() {
         getActivity().finish();
+
+        mCameraPhotos = null;
     }
 
     @Override
@@ -238,6 +262,8 @@ public class CameraFragment extends Fragment implements CameraContract {
         String uuid             = UUID.randomUUID().toString();
         File photoPath          = new File(mPath.toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
+        mDialogLoader.showLocalLoader();
+
         photoResult.saveToFile(photoPath);
 
         photoResult.toBitmap(scaled(0.20f)).whenDone(
@@ -255,6 +281,8 @@ public class CameraFragment extends Fragment implements CameraContract {
                                     photoPath.delete();
 
                                     updateCounters();
+
+                                    mDialogLoader.hideLocalLoader();
                                 }
 
                                 @Override
@@ -273,6 +301,8 @@ public class CameraFragment extends Fragment implements CameraContract {
         returnIntent.putExtra(KEY_IMAGE_CAMERA_LIST, (Serializable) mCameraPhotosAdapter.getList());
         getActivity().setResult(Activity.RESULT_OK, returnIntent);
         getActivity().finish();
+
+        mCameraPhotos = null;
     }
 
     private int getColor(int color) {
@@ -300,6 +330,12 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateCounters() {
+        if (isLimitUpper()) {
+            setDesignPhotoLimitIsTrue();
+        } else {
+            setDesignPhotoLimitIsFalse();
+        }
+
         if (mPhotosLimit == -1) {
             mCameraFragmentBinding.cameraFragmentChipLinearLayout.setVisibility(View.GONE);
         } else {
@@ -307,12 +343,6 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(mImageListSize + getItemCount()));
                 mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(mPhotosLimit));
             });
-        }
-
-        if (isLimitUpper()) {
-            setDesignPhotoLimitIsTrue();
-        } else {
-            setDesignPhotoLimitIsFalse();
         }
     }
 

@@ -175,7 +175,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         unblockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
-        mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+        if (mOnSavedCardListener != null) {
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+        }
 
         List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
 
@@ -201,7 +203,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
         unblockEditStateViewConfiguration();
         mCardShowTakenPictureViewImagesAdapter.cancelEditData();
-        mOnSavedCardListener.onCancel();
+
+        if (mOnSavedCardListener != null) {
+            mOnSavedCardListener.onCancel();
+        }
     }
 
     @Override

@@ -1,5 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -117,10 +118,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
     }
 
-    public void setColor(int color) {
+    public void setStrokeColor(int color) {
         GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitleTextView.setTextColor(ContextCompat.getColor(getContext(), color));
-        drawable.setStroke(3, ContextCompat.getColor(getContext(), color));
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitleTextView.setTextColor(color);
+        drawable.setStroke(3, color);
+    }
+
+    public void setBackgroundColor(int color){
+        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
+        drawable.setColor(color);
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)

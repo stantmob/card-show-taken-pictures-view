@@ -116,7 +116,9 @@
                 android:layout_height="55dp"
                 android:layout_gravity="center"
                 android:layout_margin="9dp"
+                android:background="@drawable/border_circle_grey"
                 android:onClick="@{handler::pickPictureToFinishAction}"
+                android:padding="15dp"
                 android:src="@drawable/ic_cam"
                 android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 

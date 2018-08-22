@@ -5,54 +5,43 @@
 
     <data>
 
-        <import type="android.view.View" />
-
         <variable
             name="handler"
-            type="br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter" />
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraPhotosAdapter" />
 
         <variable
-            name="cardShowTakenImage"
-            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage" />
-
-        <variable
-            name="cardStateEnum"
-            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum" />
+            name="photo"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto" />
 
     </data>
 
     <RelativeLayout
+        android:id="@+id/camera_show_photo_relative_layout"
         android:layout_width="55dp"
         android:layout_height="55dp"
-        android:layout_margin="9dp">
+        android:layout_margin="10dp">
 
         <com.github.siyamed.shapeimageview.CircularImageView
             android:id="@+id/card_show_taken_picture_view_general_circular_image_view"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerInParent="true"
-            android:layout_gravity="center"
-            android:background="@drawable/border_circle_blue"
-            android:padding="3dp"
-            app:cardImgHolder="@{@drawable/stant_city}"
-            app:cardImgSize="@{`500`}"
-            app:cardImgUrl="@{cardShowTakenImage.tempImagePathToShow}"
+            android:src="@drawable/stant_city"
             tools:src="@drawable/ic_cam" />
 
         <RelativeLayout
-            android:id="@+id/card_show_taken_picture_view_remove_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="@{(view)->handler.removeImage(view, cardShowTakenImage)}"
-            android:paddingBottom="5dp"
-            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
+            android:paddingBottom="5dp">
+
 
             <LinearLayout
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_alignParentEnd="true"
                 android:background="@drawable/shape_round_gray"
-                android:gravity="center">
+                android:gravity="center"
+                android:onClick="@{(view) -> handler.removePhoto(view, photo)}">
 
                 <ImageView
                     android:layout_width="15dp"

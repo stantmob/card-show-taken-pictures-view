@@ -29,11 +29,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBinding = DataBindingUtil.setContentView(
-                this, R.layout.activity_main);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
-
 
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setExampleImages();
@@ -49,11 +47,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         if(gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
+        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
+        mBinding.cardShowViewTakenPicturesView.setColor(R.color.colorPrimary);
     }
 
     @Override

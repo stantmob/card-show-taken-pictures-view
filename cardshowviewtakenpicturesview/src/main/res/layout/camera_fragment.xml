@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="handler"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraFragment" />
+
+    </data>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <io.fotoapparat.view.CameraView
+            android:id="@+id/camera_fragment_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
+
+            <io.fotoapparat.view.FocusView
+                android:id="@+id/camera_fragment_focus_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </io.fotoapparat.view.CameraView>
+
+        <ImageView
+            android:id="@+id/camera_fragment_close_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginStart="@dimen/cam_widget_margin_top_sides"
+            android:layout_marginTop="40dp"
+            android:animateLayoutChanges="true"
+            android:padding="5dp"
+            android:src="@drawable/ic_close_camera"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/camera_fragment_chip_linear_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/shape_rectangle_chip"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="@+id/camera_fragment_close_image_view"
+            app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
+            app:layout_constraintStart_toEndOf="@+id/camera_fragment_close_image_view"
+            app:layout_constraintTop_toTopOf="@+id/camera_fragment_close_image_view">
+
+            <TextView
+                android:id="@+id/camera_fragment_current_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                tools:text="0" />
+
+            <TextView
+                android:id="@+id/camera_fragment_chip_divisor_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/camera_fragment_limit_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="15sp"
+                tools:text="0" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/camera_fragment_top_linear_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/cam_widget_margin_top_sides"
+            android:layout_marginTop="40dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/camera_fragment_switch_flash_image_view"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="30dp"
+                android:src="@drawable/ic_flash_no" />
+
+            <ImageView
+                android:id="@+id/camera_fragment_switch_lens_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_invert" />
+
+        </LinearLayout>
+
+        <br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar
+            android:id="@+id/camera_fragment_zoom_seek_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="105dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="30dp"
+            android:max="30"
+            android:padding="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/camera_fragment_bottom_linear_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/camera_fragment_top_linear_layout" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/camera_photos_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:paddingEnd="0dp"
+            android:paddingStart="0dp"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/camera_fragment_bottom_linear_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/camera_fragment_bottom_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="vertical"
+            android:paddingBottom="20dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/camera_fragment_gallery_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:layout_marginStart="35dp"
+                    android:padding="20dp"
+                    android:src="@drawable/ic_image" />
+
+                <RelativeLayout
+                    android:id="@+id/camera_fragment_capture_relative_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/circle_opaque"
+                    android:padding="@dimen/cam_content_inset_primary">
+
+                    <RelativeLayout
+                        android:id="@+id/capture_button_secondary_container_relative_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/circle_white"
+                        android:padding="1dp">
+
+                        <ImageButton
+                            android:id="@+id/camera_fragment_capture_image_button"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/cam_circle_selector"
+                            android:padding="1dp"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/ic_camera"
+                            tools:ignore="ContentDescription" />
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/camera_fragment_save_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginEnd="35dp"
+                    android:padding="20dp"
+                    android:src="@drawable/ic_save" />
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+</layout>

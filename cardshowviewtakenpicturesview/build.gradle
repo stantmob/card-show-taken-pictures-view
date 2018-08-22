@@ -48,5 +48,7 @@ dependencies {
     implementation 'id.zelory:compressor:2.1.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
+    api 'com.android.support.constraint:constraint-layout:1.1.2'
+    api 'io.fotoapparat.fotoapparat:library:2.3.1'
     api 'com.github.siyamed:android-shape-imageview:0.9.3@aar'
 }

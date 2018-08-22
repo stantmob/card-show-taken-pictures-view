@@ -34,7 +34,6 @@ public class ImageBinding {
         if (hasNoUlr(url)) return;
 
         try {
-
             Picasso.with(imageView.getContext())
                     .load(url)
                     .placeholder(holder)

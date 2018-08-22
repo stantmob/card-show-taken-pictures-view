@@ -23,19 +23,17 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class CardShowTakenPictureViewFileUtil {
+public class ImageViewFileUtil {
 
+    public static final String JPEG_FILE_SUFFIX = ".jpg";
     private static final String JPEG_FILE_PREFIX = "IMG_";
-    private static final String JPEG_FILE_SUFFIX = ".jpg";
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
-    private static final int EOF = -1;
-    private static final String TEMP_IMAGE_NAME = "image_temp_stant";
-    private static String path = "/<br.com.stant>/temp";
+    private static final int EOF                 = -1;
+    private static final String TEMP_IMAGE_NAME  = "image_temp_stant";
+    private static String path                   = "/<br.com.stant>/temp";
 
     public static File getFile() {
-        return new File(
-                Environment.getExternalStorageDirectory(),
-                path);
+        return new File(Environment.getExternalStorageDirectory(), path);
     }
 
     public static Bitmap decodeBitmapFromFile(String path) {

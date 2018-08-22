@@ -14,12 +14,13 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.CardShowTakenPictureViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.reactivex.Observable;
+
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder> {
 
-    private ItemViewHolder mViewHolder;
     private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
     private List<CardShowTakenImage> mOriginalTempCardShowTakenImageList;
     private List<CardShowTakenImage> mCardShowTakenImageListAsAdded;
@@ -29,12 +30,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
 
     public CardShowTakenPictureViewImagesAdapter(Context context, List<CardShowTakenImage> imageUrlsList, CardShowTakenPictureView view){
-        this.mCurrentCardShowTakenImageList = imageUrlsList;
-        this.mContext       = context;
-        this.mView          = view;
+        this.mCurrentCardShowTakenImageList      = imageUrlsList;
+        this.mContext                            = context;
+        this.mView                               = view;
         this.mOriginalTempCardShowTakenImageList = new ArrayList<>();
-        this.mCardShowTakenImageListAsAdded = new ArrayList<>();
-        this.mCardShowTakenImageListAsRemoved = new ArrayList<>();
+        this.mCardShowTakenImageListAsAdded      = new ArrayList<>();
+        this.mCardShowTakenImageListAsRemoved    = new ArrayList<>();
     }
 
 
@@ -70,19 +71,21 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void removeImage(View view, CardShowTakenImage cardShowTakenImage){
+        int position = mCurrentCardShowTakenImageList.indexOf(cardShowTakenImage);
+
         mCurrentCardShowTakenImageList.remove(cardShowTakenImage);
         mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
-        replaceData(mCurrentCardShowTakenImageList);
 
         if(hasCardShowTakenImageAsAdded(cardShowTakenImage))
             mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+
+        notifyItemRemoved(position);
     }
 
     private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
         Observable<CardShowTakenImage> cardShowTakenImageObservable = Observable.just(cardShowTakenImage);
 
-        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded ->
-                cardShowTakenImage.equals(cardShowTakenImageAsAdded));
+        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded -> cardShowTakenImage.equals(cardShowTakenImageAsAdded));
 
         CardShowTakenImage cardShowTakenImageAsRemoved = cardShowTakenImageObservable.blockingFirst();
 
@@ -103,45 +106,54 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(ItemViewHolder holder, int position) {
-        mViewHolder = holder;
-
         CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
 
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
+        holder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
 
-        cardShowTakenImage.setTempImagePathToShow(getCorrectImageUrlToShow(cardShowTakenImage));
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.
-                cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
-                        v -> mView.showPreviewPicDialog(cardShowTakenImage));
-
-        mViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
+        holder.updateView(cardShowTakenImage);
     }
 
     public void addPicture(CardShowTakenImage cardShowTakenImage){
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
-        replaceData(mCurrentCardShowTakenImageList);
+        notifyItemInserted(mCurrentCardShowTakenImageList.size());
     }
 
     public void addPictures(List<CardShowTakenImage> cardShowTakenImages){
-        mCurrentCardShowTakenImageList.addAll(cardShowTakenImages);
+        for (CardShowTakenImage cardShowTakenImage:
+                cardShowTakenImages) {
+            addPicture(cardShowTakenImage);
+        }
+
         mCardShowTakenImageListAsAdded.addAll(cardShowTakenImages);
-        replaceData(mCurrentCardShowTakenImageList);
     }
 
-    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage) {
+    private String getCorrectImageUrlToShow(CardShowTakenImage cardShowTakenImage, ItemViewHolder itemViewHolder) {
 
         if (hasTempImagePathToShow(cardShowTakenImage)) {
-            return cardShowTakenImage.getTempImagePathToShow();
+            if (cardShowTakenImage.getLocalImageFilename() != null) {
+                itemViewHolder
+                        .mServiceInspectionsFormFilledRecycleItemBinding
+                        .cardShowTakenPictureViewGeneralCircularImageView
+                        .setImageBitmap(getImage(cardShowTakenImage));
+            } else {
+                return cardShowTakenImage.getTempImagePathToShow();
+            }
         } else if (hasRemoteImageUrl(cardShowTakenImage)) {
             return cardShowTakenImage.getRemoteImageUrl();
         } else if (hasLocalImage(cardShowTakenImage)) {
             return getTempImageFileToShowFromLocalImageFilename(cardShowTakenImage.getLocalImageFilename());
-        } else {
-            return null;
         }
+
+        return null;
+    }
+
+    private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
+        if (hasLocalImage(cardShowTakenImage)) {
+            return ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile());
+        }
+
+        return null;
     }
 
     private boolean hasTempImagePathToShow(CardShowTakenImage cardShowTakenImage) {
@@ -158,7 +170,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
         String tempImageFilePath;
-        Bitmap bitmap = CardShowTakenPictureViewFileUtil.getBitMapFromFile(localImageFilename, CardShowTakenPictureViewFileUtil.getFile());
+        Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(localImageFilename, getFile());
 
         tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
                 bitmap, "temp_image_stant", null);
@@ -178,6 +190,18 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         public ItemViewHolder(CardShowTakenPictureViewImageRecycleItemBinding serviceInspectionsFormFilledRecycleItemBinding) {
             super(serviceInspectionsFormFilledRecycleItemBinding.getRoot());
             this.mServiceInspectionsFormFilledRecycleItemBinding = serviceInspectionsFormFilledRecycleItemBinding;
+        }
+
+        public void updateView(CardShowTakenImage cardShowTakenImage) {
+            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
+
+            cardShowTakenImage.setTempImagePathToShow(getCorrectImageUrlToShow(cardShowTakenImage, this));
+            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
+            this.mServiceInspectionsFormFilledRecycleItemBinding.
+                    cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+                    v -> mView.showPreviewPicDialog(cardShowTakenImage));
+
+            this.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
         }
     }
 }

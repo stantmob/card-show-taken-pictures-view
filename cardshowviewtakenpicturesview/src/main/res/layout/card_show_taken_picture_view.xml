@@ -30,141 +30,105 @@
     </data>
 
     <LinearLayout
-        android:id="@+id/card_show_taken_picture_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/shape_rounded_white"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
+            android:layout_marginBottom="8dp">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
+            <FrameLayout
+                android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
                 android:orientation="horizontal"
-                android:padding="10dp">
-
-                <LinearLayout
-                    android:id="@+id/card_show_taken_picture_cancel_text_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:onClick="@{handler::cancelEditImagesStateViewConfiguration}"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
-
-                    <TextView
-                        android:id="@+id/card_show_taken_picture_cancel_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/card_show_taken_picture_view.btn_cancel" />
-
-                </LinearLayout>
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/card_show_taken_picture_header_title"
+                    android:id="@+id/card_show_taken_picture_cancel_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{handler::cancelEditImagesStateViewConfiguration}"
+                    android:text="@string/card_show_taken_picture_view.btn_cancel"
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
+
+                <TextView
+                    android:id="@+id/card_show_taken_picture_header_title_text_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginStart="13dp"
+                    android:fontFamily="sans-serif"
                     android:text="@string/card_show_taken_picture_view.picture_title"
-                    android:textColor="@color/gray"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}" />
 
-                <LinearLayout
-                    android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/card_show_taken_picture_save_edit_icon_container_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end"
                     android:onClick="@{handler::showEditStateViewConfiguration}"
-                    android:orientation="horizontal"
                     android:padding="5dp"
-                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}">
+                    android:src="@drawable/ic_edit_inspection_form_filled"
+                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}" />
 
-                    <com.github.siyamed.shapeimageview.CircularImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@drawable/ic_edit_inspection_form_filled" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/card_show_taken_picture_save_text_container"
-                    android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/card_show_taken_picture_save_text_view"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginTop="5dp"
                     android:onClick="@{handler::saveImageStateViewConfiguration}"
-                    android:orientation="horizontal"
-                    android:padding="5dp"
-                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
+                    android:text="@string/card_show_taken_picture_view.btn_save"
+                    android:textSize="14sp"
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 
-                    <TextView
-                        android:id="@+id/card_show_taken_picture_save_text"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/card_show_taken_picture_view.btn_save" />
+            </FrameLayout>
 
-                </LinearLayout>
-
-            </RelativeLayout>
-
-        </RelativeLayout>
+        </android.support.constraint.ConstraintLayout>
 
         <LinearLayout
-            android:id="@+id/card_show_taken_picture_images_general_container_linear_layout"
+            android:id="@+id/card_show_taken_picture_container_linear_layout"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_rectangle_mutable"
             android:orientation="horizontal"
-            android:paddingEnd="20dp"
-            android:paddingStart="20dp">
+            android:padding="9dp">
+
+            <com.github.siyamed.shapeimageview.CircularImageView
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:layout_margin="9dp"
+                android:onClick="@{handler::pickPictureToFinishAction}"
+                android:src="@drawable/ic_cam"
+                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/card_show_taken_picture_image_list_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/card_show_taken_picture_add_picture_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:onClick="@{handler::pickPictureToFinishServiceInspectionFormFilled}"
-            android:orientation="vertical"
-            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
-
-            <com.github.siyamed.shapeimageview.CircularImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_cam" />
+                android:minHeight="55dp"
+                android:orientation="horizontal"
+                app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:text="@string/card_show_taken_picture_view.add_image_text"
-                android:textAllCaps="true"
-                android:textColor="@color/gray"
-                android:textSize="12sp" />
         </LinearLayout>
 
         <RelativeLayout

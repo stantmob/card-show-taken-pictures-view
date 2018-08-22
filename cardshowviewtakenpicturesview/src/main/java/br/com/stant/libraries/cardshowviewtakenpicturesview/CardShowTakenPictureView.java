@@ -80,6 +80,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         ImageViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
 
         setupDialog();
+        setupEditMode();
         setupLayoutOptions();
     }
 
@@ -106,10 +107,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
     }
 
-    public void setupEditMode(Boolean editMode) {
-        editModeOnly = editMode;
+    public void setupEditMode() {
+        editModeOnly = mStyledAttributes.getBoolean(R.styleable.CardShowTakenPictureView_editModeOnly, false);;
 
-        if (editMode) {
+        if (editModeOnly) {
             mCardShowTakenPictureViewBinding.cardShowTakenPictureSaveEditIconContainerLinearLayout.setVisibility(GONE);
             mCardShowTakenPictureViewBinding.cardShowTakenPictureEditIconContainerLinearLayout.setVisibility(GONE);
             showEditStateViewConfiguration(this);

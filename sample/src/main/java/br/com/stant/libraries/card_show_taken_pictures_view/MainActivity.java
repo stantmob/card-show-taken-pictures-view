@@ -3,19 +3,15 @@ package br.com.stant.libraries.card_show_taken_pictures_view;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
 import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,7 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
         mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
-        mBinding.cardShowViewTakenPicturesView.setColor(R.color.colorPrimary);
+        mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+        mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
     }
 
     @Override

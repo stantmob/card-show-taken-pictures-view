@@ -23,4 +23,6 @@
 
     <string name="gallery.select_pictures">Selecione as Fotos</string>
 
+    <string name="card_show_taken_picture_view.camera_quantity_limit">Só é possível adicionar 10 fotos por vez, adicione mais posteriormente .</string>
+
 </resources>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,7 +20,6 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -39,8 +37,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.fotoapparat.result.PhotoResult;
-import io.fotoapparat.view.CameraView;
-import io.fotoapparat.view.Preview;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
@@ -128,8 +124,20 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private void setClickButtons() {
         mButtonClose.setOnClickListener(view -> closeCamera());
-        mButtonCapture.setOnClickListener(view -> takePicture());
-        mButtonOpenGallery.setOnClickListener(view -> openGallery());
+        mButtonCapture.setOnClickListener(view -> {
+            if( isNotCameraImagesQuantityLimit()) {
+                takePicture();
+            } else {
+                showToastWithCameraLimitQuantity();
+            }
+        });
+        mButtonOpenGallery.setOnClickListener(view -> {
+            if (isNotCameraImagesQuantityLimit()) {
+                openGallery();
+            } else {
+                showToastWithCameraLimitQuantity();
+            }
+        });
         mButtonReturnPhotos.setOnClickListener(view -> {
             if (isLimitUpper()) {
                 Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
@@ -256,6 +264,16 @@ public class CameraFragment extends Fragment implements CameraContract {
         return mCameraPhotosAdapter.getItemCount();
     }
 
+    private void showToastWithCameraLimitQuantity(){
+        Toast.makeText(getContext(), getResources().getText(R.string.card_show_taken_picture_view_camera_quantity_limit), Toast.LENGTH_SHORT).show();
+    }
+
+    private boolean isNotCameraImagesQuantityLimit(){
+        int cameraImagesQuantityLimit = 10;
+
+        return mCameraPhotosAdapter.getItemCount()-1 < cameraImagesQuantityLimit;
+    }
+
     @Override
     public void takePicture() {
         PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
@@ -365,6 +383,4 @@ public class CameraFragment extends Fragment implements CameraContract {
         float scale = getContext().getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + roundingValue);
     }
-
-
 }

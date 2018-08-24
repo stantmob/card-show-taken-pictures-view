@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -34,11 +33,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
-
-
-/**
- * Created by denisvieira on 07/06/17.
- */
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -127,6 +121,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void setBackgroundColor(int color){
         GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
         drawable.setColor(color);
+    }
+
+    private void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity, Integer imagesQuantityLimit) {
+        mCardShowTakenPictureViewBinding.setCurrentAndLimitPhotosQuantityText(
+                currentQuantity + "/" + imagesQuantityLimit);
+
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -240,8 +240,11 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
+        Integer currentImagesQuantity = mCardShowTakenPictureViewImagesAdapter.getItemCount()-1;
         mImagesQuantityLimit           = limitQuantity;
         mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
+
+        updateCurrentAndLimitPhotosQuantityText(currentImagesQuantity, mImagesQuantityLimit);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private static Integer mImageListSize;
     private static final int REQUEST_CAMERA_PERMISSION        = 200;
     public static final int REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
-    private static final Integer CAMERA_IMAGES_QUANTITY_LIMIT = 10;
+    private static Integer CAMERA_IMAGES_QUANTITY_LIMIT       = 10;
     public static final String BUNDLE_PHOTOS                  = "photos";
     private static ArrayList<CameraPhoto> mCameraPhotos;
 
@@ -70,6 +70,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Bundle bundlePhotos) {
         mPhotosLimit   = limitOfImages;
         mImageListSize = imageListSize;
+        Integer remainingImages = limitOfImages - imageListSize;
+
+        if (remainingImages < CAMERA_IMAGES_QUANTITY_LIMIT && isHasNotLimitOfImages(limitOfImages)) {
+            CAMERA_IMAGES_QUANTITY_LIMIT = remainingImages;
+        }
 
         if (bundlePhotos != null) {
             mCameraPhotos = (ArrayList<CameraPhoto>) bundlePhotos.getSerializable(BUNDLE_PHOTOS);
@@ -78,6 +83,9 @@ public class CameraFragment extends Fragment implements CameraContract {
         return new CameraFragment();
     }
 
+    private static boolean isHasNotLimitOfImages(Integer limitOfImages) {
+        return limitOfImages != -1;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -140,7 +148,7 @@ public class CameraFragment extends Fragment implements CameraContract {
             }
         });
         mButtonReturnPhotos.setOnClickListener(view -> {
-            if (isLimitOver()) {
+            if (isOverLimit()) {
                 Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
             } else {
                 returnImagesToCardShowTakenPicturesView();
@@ -265,7 +273,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void showToastWithCameraLimitQuantity() {
-        Toast.makeText(getContext(), getResources().getText(R.string.card_show_taken_picture_view_camera_quantity_limit), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), String.format(getString(R.string.card_show_taken_picture_view_camera_quantity_limit), CAMERA_IMAGES_QUANTITY_LIMIT), Toast.LENGTH_SHORT).show();
     }
 
     private boolean cameraImagesQuantityIsNotOnLimit() {
@@ -325,7 +333,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         return getResources().getColor(color);
     }
 
-    private boolean isLimitOver() {
+    private boolean isOverLimit() {
         if (mPhotosLimit == -1) {
             return false;
         }

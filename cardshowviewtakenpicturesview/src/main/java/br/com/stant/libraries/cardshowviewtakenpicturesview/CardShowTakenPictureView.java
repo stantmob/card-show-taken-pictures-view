@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -34,11 +33,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
-
-
-/**
- * Created by denisvieira on 07/06/17.
- */
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -129,6 +123,11 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         drawable.setColor(color);
     }
 
+    public void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity) {
+        mCardShowTakenPictureViewBinding.setCurrentAndLimitPhotosQuantityText(
+                currentQuantity + "/" + mImagesQuantityLimit);
+    }
+
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
     public static void setBinding(CardShowTakenPictureView view,
                                   String mPictureByName, Date updatedAt) {
@@ -183,7 +182,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         if (mOnSavedCardListener != null) {
-            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
+                    mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
         }
 
         List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
@@ -240,8 +240,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
+        Integer currentImagesQuantity  = mCardShowTakenPictureViewImagesAdapter.getItemCount();
         mImagesQuantityLimit           = limitQuantity;
         mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
+
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureCurrentPhotosQuantityTextView.setVisibility(VISIBLE);
+
+        updateCurrentAndLimitPhotosQuantityText(currentImagesQuantity);
     }
 
     @Override
@@ -266,7 +271,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public int getItemCount() {
+    public int getCurrentImagesQuantity() {
         return mCardShowTakenPictureViewImagesAdapter.getItemCount();
     }
 
@@ -347,7 +352,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void dispatchTakePictureOrPickGalleryIntent() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-        intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
+        intent.putExtra(KEY_IMAGE_LIST_SIZE, getCurrentImagesQuantity());
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);

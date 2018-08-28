@@ -80,6 +80,8 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
             mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
 
         notifyItemRemoved(position);
+
+        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
     }
 
     private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
@@ -117,6 +119,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
         notifyItemInserted(mCurrentCardShowTakenImageList.size());
+        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
     }
 
     public void addPictures(List<CardShowTakenImage> cardShowTakenImages){

@@ -59,22 +59,18 @@ public abstract class OrientationListener extends OrientationEventListener {
     protected void setOrientationView(int orientation){
         switch(orientation){
             case ROTATION_O:
-                //rotate as on portrait
                 rotateViews(0);
                 mRotationState = 90;
                 break;
             case ROTATION_90:
-                //rotate as left on top
                 rotateViews(-90);
                 mRotationState = 180;
                 break;
             case ROTATION_270:
-                //rotate as right on top
                 rotateViews(90);
                 mRotationState = 0;
                 break;
             case ROTATION_180:
-                //rotate as upside down
                 rotateViews(180);
                 mRotationState = 270;
                 break;

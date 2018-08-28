@@ -20,5 +20,7 @@
     <string name="camera.no_permission">You can\'t use camera without permission</string>
 
     <string name="gallery.select_pictures">Select Picture(s)</string>
-    
+
+    <string name="card_show_taken_picture_view.camera_quantity_limit">You can only add %d photos at a time, add more later.</string>
+
 </resources>

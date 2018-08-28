@@ -16,6 +16,10 @@
             type="String" />
 
         <variable
+            name="currentAndLimitPhotosQuantityText"
+            type="String" />
+
+        <variable
             name="pictureByName"
             type="String" />
 
@@ -198,6 +202,18 @@
                             tools:text="Teste" />
 
                     </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/card_show_taken_picture_current_photos_quantity_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:text="@{currentAndLimitPhotosQuantityText}"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="0/20" />
 
                 </LinearLayout>
 

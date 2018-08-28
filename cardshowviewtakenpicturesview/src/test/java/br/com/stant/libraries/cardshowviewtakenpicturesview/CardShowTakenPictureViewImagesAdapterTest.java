@@ -33,7 +33,7 @@ public class CardShowTakenPictureViewImagesAdapterTest {
 //
 //        @Test
 //        public void It_should_plus_size_of_currentImageUrls(){
-//            Integer result = cardShowTakenPictureViewImagesAdapter.getItemCount();
+//            Integer result = cardShowTakenPictureViewImagesAdapter.getCurrentImagesQuantity();
 //            Integer expected = 1;
 //
 //            Assert.assertEquals(expected, result);

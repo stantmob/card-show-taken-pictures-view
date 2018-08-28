@@ -44,7 +44,8 @@
             android:padding="5dp"
             android:src="@drawable/ic_close_camera"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            />
 
         <LinearLayout
             android:id="@+id/camera_fragment_chip_linear_layout"

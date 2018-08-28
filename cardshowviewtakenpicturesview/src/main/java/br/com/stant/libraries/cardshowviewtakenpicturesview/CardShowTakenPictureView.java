@@ -123,10 +123,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         drawable.setColor(color);
     }
 
-    private void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity, Integer imagesQuantityLimit) {
+    public void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity) {
         mCardShowTakenPictureViewBinding.setCurrentAndLimitPhotosQuantityText(
-                currentQuantity + "/" + imagesQuantityLimit);
-
+                currentQuantity + "/" + mImagesQuantityLimit);
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -183,7 +182,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         if (mOnSavedCardListener != null) {
-            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(), mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
+                    mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
         }
 
         List<CardShowTakenImage> imagesAsRemoved = mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved();
@@ -240,11 +240,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
-        Integer currentImagesQuantity = mCardShowTakenPictureViewImagesAdapter.getItemCount()-1;
+        Integer currentImagesQuantity  = mCardShowTakenPictureViewImagesAdapter.getItemCount();
         mImagesQuantityLimit           = limitQuantity;
         mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
 
-        updateCurrentAndLimitPhotosQuantityText(currentImagesQuantity, mImagesQuantityLimit);
+        mCardShowTakenPictureViewBinding.cardShowTakenPictureCurrentPhotosQuantityTextView.setVisibility(VISIBLE);
+
+        updateCurrentAndLimitPhotosQuantityText(currentImagesQuantity);
     }
 
     @Override
@@ -269,7 +271,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public int getItemCount() {
+    public int getCurrentImagesQuantity() {
         return mCardShowTakenPictureViewImagesAdapter.getItemCount();
     }
 
@@ -350,7 +352,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void dispatchTakePictureOrPickGalleryIntent() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-        intent.putExtra(KEY_IMAGE_LIST_SIZE, getItemCount());
+        intent.putExtra(KEY_IMAGE_LIST_SIZE, getCurrentImagesQuantity());
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);

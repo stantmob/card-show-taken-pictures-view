@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
-        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
+//        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(5, null);
         mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
     }

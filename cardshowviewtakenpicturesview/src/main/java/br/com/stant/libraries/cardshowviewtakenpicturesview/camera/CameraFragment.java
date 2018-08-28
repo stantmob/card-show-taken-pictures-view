@@ -50,6 +50,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private static Integer mImageListSize;
     private static final int REQUEST_CAMERA_PERMISSION        = 200;
     public static final int REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
+    private static final Integer CAMERA_IMAGES_QUANTITY_LIMIT = 10;
     public static final String BUNDLE_PHOTOS                  = "photos";
     private static ArrayList<CameraPhoto> mCameraPhotos;
 
@@ -70,7 +71,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         mPhotosLimit   = limitOfImages;
         mImageListSize = imageListSize;
 
-        if (bundlePhotos != null){
+        if (bundlePhotos != null) {
             mCameraPhotos = (ArrayList<CameraPhoto>) bundlePhotos.getSerializable(BUNDLE_PHOTOS);
         }
 
@@ -125,21 +126,21 @@ public class CameraFragment extends Fragment implements CameraContract {
     private void setClickButtons() {
         mButtonClose.setOnClickListener(view -> closeCamera());
         mButtonCapture.setOnClickListener(view -> {
-            if( isNotCameraImagesQuantityLimit()) {
-                takePicture();
-            } else {
+            if(cameraImagesQuantityIsNotOnLimit()) {
                 showToastWithCameraLimitQuantity();
+            } else {
+                takePicture();
             }
         });
         mButtonOpenGallery.setOnClickListener(view -> {
-            if (isNotCameraImagesQuantityLimit()) {
-                openGallery();
-            } else {
+            if (cameraImagesQuantityIsNotOnLimit()) {
                 showToastWithCameraLimitQuantity();
+            } else {
+                openGallery();
             }
         });
         mButtonReturnPhotos.setOnClickListener(view -> {
-            if (isLimitUpper()) {
+            if (isLimitOver()) {
                 Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
             } else {
                 returnImagesToCardShowTakenPicturesView();
@@ -152,7 +153,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         mPhotosRecyclerView.setFocusable(false);
         mPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
 
-        if (mCameraPhotos != null){
+        if (mCameraPhotos != null) {
             mCameraPhotosAdapter.addAllPhotos(mCameraPhotos);
         }
     }
@@ -259,19 +260,16 @@ public class CameraFragment extends Fragment implements CameraContract {
         }
     }
 
-    @Override
-    public int getItemCount() {
+    public int getCurrentImagesQuantity() {
         return mCameraPhotosAdapter.getItemCount();
     }
 
-    private void showToastWithCameraLimitQuantity(){
+    private void showToastWithCameraLimitQuantity() {
         Toast.makeText(getContext(), getResources().getText(R.string.card_show_taken_picture_view_camera_quantity_limit), Toast.LENGTH_SHORT).show();
     }
 
-    private boolean isNotCameraImagesQuantityLimit(){
-        int cameraImagesQuantityLimit = 10;
-
-        return mCameraPhotosAdapter.getItemCount()-1 < cameraImagesQuantityLimit;
+    private boolean cameraImagesQuantityIsNotOnLimit() {
+        return getCurrentImagesQuantity() >= CAMERA_IMAGES_QUANTITY_LIMIT;
     }
 
     @Override
@@ -327,11 +325,12 @@ public class CameraFragment extends Fragment implements CameraContract {
         return getResources().getColor(color);
     }
 
-    private boolean isLimitUpper() {
-        if (mPhotosLimit == -1){
+    private boolean isLimitOver() {
+        if (mPhotosLimit == -1) {
             return false;
         }
-        return (mImageListSize + getItemCount()) > mPhotosLimit;
+
+        return (mImageListSize + getCurrentImagesQuantity()) > mPhotosLimit;
     }
 
     public void setNavigationCameraControlsPadding() {
@@ -348,20 +347,16 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateCounters() {
-        if (isLimitUpper()) {
+        if (cameraImagesQuantityIsNotOnLimit()) {
             setDesignPhotoLimitIsTrue();
         } else {
             setDesignPhotoLimitIsFalse();
         }
 
-        if (mPhotosLimit == -1) {
-            mCameraFragmentBinding.cameraFragmentChipLinearLayout.setVisibility(View.GONE);
-        } else {
-            getActivity().runOnUiThread(() -> {
-                mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(mImageListSize + getItemCount()));
-                mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(mPhotosLimit));
-            });
-        }
+        getActivity().runOnUiThread(() -> {
+            mCameraFragmentBinding.cameraFragmentCurrentValue.setText(String.valueOf(getCurrentImagesQuantity()));
+            mCameraFragmentBinding.cameraFragmentLimitValue.setText(String.valueOf(CAMERA_IMAGES_QUANTITY_LIMIT));
+        });
     }
 
     private void setDesignPhotoLimitIsTrue() {

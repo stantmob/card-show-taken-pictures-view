@@ -1,11 +1,11 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -21,7 +21,6 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -34,13 +33,12 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPicture
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.fotoapparat.result.PhotoResult;
-import io.fotoapparat.view.CameraView;
-import io.fotoapparat.view.Preview;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
@@ -69,6 +67,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     private ImageView mButtonOpenGallery;
     private ImageGenerator mImageGenerator;
     private DialogLoader mDialogLoader;
+    private CameraPhotoPreviewDialogBinding mCameraPhotoPreviewDialogBinding;
+    private Dialog mPreviewPicDialog;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Bundle bundlePhotos) {
         mPhotosLimit   = limitOfImages;
@@ -90,6 +90,8 @@ public class CameraFragment extends Fragment implements CameraContract {
         getActivity().getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
+
+        setupDialog();
 
         mDialogLoader        = new DialogLoader(getContext());
         mImageGenerator      = new ImageGenerator(getContext(), this);
@@ -131,7 +133,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         mButtonCapture.setOnClickListener(view -> takePicture());
         mButtonOpenGallery.setOnClickListener(view -> openGallery());
         mButtonReturnPhotos.setOnClickListener(view -> {
-            if (isLimitUpper()) {
+            if (isLimitOver()) {
                 Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
             } else {
                 returnImagesToCardShowTakenPicturesView();
@@ -305,11 +307,31 @@ public class CameraFragment extends Fragment implements CameraContract {
         mCameraPhotos = null;
     }
 
+    @Override
+    public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
+        Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile());
+
+        mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
+        mPreviewPicDialog.show();
+    }
+
+    @Override
+    public void closePreviewPicDialog(View View) {
+        mPreviewPicDialog.cancel();
+    }
+
+    private void setupDialog() {
+        mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        mCameraPhotoPreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(getContext()), R.layout.camera_photo_preview_dialog, null, false);
+        mCameraPhotoPreviewDialogBinding.setHandler(this);
+        mPreviewPicDialog.setContentView(mCameraPhotoPreviewDialogBinding.getRoot());
+    }
+
     private int getColor(int color) {
         return getResources().getColor(color);
     }
 
-    private boolean isLimitUpper() {
+    private boolean isLimitOver() {
         if (mPhotosLimit == -1){
             return false;
         }
@@ -330,7 +352,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateCounters() {
-        if (isLimitUpper()) {
+        if (isLimitOver()) {
             setDesignPhotoLimitIsTrue();
         } else {
             setDesignPhotoLimitIsFalse();

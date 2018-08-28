@@ -152,7 +152,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage) {
-        mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
+        if (cardShowTakenImage.getTempImagePathToShow() != null) {
+            mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
+        } else if (cardShowTakenImage.getLocalImageFilename() != null) {
+            Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), ImageViewFileUtil.getFile());
+            mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
+        }
+
         mPreviewPicDialog.show();
     }
 
@@ -378,7 +384,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, new Date(), new Date());
+                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, cameraPhoto.getCreatedAt(), cameraPhoto.getUpdatedAt());
 
                                 mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                                 mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);

@@ -110,6 +110,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
             this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getLocalImage(cameraPhoto));
             this.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             this.mCameraPhotosRecyclerViewBinding.executePendingBindings();
+            this.mCameraPhotosRecyclerViewBinding.
+                    cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto));
         }
     }
 }

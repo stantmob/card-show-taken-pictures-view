@@ -32,9 +32,9 @@ public class ImageGenerator {
         this.mCardContract = cardContract;
     }
 
-    public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType,
+    public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
                                                      CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType);
+        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, orientation);
 
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
@@ -63,23 +63,23 @@ public class ImageGenerator {
         }
 
         Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
-        File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType);
+        File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType, null);
 
         cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
-    private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto) {
+    private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
         File file = new File(ImageViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             if (typePhoto.equals(fromCameraBack)) {
-                rotateImage(bitmap, 90).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             } else if (typePhoto.equals(fromGallery)){
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
             } else if (typePhoto.equals(fromCameraFront)){
-                rotateImage(bitmap, -90).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientationFromFront(orientation)).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -94,5 +94,18 @@ public class ImageGenerator {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+    private Integer orientationFromFront(int orientation){
+        if (orientation == 0){
+            return orientation;
+        } else if (orientation == 90){
+            return orientation + 180;
+        } else if (orientation == 180){
+            return orientation;
+        } else if (orientation == 270){
+            return orientation + 180;
+        }
+
+        return 0;
+    }
 
 }

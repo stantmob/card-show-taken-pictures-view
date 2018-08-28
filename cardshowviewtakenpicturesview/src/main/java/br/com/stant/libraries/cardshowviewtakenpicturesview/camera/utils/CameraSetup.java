@@ -43,6 +43,7 @@ public class CameraSetup {
     private boolean mActiveCameraBack;
     private boolean mIsChecked;
     private static Integer mLensPosition;
+    private View mToogleTorchView;
 
     public CameraSetup(Context context, CameraView cameraView, FocusView focusView) {
         this.mContext             = context;

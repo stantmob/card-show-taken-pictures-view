@@ -3,6 +3,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
@@ -38,6 +39,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraP
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import io.fotoapparat.result.PhotoResult;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
@@ -69,6 +71,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private DialogLoader mDialogLoader;
     private CameraPhotoPreviewDialogBinding mCameraPhotoPreviewDialogBinding;
     private Dialog mPreviewPicDialog;
+    private OrientationListener mOrientationListener;
 
     public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Bundle bundlePhotos) {
         mPhotosLimit   = limitOfImages;
@@ -112,12 +115,43 @@ public class CameraFragment extends Fragment implements CameraContract {
         setClickButtons();
         setAdapter();
         setCameraSetup();
+        setOrientation();
 
         updateCounters();
 
         return mCameraFragmentBinding.getRoot();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        mOrientationListener.enable();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mOrientationListener.disable();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mCameraSetup.getFotoapparat().start();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mCameraSetup.getFotoapparat().stop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mOrientationListener.disable();
+    }
 
     private void setViews() {
         mButtonClose        = mCameraFragmentBinding.cameraFragmentCloseImageView;
@@ -126,6 +160,19 @@ public class CameraFragment extends Fragment implements CameraContract {
         mButtonOpenGallery  = mCameraFragmentBinding.cameraFragmentGalleryImageView;
         mPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
         mNavigationCamera   = mCameraFragmentBinding.cameraFragmentBottomLinearLayout;
+    }
+
+    private void setOrientation(){
+        mOrientationListener = new OrientationListener(getContext(), mButtonClose, mButtonCapture,
+                mButtonReturnPhotos, mButtonOpenGallery,
+                mCameraFragmentBinding.cameraFragmentSwitchLensImageView,
+                mCameraFragmentBinding.cameraFragmentChipLinearLayout,
+                mCameraFragmentBinding.cameraFragmentSwitchFlashImageView) {
+            @Override
+            public void onSimpleOrientationChanged(int orientation) {
+                setOrientationView(orientation);
+            }
+        };
     }
 
     private void setClickButtons() {
@@ -218,18 +265,6 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mCameraSetup.getFotoapparat().start();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mCameraSetup.getFotoapparat().stop();
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
@@ -272,6 +307,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                 bitmapPhoto -> {
                     assert bitmapPhoto != null;
                     mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),
+                            mOrientationListener.getRotationState(),
                             new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                                 @Override
                                 public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {

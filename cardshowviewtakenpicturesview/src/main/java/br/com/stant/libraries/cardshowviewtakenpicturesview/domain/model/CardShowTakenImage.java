@@ -4,10 +4,6 @@ import android.graphics.Bitmap;
 
 import java.util.Date;
 
-/**
- * Created by stant on 10/07/17.
- */
-
 public class CardShowTakenImage {
 
     private String identifier;

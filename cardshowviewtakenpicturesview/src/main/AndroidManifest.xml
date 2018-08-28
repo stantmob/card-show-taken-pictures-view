@@ -15,8 +15,8 @@
 
         <activity
             android:name=".camera.CameraActivity"
-            android:theme="@style/AppThemeCamera"
-            android:screenOrientation="portrait"/>
+            android:configChanges="screenSize|orientation|screenLayout|navigation"
+            android:theme="@style/AppThemeCamera" />
 
     </application>
 

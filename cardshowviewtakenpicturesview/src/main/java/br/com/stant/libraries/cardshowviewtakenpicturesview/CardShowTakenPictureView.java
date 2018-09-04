@@ -155,7 +155,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (cardShowTakenImage.getTempImagePathToShow() != null) {
             mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
         } else if (cardShowTakenImage.getLocalImageFilename() != null) {
-            Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), ImageViewFileUtil.getFile());
+            Bitmap bitmap = ImageViewFileUtil.getBitmapFromFile(cardShowTakenImage.getLocalImageFilename(), ImageViewFileUtil.getFile(), 1);
             mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
         }
 

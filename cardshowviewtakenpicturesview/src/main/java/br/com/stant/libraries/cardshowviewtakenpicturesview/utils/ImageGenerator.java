@@ -45,7 +45,11 @@ public class ImageGenerator {
             return;
         }
 
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize          = 8;
+        options.inPreferredConfig     = Bitmap.Config.RGB_565;
+
+        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath(), options);
 
         File file = new File(getFile() + "/" + photoTaken.getName());
 
@@ -62,7 +66,11 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize          = 8;
+        options.inPreferredConfig     = Bitmap.Config.RGB_565;
+
+        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath(), options);
         File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType, null);
 
         cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());

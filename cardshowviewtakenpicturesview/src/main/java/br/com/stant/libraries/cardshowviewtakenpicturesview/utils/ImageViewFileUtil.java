@@ -36,15 +36,15 @@ public class ImageViewFileUtil {
         return new File(Environment.getExternalStorageDirectory(), path);
     }
 
-    public static Bitmap decodeBitmapFromFile(String path) {
+    private static Bitmap decodeBitmapFromFile(String path, Integer sampleSize) {
         Bitmap result;
 
         final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 4;
-        BitmapFactory.decodeFile(path, options);
+
         try {
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            options.inSampleSize = 2;
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inSampleSize      = sampleSize;
+
             result = BitmapFactory.decodeFile(path, options);
 
             ExifInterface ei = new ExifInterface(path);
@@ -62,34 +62,25 @@ public class ImageViewFileUtil {
                     break;
             }
 
-        } catch (OutOfMemoryError oe) {
-            options.inPreferredConfig = Bitmap.Config.ARGB_4444;
-            options.inSampleSize = 4;
-            result = BitmapFactory.decodeFile(path, options);
-        } catch (IOException io) {
-            options.inPreferredConfig = Bitmap.Config.ARGB_4444;
-            options.inSampleSize = 4;
+        } catch (OutOfMemoryError | IOException throwable) {
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inSampleSize = sampleSize*2;
             result = BitmapFactory.decodeFile(path, options);
         }
 
         return result;
     }
 
-    public static Bitmap getBitMapFromFile(String fileName, File sdcard) {
+    public static Bitmap getBitmapFromFile(String fileName, File sdcard, Integer sampleSize) {
         File[] files = getFiles(fileName, sdcard);
         if (files != null && files.length > 0) {
-            return decodeBitmapFromFile(files[files.length - 1].getAbsolutePath());
+            return decodeBitmapFromFile(files[files.length - 1].getAbsolutePath(), sampleSize);
         }
         return null;
     }
 
     private static File[] getFiles(final String fileName, File sdcard) {
-        return sdcard.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.contains(fileName) && ((name.endsWith(".jpg")) || (name.endsWith(".png")));
-            }
-        });
+        return sdcard.listFiles((dir, name) -> name.contains(fileName) && ((name.endsWith(".jpg")) || (name.endsWith(".png"))));
     }
 
     public static void createTempDirectory(File dir) {
@@ -114,6 +105,7 @@ public class ImageViewFileUtil {
 
     public static File prepareFile(Intent takePictureIntent) {
         File file = null;
+
         try {
             file = setUpPhotoFile();
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(file));
@@ -121,10 +113,11 @@ public class ImageViewFileUtil {
             e.printStackTrace();
             file = null;
         }
+
         return file;
     }
 
-    public static Bitmap rotateBitmap(Bitmap bitmap, int degree) {
+    private static Bitmap rotateBitmap(Bitmap bitmap, int degree) {
         int w = bitmap.getWidth();
         int h = bitmap.getHeight();
 

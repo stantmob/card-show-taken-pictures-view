@@ -153,7 +153,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
         if (hasLocalImage(cardShowTakenImage)) {
-            return ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile());
+            return ImageViewFileUtil.getBitmapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile(), 2);
         }
 
         return null;
@@ -173,7 +173,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
         String tempImageFilePath;
-        Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(localImageFilename, getFile());
+        Bitmap bitmap = ImageViewFileUtil.getBitmapFromFile(localImageFilename, getFile(), 2);
 
         tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
                 bitmap, "temp_image_stant", null);

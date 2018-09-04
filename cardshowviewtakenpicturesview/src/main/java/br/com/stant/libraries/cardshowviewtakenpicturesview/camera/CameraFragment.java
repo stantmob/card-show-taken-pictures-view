@@ -57,6 +57,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private static Integer CAMERA_IMAGES_QUANTITY_LIMIT       = 10;
     public static final String BUNDLE_PHOTOS                  = "photos";
     private static ArrayList<CameraPhoto> mCameraPhotos;
+    private static boolean mIsMultipleGallerySelection = false;
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
@@ -74,10 +75,13 @@ public class CameraFragment extends Fragment implements CameraContract {
     private Dialog mPreviewPicDialog;
     private OrientationListener mOrientationListener;
 
-    public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Bundle bundlePhotos) {
+    public static CameraFragment newInstance(Integer limitOfImages, Integer imageListSize, Boolean isMultipleGallerySelection, Bundle bundlePhotos) {
         mPhotosLimit   = limitOfImages;
         mImageListSize = imageListSize;
         Integer remainingImages = limitOfImages - imageListSize;
+        if( isMultipleGallerySelection != null ) {
+            mIsMultipleGallerySelection = isMultipleGallerySelection;
+        }
 
         if (remainingImages < CAMERA_IMAGES_QUANTITY_LIMIT && isHasNotLimitOfImages(limitOfImages)) {
             CAMERA_IMAGES_QUANTITY_LIMIT = remainingImages;
@@ -234,7 +238,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
-        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+
+        if(mIsMultipleGallerySelection) {
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        }
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, getString(R.string.gallery_select_pictures)), REQUEST_IMAGE_LIST_GALLERY_RESULT);
     }
@@ -264,7 +271,8 @@ public class CameraFragment extends Fragment implements CameraContract {
             bundle.putSerializable(BUNDLE_PHOTOS, (Serializable) mCameraPhotosAdapter.getList());
 
             FragmentTransaction tr = getFragmentManager().beginTransaction();
-            tr.replace(R.id.camera_content_frame, CameraFragment.newInstance(mPhotosLimit, mImageListSize, bundle));
+            tr.replace(R.id.camera_content_frame, CameraFragment.newInstance(mPhotosLimit, mImageListSize,
+                    mIsMultipleGallerySelection, bundle));
             tr.commit();
         }
     }

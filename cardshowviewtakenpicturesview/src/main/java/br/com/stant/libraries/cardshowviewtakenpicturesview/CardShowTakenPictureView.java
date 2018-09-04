@@ -39,6 +39,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_LIMIT_IMAGES       = "limit_images";
     public static final String KEY_IMAGE_LIST_SIZE    = "image_list_size";
     public static final String KEY_IMAGE_CAMERA_LIST  = "image_camera_list";
+//    public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION  = "image_camera_list";
     public static final int REQUEST_IMAGE_LIST_RESULT = 2;
     public boolean canEditState;
     private File mSdcardTempImagesDirectory = getFile();

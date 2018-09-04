@@ -39,7 +39,7 @@ public class ImageGenerator {
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
-    public void generateCardShowTakenImageFromCamera(File photoTaken,
+    public static void generateCardShowTakenImageFromCamera(File photoTaken,
                                                      CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         if (photoTaken == null) {
             return;

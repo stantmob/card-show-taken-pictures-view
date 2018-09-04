@@ -39,7 +39,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_LIMIT_IMAGES       = "limit_images";
     public static final String KEY_IMAGE_LIST_SIZE    = "image_list_size";
     public static final String KEY_IMAGE_CAMERA_LIST  = "image_camera_list";
-//    public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION  = "image_camera_list";
+    public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION  = "is_multiple_gallery_selection";
     public static final int REQUEST_IMAGE_LIST_RESULT = 2;
     public boolean canEditState;
     private File mSdcardTempImagesDirectory = getFile();
@@ -57,6 +57,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
     private ImageGenerator imageGenerator;
+    private boolean mIsMultipleGallerySelection = false;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -122,6 +123,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void setBackgroundColor(int color){
         GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
         drawable.setColor(color);
+    }
+
+    public void setIsMultipleGallerySelection(boolean isMultipleGallerySelection){
+        mIsMultipleGallerySelection = isMultipleGallerySelection;
     }
 
     public void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity) {
@@ -360,6 +365,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
         intent.putExtra(KEY_IMAGE_LIST_SIZE, getCurrentImagesQuantity());
+        intent.putExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, mIsMultipleGallerySelection);
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);

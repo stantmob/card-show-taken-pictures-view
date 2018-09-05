@@ -79,7 +79,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     private Bitmap getLocalImage(CameraPhoto cameraPhoto) {
         if (hasLocalImage(cameraPhoto)) {
-            return ImageViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile());
+            return ImageViewFileUtil.getBitmapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile(), 2);
         }
 
         return null;

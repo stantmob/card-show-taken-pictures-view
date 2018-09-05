@@ -37,6 +37,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFr
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
@@ -46,6 +47,7 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTaken
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
+import static com.annimon.stream.Optional.ofNullable;
 import static io.fotoapparat.result.transformer.ResolutionTransformersKt.scaled;
 
 public class CameraFragment extends Fragment implements CameraContract {
@@ -332,31 +334,31 @@ public class CameraFragment extends Fragment implements CameraContract {
         photoResult.saveToFile(photoPath);
 
         photoResult.toBitmap(scaled(0.20f)).whenDone(
-                bitmapPhoto -> {
-                    assert bitmapPhoto != null;
-                    mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),
-                            mOrientationListener.getRotationState(),
-                            new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
-                                @Override
-                                public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                    CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
+                bitmapPhotoResult -> ofNullable(bitmapPhotoResult).ifPresent(
+                        (bitmapPhoto) ->
+                                mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),
+                                        mOrientationListener.getRotationState(),
+                                        new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
+                                            @Override
+                                            public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                                                CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
 
-                                    mCameraPhotosAdapter.addPicture(cameraPhoto);
-                                    mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
+                                                mCameraPhotosAdapter.addPicture(cameraPhoto);
+                                                mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount() - 1);
 
-                                    photoPath.delete();
+                                                photoPath.delete();
 
-                                    updateCounters();
+                                                updateCounters();
 
-                                    mDialogLoader.hideLocalLoader();
-                                }
+                                                mDialogLoader.hideLocalLoader();
+                                            }
 
-                                @Override
-                                public void onError() {
+                                            @Override
+                                            public void onError() {
 
-                                }
-                            });
-                }
+                                            }
+                                })
+                )
         );
 
     }
@@ -373,7 +375,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
-        Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile());
+        Bitmap bitmap = ImageDecoder.getBitmapFromFile(cameraPhoto.getTempImagePathToShow());
 
         mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
         mPreviewPicDialog.show();

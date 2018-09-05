@@ -29,6 +29,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
@@ -155,7 +156,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (cardShowTakenImage.getTempImagePathToShow() != null) {
             mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
         } else if (cardShowTakenImage.getLocalImageFilename() != null) {
-            Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), ImageViewFileUtil.getFile());
+            Bitmap bitmap = ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cardShowTakenImage.getLocalImageFilename());
             mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
         }
 

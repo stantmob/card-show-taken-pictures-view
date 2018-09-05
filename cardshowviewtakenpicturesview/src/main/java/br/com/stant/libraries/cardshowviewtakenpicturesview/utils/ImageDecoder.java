@@ -15,4 +15,11 @@ public class ImageDecoder {
         return BitmapFactory.decodeFile(localPath.toString() + "/" + fileName);
     }
 
+    public static Integer getImagePercentProportion(Bitmap bitmap){
+
+        int size = bitmap.getByteCount();
+
+        return 100 - (10000000 / size);
+    }
+
 }

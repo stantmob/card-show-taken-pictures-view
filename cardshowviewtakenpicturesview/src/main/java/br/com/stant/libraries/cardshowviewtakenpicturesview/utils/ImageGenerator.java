@@ -80,14 +80,16 @@ public class ImageGenerator {
         String uuid = UUID.randomUUID().toString();
         File file = new File(ImageViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
 
+        int  bitmapProportion = ImageDecoder.getImagePercentProportion(bitmap);
+
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             if (typePhoto.equals(fromCameraBack)) {
-                rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
             } else if (typePhoto.equals(fromGallery)){
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
             } else if (typePhoto.equals(fromCameraFront)){
-                rotateImage(bitmap, orientationFromFront(orientation)).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientationFromFront(orientation)).compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -333,7 +333,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         photoResult.saveToFile(photoPath);
 
-        photoResult.toBitmap(scaled(0.20f)).whenDone(
+        photoResult.toBitmap().whenDone(
                 bitmapPhotoResult -> ofNullable(bitmapPhotoResult).ifPresent(
                         (bitmapPhoto) ->
                                 mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),

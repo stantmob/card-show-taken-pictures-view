@@ -37,6 +37,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFr
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
@@ -374,7 +375,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
-        Bitmap bitmap = ImageViewFileUtil.getBitmapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile(), 1);
+        Bitmap bitmap = ImageDecoder.getBitmapFromFile(cameraPhoto.getTempImagePathToShow());
 
         mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
         mPreviewPicDialog.show();

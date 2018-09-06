@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,11 +76,12 @@ public class ImageGenerator {
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             if (typePhoto.equals(fromCameraBack)) {
-                rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientation, uuid).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             } else if (typePhoto.equals(fromGallery)){
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
+                saveInPictures(bitmap, uuid);
             } else if (typePhoto.equals(fromCameraFront)){
-                rotateImage(bitmap, orientationFromFront(orientation)).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+                rotateImage(bitmap, orientationFromFront(orientation), uuid).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -88,10 +90,20 @@ public class ImageGenerator {
         return file;
     }
 
-    private Bitmap rotateImage(Bitmap source, float angle) {
+    private void saveInPictures(Bitmap bitmap, String uuid){
+        MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid);
+    }
+
+
+    private Bitmap rotateImage(Bitmap source, float angle, String uuid) {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+
+        Bitmap bitmap = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+
+        saveInPictures(bitmap, uuid);
+
+        return bitmap;
     }
 
     private Integer orientationFromFront(int orientation){

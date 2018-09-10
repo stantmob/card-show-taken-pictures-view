@@ -7,19 +7,39 @@ import java.io.File;
 
 public class ImageDecoder {
 
-    public static Bitmap getBitmapFromFile(String localPhoto){
-        return BitmapFactory.decodeFile(localPhoto);
+    private static final int fullPercentage = 80;
+    private static final Double idealSize   = 10000000.0;
+
+    public static Bitmap getBitmapFromFile(String localPhoto, Integer sampleSize){
+        BitmapFactory.Options options = getOptions(sampleSize);
+
+        return BitmapFactory.decodeFile(localPhoto, options);
     }
 
-    public static Bitmap getBitmapFromFile(File localPath, String fileName){
-        return BitmapFactory.decodeFile(localPath.toString() + "/" + fileName);
+    public static Bitmap getBitmapFromFile(File localPath, String fileName, Integer sampleSize){
+        BitmapFactory.Options options = getOptions(sampleSize);
+
+        return BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options);
     }
 
-    public static Integer getImagePercentProportion(Bitmap bitmap){
+    private static BitmapFactory.Options getOptions(Integer sampleSize) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
 
-        int size = bitmap.getByteCount();
+        options.inSampleSize      = sampleSize;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        return 100 - (10000000 / size);
+        return options;
+    }
+
+    public static Integer getImageQualityPercent(Bitmap bitmap){
+        int fullSize      = bitmap.getByteCount();
+        Double percentage = fullPercentage*(idealSize/fullSize);
+
+        if (percentage > fullPercentage) {
+            return 80;
+        }
+
+        return percentage.intValue();
     }
 
 }

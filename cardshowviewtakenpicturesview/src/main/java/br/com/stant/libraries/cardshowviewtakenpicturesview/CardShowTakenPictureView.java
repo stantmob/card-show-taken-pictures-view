@@ -156,7 +156,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (cardShowTakenImage.getTempImagePathToShow() != null) {
             mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
         } else if (cardShowTakenImage.getLocalImageFilename() != null) {
-            Bitmap bitmap = ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cardShowTakenImage.getLocalImageFilename());
+            Bitmap bitmap = ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cardShowTakenImage.getLocalImageFilename(), 1);
             mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
         }
 
@@ -277,11 +277,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mOnSavedCardListener = onSavedCardListener;
     }
 
-    @Override
-    public int getCurrentImagesQuantity() {
-        return mCardShowTakenPictureViewImagesAdapter.getItemCount();
-    }
-
     public void setFragment(Fragment fragment) {
         mFragment = fragment;
         mActivity = fragment.getActivity();
@@ -359,7 +354,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void dispatchTakePictureOrPickGalleryIntent() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-        intent.putExtra(KEY_IMAGE_LIST_SIZE, getCurrentImagesQuantity());
+        intent.putExtra(KEY_IMAGE_LIST_SIZE, mCardShowTakenPictureViewImagesAdapter.getItemCount());
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
@@ -369,7 +364,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
-        imageGenerator = new ImageGenerator(getContext(), this);
+        imageGenerator = new ImageGenerator(getContext());
 
         if (requestCode == REQUEST_IMAGE_LIST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
 

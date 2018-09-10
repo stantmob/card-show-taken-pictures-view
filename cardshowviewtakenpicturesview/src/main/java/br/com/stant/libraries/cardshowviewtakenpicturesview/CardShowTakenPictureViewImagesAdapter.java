@@ -14,6 +14,7 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import io.reactivex.Observable;
 
@@ -153,7 +154,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private Bitmap getImage(CardShowTakenImage cardShowTakenImage) {
         if (hasLocalImage(cardShowTakenImage)) {
-            return ImageViewFileUtil.getBitmapFromFile(cardShowTakenImage.getLocalImageFilename(), getFile(), 2);
+            return ImageDecoder.getBitmapFromFile(getFile(), cardShowTakenImage.getLocalImageFilename(), 2);
         }
 
         return null;
@@ -173,7 +174,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     private String getTempImageFileToShowFromLocalImageFilename(String localImageFilename){
         String tempImageFilePath;
-        Bitmap bitmap = ImageViewFileUtil.getBitmapFromFile(localImageFilename, getFile(), 2);
+        Bitmap bitmap = ImageDecoder.getBitmapFromFile(getFile(), localImageFilename,2);
 
         tempImageFilePath = MediaStore.Images.Media.insertImage(mView.getContext().getContentResolver(),
                 bitmap, "temp_image_stant", null);

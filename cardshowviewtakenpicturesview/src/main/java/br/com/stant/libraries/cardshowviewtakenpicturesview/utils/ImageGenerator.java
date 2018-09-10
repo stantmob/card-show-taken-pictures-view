@@ -2,8 +2,6 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 
 import java.io.File;
@@ -14,8 +12,10 @@ import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
 
 public class ImageGenerator {
 
@@ -23,13 +23,10 @@ public class ImageGenerator {
     public static final Integer fromGallery     = 2;
     public static final Integer fromCameraFront = 3;
 
-    private CardContract mCardContract;
     private Context mContext;
-    private File mCompressedImage = null;
 
-    public ImageGenerator(Context context, CardContract cardContract) {
-        this.mContext      = context;
-        this.mCardContract = cardContract;
+    public ImageGenerator(Context context) {
+        this.mContext = context;
     }
 
     public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
@@ -45,11 +42,7 @@ public class ImageGenerator {
             return;
         }
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize          = 8;
-        options.inPreferredConfig     = Bitmap.Config.RGB_565;
-
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath(), options);
+        Bitmap bitmapImageFromIntentPath = ImageDecoder.getBitmapFromFile(photoTaken.getAbsolutePath(), 8);
 
         File file = new File(getFile() + "/" + photoTaken.getName());
 
@@ -66,11 +59,7 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize          = 8;
-        options.inPreferredConfig     = Bitmap.Config.RGB_565;
-
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath(), options);
+        Bitmap bitmapImageFromIntentPath = ImageDecoder.getBitmapFromFile(photoTaken.getAbsolutePath(), 1);
         File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType, null);
 
         cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());
@@ -78,18 +67,20 @@ public class ImageGenerator {
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
-        File file = new File(ImageViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
+        File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-        int  bitmapProportion = ImageDecoder.getImagePercentProportion(bitmap);
+        int quality = ImageDecoder.getImageQualityPercent(bitmap);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            if (typePhoto.equals(fromCameraBack)) {
-                rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
-            } else if (typePhoto.equals(fromGallery)){
-                bitmap.compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
-            } else if (typePhoto.equals(fromCameraFront)){
-                rotateImage(bitmap, orientationFromFront(orientation)).compress(Bitmap.CompressFormat.JPEG, bitmapProportion, fileOutputStream);
+            if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
+                try {
+                    rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                } catch (OutOfMemoryError outOfMemoryError) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                }
+            } else if (typePhoto.equals(fromGallery)) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -98,24 +89,5 @@ public class ImageGenerator {
         return file;
     }
 
-    private Bitmap rotateImage(Bitmap source, float angle) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-    }
-
-    private Integer orientationFromFront(int orientation){
-        if (orientation == 0){
-            return orientation;
-        } else if (orientation == 90){
-            return orientation + 180;
-        } else if (orientation == 180){
-            return orientation;
-        } else if (orientation == 270){
-            return orientation + 180;
-        }
-
-        return 0;
-    }
 
 }

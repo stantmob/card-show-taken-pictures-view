@@ -46,9 +46,9 @@ import io.fotoapparat.result.PhotoResult;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static com.annimon.stream.Optional.ofNullable;
-import static io.fotoapparat.result.transformer.ResolutionTransformersKt.scaled;
 
 public class CameraFragment extends Fragment implements CameraContract {
 
@@ -108,7 +108,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         setupDialog();
 
         mDialogLoader        = new DialogLoader(getContext());
-        mImageGenerator      = new ImageGenerator(getContext(), this);
+        mImageGenerator      = new ImageGenerator(getContext());
         mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);
     }
 
@@ -327,7 +327,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void takePicture() {
         PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
         String uuid             = UUID.randomUUID().toString();
-        File photoPath          = new File(mPath.toString() + "/" + uuid + JPEG_FILE_SUFFIX);
+        File photoPath          = new File(mPath.toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         mDialogLoader.showLocalLoader();
 
@@ -337,7 +337,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                 bitmapPhotoResult -> ofNullable(bitmapPhotoResult).ifPresent(
                         (bitmapPhoto) ->
                                 mImageGenerator.generateCardShowTakenImageFromCamera(bitmapPhoto.bitmap, getLensPosition(),
-                                        mOrientationListener.getRotationState(),
+                                        bitmapPhoto.rotationDegrees,
                                         new CardShowTakenPictureViewContract.CardShowTakenCompressedCallback() {
                                             @Override
                                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
@@ -375,7 +375,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
-        Bitmap bitmap = ImageDecoder.getBitmapFromFile(cameraPhoto.getTempImagePathToShow());
+        Bitmap bitmap = ImageDecoder.getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), 1);
 
         mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
         mPreviewPicDialog.show();

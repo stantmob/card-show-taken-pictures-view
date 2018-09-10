@@ -16,6 +16,7 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
@@ -79,7 +80,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     private Bitmap getLocalImage(CameraPhoto cameraPhoto) {
         if (hasLocalImage(cameraPhoto)) {
-            return ImageViewFileUtil.getBitmapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile(), 2);
+            return ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cameraPhoto.getLocalImageFilename(),2);
         }
 
         return null;

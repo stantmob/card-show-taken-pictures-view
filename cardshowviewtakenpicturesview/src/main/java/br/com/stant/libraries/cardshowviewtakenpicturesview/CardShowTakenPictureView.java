@@ -29,10 +29,10 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
@@ -88,7 +88,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private void setAdapter() {
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(new ArrayList<>(0), this);
 
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
@@ -153,12 +153,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage) {
-        if (cardShowTakenImage.getTempImagePathToShow() != null) {
-            mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
-        } else if (cardShowTakenImage.getLocalImageFilename() != null) {
-            Bitmap bitmap = ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cardShowTakenImage.getLocalImageFilename(), 1);
-            mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
-        }
+        setImageBitmapToImageView(mCardShowTakenPicturePreviewDialogBinding.previewImage, cardShowTakenImage, 1);
 
         mPreviewPicDialog.show();
     }
@@ -265,7 +260,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public boolean hasImageByIdentifier(String identifier) {
         List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getData();
         for (CardShowTakenImage cardShowTakenImage : cardShowTakenPictures) {
-            if (identifier == cardShowTakenImage.getIdentifier())
+            if (identifier.equals(cardShowTakenImage.getIdentifier()))
                 return true;
         }
 

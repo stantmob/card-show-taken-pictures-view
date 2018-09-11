@@ -23,11 +23,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     private CameraFragment mCameraFragment;
     private ItemViewHolder mViewHolder;
-    private Context mContext;
     private List<CameraPhoto> mPhotos;
 
-    public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
-        this.mContext        = context;
+    public CameraPhotosAdapter(CameraFragment cameraFragment) {
         this.mCameraFragment = cameraFragment;
         this.mPhotos         = new ArrayList<>();
     }
@@ -80,7 +78,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     private Bitmap getLocalImage(CameraPhoto cameraPhoto) {
         if (hasLocalImage(cameraPhoto)) {
-            return ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cameraPhoto.getLocalImageFilename(),2);
+            return ImageDecoder.getBitmapFromFile(ImageViewFileUtil.getFile(), cameraPhoto.getLocalImageFilename(),8);
         }
 
         return null;

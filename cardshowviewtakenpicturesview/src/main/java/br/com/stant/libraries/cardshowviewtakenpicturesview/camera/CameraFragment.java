@@ -109,7 +109,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mDialogLoader        = new DialogLoader(getContext());
         mImageGenerator      = new ImageGenerator(getContext());
-        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);
+        mCameraPhotosAdapter = new CameraPhotosAdapter(this);
     }
 
     @Nullable

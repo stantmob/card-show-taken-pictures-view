@@ -1,10 +1,12 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.bindings;
 
 import android.databinding.BindingAdapter;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 /**
  * Created by stant on 13/01/17.
@@ -22,7 +24,23 @@ public class ImageBinding {
                     .resize(Integer.valueOf(size), Integer.valueOf(size))
                     .centerCrop()
                     .placeholder(holder)
-                    .into(imageView);
+                    .into(new Target() {
+                        @Override
+                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                            imageView.setImageBitmap(bitmap);
+                        }
+
+                        @Override
+                        public void onBitmapFailed(Drawable errorDrawable) {
+                            imageView.setImageDrawable(errorDrawable);
+
+                        }
+
+                        @Override
+                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+                            imageView.setImageDrawable(placeHolderDrawable);
+                        }
+                    });
         }
         catch (Exception e){
             System.out.println("error on image");

@@ -2,8 +2,6 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.net.Uri;
 import android.provider.MediaStore;
 
@@ -14,9 +12,16 @@ import java.io.IOException;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPEG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFileSync;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
 
 public class ImageGenerator {
 
@@ -24,13 +29,10 @@ public class ImageGenerator {
     public static final Integer fromGallery     = 2;
     public static final Integer fromCameraFront = 3;
 
-    private CardContract mCardContract;
     private Context mContext;
-    private File mCompressedImage = null;
 
-    public ImageGenerator(Context context, CardContract cardContract) {
-        this.mContext      = context;
-        this.mCardContract = cardContract;
+    public ImageGenerator(Context context) {
+        this.mContext = context;
     }
 
     public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
@@ -40,17 +42,17 @@ public class ImageGenerator {
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
-    public static void generateCardShowTakenImageFromCamera(File photoTaken,
+    public void generateCardShowTakenImageFromCamera(File photoTaken,
                                                      CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         if (photoTaken == null) {
             return;
         }
 
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
+        final File file = new File(getFile() + "/" + photoTaken.getName());
 
-        File file = new File(getFile() + "/" + photoTaken.getName());
-
-        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), file.toString());
+        getBitmapFromFile(photoTaken.getAbsolutePath(), 8,
+                (bitmap) -> cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString())
+        );
     }
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
@@ -63,25 +65,29 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        Bitmap bitmapImageFromIntentPath = BitmapFactory.decodeFile(photoTaken.getAbsolutePath());
-        File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType, null);
-
-        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());
+        Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 1);
+        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
+        cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
-        File file = new File(ImageViewFileUtil.getFile().toString() + "/" + uuid + JPEG_FILE_SUFFIX);
+        File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
+
+        saveInPictures(bitmap, uuid);
+
+        int quality = ImageDecoder.getImageQualityPercent(bitmap);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            if (typePhoto.equals(fromCameraBack)) {
-                rotateImage(bitmap, orientation, uuid).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
-            } else if (typePhoto.equals(fromGallery)){
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 20, fileOutputStream);
-                saveInPictures(bitmap, uuid);
-            } else if (typePhoto.equals(fromCameraFront)){
-                rotateImage(bitmap, orientationFromFront(orientation), uuid).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream);
+            if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
+                try {
+                    rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                } catch (OutOfMemoryError outOfMemoryError) {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                }
+            } else if (typePhoto.equals(fromGallery)) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -91,33 +97,11 @@ public class ImageGenerator {
     }
 
     private void saveInPictures(Bitmap bitmap, String uuid){
-        MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid);
+        Observable.fromCallable(() -> MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
-
-    private Bitmap rotateImage(Bitmap source, float angle, String uuid) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(angle);
-
-        Bitmap bitmap = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
-
-        saveInPictures(bitmap, uuid);
-
-        return bitmap;
-    }
-
-    private Integer orientationFromFront(int orientation){
-        if (orientation == 0){
-            return orientation;
-        } else if (orientation == 90){
-            return orientation + 180;
-        } else if (orientation == 180){
-            return orientation;
-        } else if (orientation == 270){
-            return orientation + 180;
-        }
-
-        return 0;
-    }
 
 }

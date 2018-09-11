@@ -32,15 +32,16 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
-    public static final String KEY_LIMIT_IMAGES       = "limit_images";
-    public static final String KEY_IMAGE_LIST_SIZE    = "image_list_size";
-    public static final String KEY_IMAGE_CAMERA_LIST  = "image_camera_list";
-    public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION  = "is_multiple_gallery_selection";
-    public static final int REQUEST_IMAGE_LIST_RESULT = 2;
+    public static final String KEY_LIMIT_IMAGES                  = "limit_images";
+    public static final String KEY_IMAGE_LIST_SIZE               = "image_list_size";
+    public static final String KEY_IMAGE_CAMERA_LIST             = "image_camera_list";
+    public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
+    public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
     public boolean canEditState;
     private File mSdcardTempImagesDirectory = getFile();
     private File mPhotoTaken;
@@ -89,7 +90,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private void setAdapter() {
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(getContext(), new ArrayList<>(0), this);
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(new ArrayList<>(0), this);
 
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
         mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
@@ -158,12 +159,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage) {
-        if (cardShowTakenImage.getTempImagePathToShow() != null) {
-            mCardShowTakenPicturePreviewDialogBinding.setImageUrl(cardShowTakenImage.getTempImagePathToShow());
-        } else if (cardShowTakenImage.getLocalImageFilename() != null) {
-            Bitmap bitmap = ImageViewFileUtil.getBitMapFromFile(cardShowTakenImage.getLocalImageFilename(), ImageViewFileUtil.getFile());
-            mCardShowTakenPicturePreviewDialogBinding.previewImage.setImageBitmap(bitmap);
-        }
+        setImageBitmapToImageView(mCardShowTakenPicturePreviewDialogBinding.previewImage, cardShowTakenImage, 1);
 
         mPreviewPicDialog.show();
     }
@@ -270,7 +266,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public boolean hasImageByIdentifier(String identifier) {
         List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getData();
         for (CardShowTakenImage cardShowTakenImage : cardShowTakenPictures) {
-            if (identifier == cardShowTakenImage.getIdentifier())
+            if (identifier.equals(cardShowTakenImage.getIdentifier()))
                 return true;
         }
 
@@ -280,11 +276,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     @Override
     public void setOnSavedCardListener(OnSavedCardListener onSavedCardListener) {
         mOnSavedCardListener = onSavedCardListener;
-    }
-
-    @Override
-    public int getCurrentImagesQuantity() {
-        return mCardShowTakenPictureViewImagesAdapter.getItemCount();
     }
 
     public void setFragment(Fragment fragment) {
@@ -330,7 +321,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public void setExampleImages() {
         List<CardShowTakenImage> images = new ArrayList<>();
-        images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
+        images.add(new CardShowTakenImage(null, "https://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
         images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png", new Date(), new Date()));
 
         setCardImages(images);
@@ -364,7 +355,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void dispatchTakePictureOrPickGalleryIntent() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-        intent.putExtra(KEY_IMAGE_LIST_SIZE, getCurrentImagesQuantity());
+        intent.putExtra(KEY_IMAGE_LIST_SIZE, mCardShowTakenPictureViewImagesAdapter.getItemCount());
         intent.putExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, mIsMultipleGallerySelection);
 
         if (mFragment != null) {
@@ -375,7 +366,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void addImageOnActivityResult(int requestCode, int resultCode, Intent data) {
-        imageGenerator = new ImageGenerator(getContext(), this);
+        imageGenerator = new ImageGenerator(getContext());
 
         if (requestCode == REQUEST_IMAGE_LIST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
 

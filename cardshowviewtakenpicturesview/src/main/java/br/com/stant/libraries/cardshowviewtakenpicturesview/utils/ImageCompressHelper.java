@@ -21,7 +21,7 @@ public class ImageCompressHelper {
      * @param reqHeight
      * @return
      */
-    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
 // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -50,7 +50,6 @@ public class ImageCompressHelper {
      * @return
      */
     public static Bitmap getSmallBitmap(String filePath) {
-
         File file = new File(filePath);
         long originalSize = file.length();
 

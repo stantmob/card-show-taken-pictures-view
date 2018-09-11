@@ -16,17 +16,19 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
+
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
     private CameraFragment mCameraFragment;
     private ItemViewHolder mViewHolder;
-    private Context mContext;
     private List<CameraPhoto> mPhotos;
 
-    public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
-        this.mContext        = context;
+    public CameraPhotosAdapter(CameraFragment cameraFragment) {
         this.mCameraFragment = cameraFragment;
         this.mPhotos         = new ArrayList<>();
     }
@@ -58,7 +60,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     public void removePhoto(View view, CameraPhoto cameraPhoto){
         int position = mPhotos.indexOf(cameraPhoto);
         mPhotos.remove(cameraPhoto);
-        File file = new File(ImageViewFileUtil.getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
+        File file = new File(getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
             mCameraFragment.updateCounters();
         }
@@ -75,18 +77,6 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
              photos) {
             addPhoto(photo);
         }
-    }
-
-    private Bitmap getLocalImage(CameraPhoto cameraPhoto) {
-        if (hasLocalImage(cameraPhoto)) {
-            return ImageViewFileUtil.getBitMapFromFile(cameraPhoto.getLocalImageFilename(), ImageViewFileUtil.getFile());
-        }
-
-        return null;
-    }
-
-    private boolean hasLocalImage(CameraPhoto cameraPhoto) {
-        return cameraPhoto.getLocalImageFilename() != null;
     }
 
     public void addPicture(CameraPhoto cardShowTakenImage){
@@ -107,7 +97,10 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         }
 
         void updateView(CameraPhoto cameraPhoto) {
-            this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(getLocalImage(cameraPhoto));
+            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), 8,
+                    (bitmap) -> this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap)
+            );
+
             this.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             this.mCameraPhotosRecyclerViewBinding.executePendingBindings();
             this.mCameraPhotosRecyclerViewBinding.
@@ -115,4 +108,6 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
                     view -> mCameraFragment.showPreviewPicDialog(cameraPhoto));
         }
     }
+
+
 }

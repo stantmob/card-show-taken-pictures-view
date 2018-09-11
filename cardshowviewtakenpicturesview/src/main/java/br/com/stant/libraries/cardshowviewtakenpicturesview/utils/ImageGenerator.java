@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFileSync;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
@@ -42,11 +44,11 @@ public class ImageGenerator {
             return;
         }
 
-        Bitmap bitmapImageFromIntentPath = ImageDecoder.getBitmapFromFile(photoTaken.getAbsolutePath(), 8);
+        final File file = new File(getFile() + "/" + photoTaken.getName());
 
-        File file = new File(getFile() + "/" + photoTaken.getName());
-
-        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, photoTaken.getName(), file.toString());
+        getBitmapFromFile(photoTaken.getAbsolutePath(), 8,
+                (bitmap) -> cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString())
+        );
     }
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
@@ -59,10 +61,10 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        Bitmap bitmapImageFromIntentPath = ImageDecoder.getBitmapFromFile(photoTaken.getAbsolutePath(), 1);
-        File tempImagePathToShow         = createTempImageFileToShow(bitmapImageFromIntentPath, photoType, null);
+        Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 1);
+        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
+        cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
 
-        cardShowTakenCompressedCallback.onSuccess(bitmapImageFromIntentPath, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {

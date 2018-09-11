@@ -2,7 +2,9 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.widget.ImageView;
 
 import com.github.siyamed.shapeimageview.CircularImageView;
@@ -14,25 +16,45 @@ import java.io.File;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static io.reactivex.Observable.fromCallable;
 
 public class ImageDecoder {
 
-    public static Bitmap getBitmapFromFile(String localPhoto, Integer sampleSize){
-        BitmapFactory.Options options = getOptions(sampleSize);
+    public static Bitmap getBitmapFromFileSync(String localPhoto, Integer sampleSize){
+        Options options = getOptions(sampleSize);
 
         return BitmapFactory.decodeFile(localPhoto, options);
     }
 
-    public static Bitmap getBitmapFromFile(File localPath, String fileName, Integer sampleSize){
-        BitmapFactory.Options options = getOptions(sampleSize);
+    public static void getBitmapFromFile(String localPhoto, Integer sampleSize, BitmapFromFileCallback callback){
+        Options options = getOptions(sampleSize);
 
-        return BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options);
+        fromCallable(() -> BitmapFactory.decodeFile(localPhoto, options))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        callback::onBitmapDecoded
+                );
     }
 
-    private static BitmapFactory.Options getOptions(Integer sampleSize) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
+    public static void getBitmapFromFile(File localPath, String fileName, Integer sampleSize, BitmapFromFileCallback callback){
+        Options options = getOptions(sampleSize);
+
+
+        fromCallable(() -> BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        callback::onBitmapDecoded
+                );
+    }
+
+    private static Options getOptions(Integer sampleSize) {
+        Options options = new Options();
 
         options.inSampleSize      = sampleSize;
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -42,21 +64,11 @@ public class ImageDecoder {
 
     public static void setImageBitmapToImageView(ImageView imageView, CardShowTakenImage cardShowTakenImage, Integer sampleSize) {
         if (cardShowTakenImage.hasOnlyRemoteUrl()) {
-            ImageDecoder.setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
+            setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
         } else if (cardShowTakenImage.hasLocalImage()) {
-            imageView.setImageBitmap(ImageDecoder.getBitmapFromFile(getFile(), cardShowTakenImage.getLocalImageFilename(), sampleSize));
+            getBitmapFromFile(getFile(), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
         } else {
-            imageView.setImageBitmap(ImageDecoder.getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize));
-        }
-    }
-
-    public static void setImageBitmapToImageView(CircularImageView circularImageView, CardShowTakenImage cardShowTakenImage, Integer sampleSize) {
-        if (cardShowTakenImage.hasOnlyRemoteUrl()) {
-            ImageDecoder.setBitmapFromInternet(circularImageView, cardShowTakenImage.getRemoteImageUrl());
-        } else if (cardShowTakenImage.hasLocalImage()) {
-            circularImageView.setImageBitmap(ImageDecoder.getBitmapFromFile(getFile(), cardShowTakenImage.getLocalImageFilename(), sampleSize));
-        } else {
-            circularImageView.setImageBitmap(ImageDecoder.getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize));
+            getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, imageView::setImageBitmap);
         }
     }
 
@@ -64,10 +76,15 @@ public class ImageDecoder {
         if (url == null || url.isEmpty()) return;
 
         try{
-            Picasso.with(imageView.getContext())
+            Picasso.Builder builder = new Picasso.Builder(imageView.getContext());
+            builder.listener(
+                    (picasso, uri, exception) -> exception.printStackTrace()
+            );
+
+            builder.build()
                     .load(url)
-                    .resize(55, 55)
-                    .centerCrop()
+                    .resize(500, 500)
+                    .centerInside()
                     .placeholder(R.drawable.stant_city)
                     .into(new Target() {
                         @Override
@@ -78,7 +95,6 @@ public class ImageDecoder {
                         @Override
                         public void onBitmapFailed(Drawable errorDrawable) {
                             imageView.setImageDrawable(errorDrawable);
-
                         }
 
                         @Override
@@ -105,4 +121,6 @@ public class ImageDecoder {
 
         return percentage.intValue();
     }
+
+
 }

@@ -315,7 +315,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public void setExampleImages() {
         List<CardShowTakenImage> images = new ArrayList<>();
-        images.add(new CardShowTakenImage(null, "http://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
+        images.add(new CardShowTakenImage(null, "https://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
         images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png", new Date(), new Date()));
 
         setCardImages(images);

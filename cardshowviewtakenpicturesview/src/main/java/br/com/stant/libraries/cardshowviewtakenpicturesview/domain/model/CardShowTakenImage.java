@@ -66,7 +66,11 @@ public class CardShowTakenImage {
     }
 
     public boolean hasOnlyRemoteUrl() {
-        return remoteImageUrl != null && !remoteImageUrl.isEmpty();
+        return !hasLocalImage() && !hasTempPathToShow() && remoteImageUrl != null && !remoteImageUrl.isEmpty();
+    }
+
+    private boolean hasTempPathToShow() {
+        return tempImagePathToShow != null && !tempImagePathToShow.isEmpty();
     }
 
     public boolean hasLocalImage() {

@@ -3,6 +3,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +12,9 @@ import java.io.IOException;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFileSync;
@@ -64,12 +68,13 @@ public class ImageGenerator {
         Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 1);
         File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
-
     }
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
         File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
+
+        saveInPictures(bitmap, uuid);
 
         int quality = ImageDecoder.getImageQualityPercent(bitmap);
 
@@ -89,6 +94,13 @@ public class ImageGenerator {
         }
 
         return file;
+    }
+
+    private void saveInPictures(Bitmap bitmap, String uuid){
+        Observable.fromCallable(() -> MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
     }
 
 

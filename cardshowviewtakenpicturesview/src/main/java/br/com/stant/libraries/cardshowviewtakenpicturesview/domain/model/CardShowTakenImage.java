@@ -1,14 +1,8 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model;
 
 import android.graphics.Bitmap;
-import android.provider.MediaStore;
 
 import java.util.Date;
-
-import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewImagesAdapter;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
-
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenImage {
 
@@ -27,15 +21,6 @@ public class CardShowTakenImage {
         this.tempImagePathToShow       = tempImagePathToShow;
         this.createdAt                 = createdAt;
         this.updatedAt                 = updatedAt;
-    }
-
-    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
-                              Date createdAt, Date updatedAt) {
-        this.identifier         = identifier;
-        this.remoteImageUrl     = remoteImageUrl;
-        this.localImageFilename = localImageFilename;
-        this.createdAt          = createdAt;
-        this.updatedAt          = updatedAt;
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt, Date updatedAt) {
@@ -77,5 +62,7 @@ public class CardShowTakenImage {
         return localImageFilename != null && !localImageFilename.isEmpty();
     }
 
-
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 }

@@ -1,7 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model;
 
 import android.graphics.Bitmap;
-
 import java.util.Date;
 
 public class CardShowTakenImage {
@@ -21,6 +20,15 @@ public class CardShowTakenImage {
         this.tempImagePathToShow       = tempImagePathToShow;
         this.createdAt                 = createdAt;
         this.updatedAt                 = updatedAt;
+    }
+
+    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
+                              Date createdAt, Date updatedAt) {
+        this.identifier         = identifier;
+        this.remoteImageUrl     = remoteImageUrl;
+        this.localImageFilename = localImageFilename;
+        this.createdAt          = createdAt;
+        this.updatedAt          = updatedAt;
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt, Date updatedAt) {

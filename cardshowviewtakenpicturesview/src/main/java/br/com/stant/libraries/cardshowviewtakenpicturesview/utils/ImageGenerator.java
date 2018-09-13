@@ -74,7 +74,7 @@ public class ImageGenerator {
         String uuid = UUID.randomUUID().toString();
         File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-        saveInPictures(bitmap, uuid);
+//        saveInPictures(bitmap, uuid);
 
         int quality = ImageDecoder.getImageQualityPercent(bitmap);
 

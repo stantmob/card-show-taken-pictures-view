@@ -97,7 +97,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         }
 
         void updateView(CameraPhoto cameraPhoto) {
-            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), 8,
+            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), 2,
                     (bitmap) -> this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap)
             );
 

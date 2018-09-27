@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
@@ -22,6 +20,7 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
+import static io.reactivex.Observable.just;
 
 public class ImageGenerator {
 
@@ -50,7 +49,7 @@ public class ImageGenerator {
 
         final File file = new File(getFile() + "/" + photoTaken.getName());
 
-        getBitmapFromFile(photoTaken.getAbsolutePath(), 8,
+        getBitmapFromFile(photoTaken.getAbsolutePath(), 2,
                 (bitmap) -> cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString())
         );
     }
@@ -65,7 +64,7 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 1);
+        Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 600);
         File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
@@ -74,20 +73,21 @@ public class ImageGenerator {
         String uuid = UUID.randomUUID().toString();
         File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-//        saveInPictures(bitmap, uuid);
-
-        int quality = ImageDecoder.getImageQualityPercent(bitmap);
+        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, 1000);
+        final int quality   = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
+                saveInPictures(bitmap, orientation, uuid);
+
                 try {
-                    rotateImage(bitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                    rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
                 } catch (OutOfMemoryError outOfMemoryError) {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
                 }
             } else if (typePhoto.equals(fromGallery)) {
-                bitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -96,10 +96,17 @@ public class ImageGenerator {
         return file;
     }
 
-    private void saveInPictures(Bitmap bitmap, String uuid){
-        Observable.fromCallable(() -> MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
+    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
+        try {
+            subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
+        } catch (OutOfMemoryError outOfMemoryError) {
+            subscribeSaveImageInPicturesThread(bitmap, uuid);
+        }
+    }
+
+    private void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
+        just(MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe();
     }
 

@@ -4,10 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
-import com.github.siyamed.shapeimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Picasso.LoadedFrom;
 import com.squareup.picasso.Target;
@@ -20,20 +19,78 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
-import static io.reactivex.Observable.fromCallable;
+import static io.reactivex.Observable.just;
 
 public class ImageDecoder {
 
-    public static Bitmap getBitmapFromFileSync(String localPhoto, Integer sampleSize){
-        Options options = getOptions(sampleSize);
+    static Bitmap scaleBitmap(@NonNull Bitmap bitmap, @NonNull Integer desiredSize) {
+        Integer width  = bitmap.getWidth();
+        Integer height = bitmap.getHeight();
+
+        Integer idealWidth  = calculateIdealWidth(width, height, desiredSize);
+        Integer idealHeight = calculateIdealHeight(width, height, desiredSize);
+
+        return Bitmap.createScaledBitmap(bitmap, idealWidth, idealHeight, false);
+    }
+
+    private static Integer calculateIdealWidth(Integer width, Integer height, Integer desiredWidth) {
+        if (width >= height) {
+            return desiredWidth;
+        } else {
+            Double idealWidthAsDouble = ((width.doubleValue()/height) * desiredWidth);
+            return idealWidthAsDouble.intValue();
+        }
+    }
+
+    private static Integer calculateIdealHeight(Integer width, Integer height, Integer desiredHeight) {
+        if (height >= width) {
+            return desiredHeight;
+        } else {
+            Double idealHeightAsDouble = ((height.doubleValue()/width) * desiredHeight);
+            return idealHeightAsDouble.intValue();
+        }
+    }
+
+    static Bitmap getBitmapFromFileSync(@NonNull String localPhoto, @NonNull Integer desiredSize){
+        Options options = new Options();
+
+        options.inSampleSize       = 1;
+        options.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeFile(localPhoto, options);
+
+        options.inSampleSize       = calculateInSampleSize(options, desiredSize, desiredSize);
+        options.inJustDecodeBounds = false;
 
         return BitmapFactory.decodeFile(localPhoto, options);
     }
 
-    public static void getBitmapFromFile(String localPhoto, Integer sampleSize, BitmapFromFileCallback callback){
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width  = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth  = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    public static void getBitmapFromFile(String localPhoto, Integer sampleSize, BitmapFromFileCallback callback) {
         Options options = getOptions(sampleSize);
 
-        fromCallable(() -> BitmapFactory.decodeFile(localPhoto, options))
+        just(BitmapFactory.decodeFile(localPhoto, options))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -41,11 +98,10 @@ public class ImageDecoder {
                 );
     }
 
-    public static void getBitmapFromFile(File localPath, String fileName, Integer sampleSize, BitmapFromFileCallback callback){
+    public static void getBitmapFromFile(File localPath, String fileName, Integer sampleSize, BitmapFromFileCallback callback) {
         Options options = getOptions(sampleSize);
 
-
-        fromCallable(() -> BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
+        just(BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -56,8 +112,9 @@ public class ImageDecoder {
     private static Options getOptions(Integer sampleSize) {
         Options options = new Options();
 
-        options.inSampleSize      = sampleSize;
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        options.inSampleSize       = sampleSize;
+        options.inJustDecodeBounds = false;
+        options.inPreferredConfig  = Bitmap.Config.ARGB_8888;
 
         return options;
     }
@@ -108,8 +165,8 @@ public class ImageDecoder {
         }
     }
 
-    public static Integer getImageQualityPercent(Bitmap bitmap){
-        final int fullPercentage = 70;
+    static Integer getImageQualityPercent(Bitmap bitmap){
+        final int fullPercentage = 80;
         final Double idealSize   = 10000000.0;
 
         int fullSize      = bitmap.getByteCount();

@@ -11,7 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
-import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
@@ -35,27 +35,28 @@ public class ImageGenerator {
     }
 
     public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
-                                                     CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+                                                     CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, orientation);
 
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
     public void generateCardShowTakenImageFromCamera(File photoTaken,
-                                                     CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+                                                     CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         if (photoTaken == null) {
             return;
         }
 
         final File file = new File(getFile() + "/" + photoTaken.getName());
 
-        getBitmapFromFile(photoTaken.getAbsolutePath(), 2,
+        final Integer sampleSizeForSmallImages = 2;
+        getBitmapFromFile(photoTaken.getAbsolutePath(), sampleSizeForSmallImages,
                 (bitmap) -> cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString())
         );
     }
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
-                                                           CardShowTakenPictureViewContract.CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
+                                                           CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         File photoTaken = new File(ImageViewFileUtil.getFile().toString());
 
         try {
@@ -64,7 +65,9 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        Bitmap bitmap = getBitmapFromFileSync(photoTaken.getAbsolutePath(), 600);
+        final Integer desiredSize = 600;
+        Bitmap bitmap             = getBitmapFromFileSync(photoTaken.getAbsolutePath(), desiredSize);
+
         File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
         cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
@@ -73,8 +76,9 @@ public class ImageGenerator {
         String uuid = UUID.randomUUID().toString();
         File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, 1000);
-        final int quality   = ImageDecoder.getImageQualityPercent(scaledBitmap);
+        final Integer desiredSize = 1000;
+        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);

@@ -54,8 +54,9 @@ public class ImageDecoder {
     static Bitmap getBitmapFromFileSync(@NonNull String localPhoto, @NonNull Integer desiredSize){
         Options options = new Options();
 
-        options.inSampleSize       = 1;
-        options.inJustDecodeBounds = true;
+        final int defaultSampleSize = 1;
+        options.inSampleSize        = defaultSampleSize;
+        options.inJustDecodeBounds  = true;
 
         BitmapFactory.decodeFile(localPhoto, options);
 

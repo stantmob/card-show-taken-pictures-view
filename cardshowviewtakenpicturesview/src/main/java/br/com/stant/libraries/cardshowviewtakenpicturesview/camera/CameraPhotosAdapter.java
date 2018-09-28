@@ -1,9 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +14,6 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
@@ -97,7 +93,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         }
 
         void updateView(CameraPhoto cameraPhoto) {
-            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), 2,
+            final Integer sampleSizeForSmallImages = 2;
+
+            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
                     (bitmap) -> this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap)
             );
 

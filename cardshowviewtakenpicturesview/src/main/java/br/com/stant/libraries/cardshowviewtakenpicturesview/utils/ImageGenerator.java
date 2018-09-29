@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -65,7 +66,7 @@ public class ImageGenerator {
             e.printStackTrace();
         }
 
-        final Integer desiredSize = 600;
+        final Integer desiredSize = 800;
         Bitmap bitmap             = getBitmapFromFileSync(photoTaken.getAbsolutePath(), desiredSize);
 
         File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
@@ -76,24 +77,28 @@ public class ImageGenerator {
         String uuid = UUID.randomUUID().toString();
         File file   = new File(ImageViewFileUtil.getFile().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-        final Integer desiredSize = 1000;
+        final Integer desiredSize = 1400;
         Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
         final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
                 saveInPictures(bitmap, orientation, uuid);
 
                 try {
-                    rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                    rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 } catch (OutOfMemoryError outOfMemoryError) {
-                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                    scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 }
             } else if (typePhoto.equals(fromGallery)) {
-                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, fileOutputStream);
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             }
-        } catch (FileNotFoundException e) {
+
+            fileOutputStream.write(outputStream.toByteArray());
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

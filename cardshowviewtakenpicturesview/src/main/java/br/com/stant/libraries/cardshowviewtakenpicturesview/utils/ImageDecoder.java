@@ -167,8 +167,8 @@ public class ImageDecoder {
     }
 
     static Integer getImageQualityPercent(Bitmap bitmap){
-        final int fullPercentage = 80;
-        final Double idealSize   = 10000000.0;
+        final int fullPercentage = 90;
+        final Double idealSize   = 15000000.0;
 
         int fullSize      = bitmap.getByteCount();
         Double percentage = fullPercentage*(idealSize/fullSize);

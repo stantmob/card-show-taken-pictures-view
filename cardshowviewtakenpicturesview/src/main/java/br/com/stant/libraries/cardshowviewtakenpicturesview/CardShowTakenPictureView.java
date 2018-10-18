@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
@@ -383,6 +384,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, cameraPhoto.getCreatedAt(), cameraPhoto.getUpdatedAt());
+
+                                imageGenerator.subscribeSaveImageInPicturesThread(bitmap, UUID.randomUUID().toString());
 
                                 mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                                 mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);

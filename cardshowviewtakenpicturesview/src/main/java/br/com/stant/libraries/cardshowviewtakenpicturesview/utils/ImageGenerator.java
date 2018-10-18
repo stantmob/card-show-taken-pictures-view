@@ -86,7 +86,6 @@ public class ImageGenerator {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
-                saveInPictures(bitmap, orientation, uuid);
 
                 try {
                     rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
@@ -105,15 +104,7 @@ public class ImageGenerator {
         return file;
     }
 
-    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
-        try {
-            subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
-        } catch (OutOfMemoryError outOfMemoryError) {
-            subscribeSaveImageInPicturesThread(bitmap, uuid);
-        }
-    }
-
-    private void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
+    public void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
         just(MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe();

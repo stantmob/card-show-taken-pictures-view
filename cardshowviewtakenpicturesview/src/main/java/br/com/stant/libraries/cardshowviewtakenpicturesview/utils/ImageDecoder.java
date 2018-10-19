@@ -1,9 +1,11 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.drawable.Drawable;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
@@ -12,6 +14,7 @@ import com.squareup.picasso.Picasso.LoadedFrom;
 import com.squareup.picasso.Target;
 
 import java.io.File;
+import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -180,5 +183,10 @@ public class ImageDecoder {
         return percentage.intValue();
     }
 
+    public static void subscribeSaveImageInPicturesThread(Context context, Bitmap bitmap) {
+        just(MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "stant", UUID.randomUUID().toString()))
+                .subscribeOn(Schedulers.newThread())
+                .subscribe();
+    }
 
 }

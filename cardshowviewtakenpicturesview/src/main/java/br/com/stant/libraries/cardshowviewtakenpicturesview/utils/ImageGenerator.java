@@ -3,17 +3,14 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.MediaStore;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
-import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFileSync;
@@ -21,7 +18,6 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
-import static io.reactivex.Observable.just;
 
 public class ImageGenerator {
 
@@ -86,7 +82,6 @@ public class ImageGenerator {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
-                saveInPictures(bitmap, orientation, uuid);
 
                 try {
                     rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
@@ -104,20 +99,5 @@ public class ImageGenerator {
 
         return file;
     }
-
-    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
-        try {
-            subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
-        } catch (OutOfMemoryError outOfMemoryError) {
-            subscribeSaveImageInPicturesThread(bitmap, uuid);
-        }
-    }
-
-    private void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
-        just(MediaStore.Images.Media.insertImage(mContext.getContentResolver(), bitmap, "stant", uuid))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe();
-    }
-
 
 }

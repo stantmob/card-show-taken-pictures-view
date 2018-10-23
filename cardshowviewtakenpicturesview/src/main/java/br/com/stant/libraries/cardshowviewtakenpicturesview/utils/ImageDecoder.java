@@ -9,9 +9,8 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Picasso.LoadedFrom;
-import com.squareup.picasso.Target;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
 import java.util.UUID;
@@ -137,32 +136,10 @@ public class ImageDecoder {
         if (url == null || url.isEmpty()) return;
 
         try{
-            Picasso.Builder builder = new Picasso.Builder(imageView.getContext());
-            builder.listener(
-                    (picasso, uri, exception) -> exception.printStackTrace()
-            );
 
-            builder.build()
-                    .load(url)
-                    .resize(500, 500)
-                    .centerInside()
-                    .placeholder(R.drawable.stant_city)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, LoadedFrom from) {
-                            imageView.setImageBitmap(bitmap);
-                        }
-
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            imageView.setImageDrawable(errorDrawable);
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                            imageView.setImageDrawable(placeHolderDrawable);
-                        }
-                    });
+            Glide.with(imageView.getContext()).applyDefaultRequestOptions(
+                    new RequestOptions().placeholder(R.drawable.stant_city).centerInside()
+                    .override(500,500)).load(url).into(imageView);
         }
         catch (Exception e){
             e.printStackTrace();

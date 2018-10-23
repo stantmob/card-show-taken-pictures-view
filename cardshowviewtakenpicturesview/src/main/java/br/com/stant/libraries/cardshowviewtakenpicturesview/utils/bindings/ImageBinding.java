@@ -3,14 +3,19 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.bindings;
 import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
-/**
- * Created by stant on 13/01/17.
- */
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class ImageBinding {
 
@@ -18,33 +23,27 @@ public class ImageBinding {
     public static void loadCardImage(ImageView imageView, String url, String size, Drawable holder){
         if (hasNoUlr(url)) return;
 
-        try{
-            Picasso.with(imageView.getContext())
-                    .load(url)
-                    .resize(Integer.valueOf(size), Integer.valueOf(size))
-                    .centerCrop()
-                    .placeholder(holder)
-                    .into(new Target() {
-                        @Override
-                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                            imageView.setImageBitmap(bitmap);
-                        }
+        try {
+            Uri uri = Uri.parse(url);
 
-                        @Override
-                        public void onBitmapFailed(Drawable errorDrawable) {
-                            imageView.setImageDrawable(errorDrawable);
+            Observable.just(Glide.with(imageView.getContext()).load(uri))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            (requestBuilder) ->
+                                    requestBuilder.into(new SimpleTarget<Drawable>(Integer.parseInt(size), Integer.parseInt(size)) {
+                                        @Override
+                                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                            imageView.setImageDrawable(resource);
+                                        }
+                                    })
+                    );
 
-                        }
-
-                        @Override
-                        public void onPrepareLoad(Drawable placeHolderDrawable) {
-                            imageView.setImageDrawable(placeHolderDrawable);
-                        }
-                    });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println("error on image");
         }
+
+
     }
 
     @BindingAdapter({"cardImgUrl","cardImgHolder"})
@@ -52,10 +51,8 @@ public class ImageBinding {
         if (hasNoUlr(url)) return;
 
         try {
-            Picasso.with(imageView.getContext())
-                    .load(url)
-                    .placeholder(holder)
-                    .into(imageView);
+            Glide.with(imageView.getContext()).load(url)
+                    .apply(new RequestOptions().placeholder(holder)).into(imageView);
         }
         catch (Exception e){
             System.out.println(" error vei");

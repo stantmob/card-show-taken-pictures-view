@@ -63,7 +63,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
-    private File mPath = ImageViewFileUtil.getPrivateTempDirectory();
+    private File mPath;
     private ImageButton mButtonCapture;
     private CameraSetup mCameraSetup;
     private ImageView mButtonReturnPhotos;
@@ -104,6 +104,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mPath = ImageViewFileUtil.getPrivateTempDirectory(getContext());
+
         getActivity().getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED);
@@ -112,7 +114,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mDialogLoader        = new DialogLoader(getContext());
         mImageGenerator      = new ImageGenerator(getContext());
-        mCameraPhotosAdapter = new CameraPhotosAdapter(this);
+        mCameraPhotosAdapter = new CameraPhotosAdapter(getContext(), this);
     }
 
     @Nullable

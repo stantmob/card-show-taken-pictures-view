@@ -1,6 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,10 +24,12 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     private CameraFragment mCameraFragment;
     private ItemViewHolder mViewHolder;
     private List<CameraPhoto> mPhotos;
+    private final Context mContext;
 
-    public CameraPhotosAdapter(CameraFragment cameraFragment) {
+    public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
         this.mCameraFragment = cameraFragment;
         this.mPhotos         = new ArrayList<>();
+        this.mContext        = context;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     public void removePhoto(View view, CameraPhoto cameraPhoto){
         int position = mPhotos.indexOf(cameraPhoto);
         mPhotos.remove(cameraPhoto);
-        File file = new File(getPrivateTempDirectory().toString() + "/" + cameraPhoto.getLocalImageFilename());
+        File file = new File(getPrivateTempDirectory(mContext).toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
             mCameraFragment.updateCounters();
         }
@@ -95,7 +98,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         void updateView(CameraPhoto cameraPhoto) {
             final Integer sampleSizeForSmallImages = 2;
 
-            getBitmapFromFile(getPrivateTempDirectory(), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
+            getBitmapFromFile(getPrivateTempDirectory(mContext), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
                     (bitmap) -> this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap)
             );
 

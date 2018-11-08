@@ -122,7 +122,7 @@ public class ImageDecoder {
         if (cardShowTakenImage.hasOnlyRemoteUrl()) {
             setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
         } else if (cardShowTakenImage.hasLocalImage()) {
-            getBitmapFromFile(getPrivateTempDirectory(), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
+            getBitmapFromFile(getPrivateTempDirectory(imageView.getContext()), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
         } else {
             getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, imageView::setImageBitmap);
         }

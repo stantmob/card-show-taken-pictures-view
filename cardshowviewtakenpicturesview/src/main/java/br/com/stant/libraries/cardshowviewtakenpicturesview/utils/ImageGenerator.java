@@ -49,7 +49,7 @@ public class ImageGenerator {
             return;
         }
 
-        final File file = new File(getPrivateTempDirectory() + "/" + photoTaken.getName());
+        final File file = new File(getPrivateTempDirectory(mContext) + "/" + photoTaken.getName());
 
         final Integer sampleSizeForSmallImages = 2;
         getBitmapFromFile(photoTaken.getAbsolutePath(), sampleSizeForSmallImages,
@@ -59,7 +59,7 @@ public class ImageGenerator {
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
                                                            CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        File photoTaken = new File(ImageViewFileUtil.getPrivateTempDirectory().toString());
+        File photoTaken = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString());
 
         try {
             photoTaken = ImageViewFileUtil.from(mContext, data);
@@ -76,14 +76,14 @@ public class ImageGenerator {
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
-        File file   = new File(ImageViewFileUtil.getPrivateTempDirectory().toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
+        File file   = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         final Integer desiredSize = 1400;
         Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
         final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
-            FileOutputStream fileOutputStream  = new FileOutputStream(file);
+            FileOutputStream fileOutputStream  = mContext.openFileOutput(file.getName(), Context.MODE_PRIVATE);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {

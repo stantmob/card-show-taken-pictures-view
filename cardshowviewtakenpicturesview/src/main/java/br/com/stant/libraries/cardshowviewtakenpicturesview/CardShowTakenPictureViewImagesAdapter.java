@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,11 +11,9 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import io.reactivex.Observable;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
 
 public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder> {
 

@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewBinding;
@@ -32,8 +33,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.subscribeSaveImageInPicturesThread;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -43,7 +43,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
     public boolean canEditState;
-    private File mSdcardTempImagesDirectory = getFile();
+    private File mSdcardTempImagesDirectory = getPrivateTempDirectory();
     private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;
@@ -74,8 +74,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         setOrientation(HORIZONTAL);
 
         setAdapter();
-
-        ImageViewFileUtil.createTempDirectory(mSdcardTempImagesDirectory);
 
         setupDialog();
         setupEditMode();
@@ -204,7 +202,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             for (CardShowTakenImage cardShowTakenImage :
                     imagesAsRemoved) {
                 if (cardShowTakenImage.getLocalImageFilename() != null) {
-                    File file = new File(getFile() + "/" + cardShowTakenImage.getLocalImageFilename());
+                    File file = new File(getPrivateTempDirectory() + "/" + cardShowTakenImage.getLocalImageFilename());
                     if (file.exists()) {
                         file.delete();
                     }
@@ -383,8 +381,6 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, cameraPhoto.getCreatedAt(), cameraPhoto.getUpdatedAt());
-
-                                subscribeSaveImageInPicturesThread(getContext(), bitmap);
 
                                 mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                                 mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);

@@ -43,7 +43,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
     public boolean canEditState;
-    private File mSdcardTempImagesDirectory = getPrivateTempDirectory();
+    private File mSdcardTempImagesDirectory = getPrivateTempDirectory(getContext());
     private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;
@@ -202,7 +202,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             for (CardShowTakenImage cardShowTakenImage :
                     imagesAsRemoved) {
                 if (cardShowTakenImage.getLocalImageFilename() != null) {
-                    File file = new File(getPrivateTempDirectory() + "/" + cardShowTakenImage.getLocalImageFilename());
+                    File file = new File(getPrivateTempDirectory(getContext()) + "/" + cardShowTakenImage.getLocalImageFilename());
                     if (file.exists()) {
                         file.delete();
                     }

@@ -22,18 +22,9 @@ public class ImageViewFileUtil {
     public static final String JPG_FILE_PREFIX   = "IMG-";
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     private static final int EOF                 = -1;
-    private static String tempPath               = "/<br.com.stant>/temp";
 
-    public static File getPrivateTempDirectory() {
-        File directory = new File(Environment.getExternalStorageDirectory(), tempPath);
-
-        if (directoryDoesNotExists(directory)) {
-            if (!createDirectory(directory)) {
-                Log.e(ImageGenerator.class.getCanonicalName(), "Directory not created");
-            }
-        }
-
-        return directory;
+    public static File getPrivateTempDirectory(Context context) {
+        return context.getFilesDir();
     }
 
     public static File getPublicAlbumDirectoryAtPictures(String albumName) {

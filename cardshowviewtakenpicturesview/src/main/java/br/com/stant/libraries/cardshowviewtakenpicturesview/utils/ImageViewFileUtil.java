@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.OpenableColumns;
@@ -16,22 +15,50 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ImageViewFileUtil {
 
     public static final String JPG_FILE_SUFFIX   = ".jpg";
-    public static final String JPG_FILE_PREFIX  = "IMG-";
+    public static final String JPG_FILE_PREFIX   = "IMG-";
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
     private static final int EOF                 = -1;
-    private static String path                   = "/<br.com.stant>/temp";
+    private static String tempPath               = "/<br.com.stant>/temp";
 
-    public static File getFile() {
-        return new File(Environment.getExternalStorageDirectory(), path);
+    public static File getPrivateTempDirectory() {
+        File directory = new File(Environment.getExternalStorageDirectory(), tempPath);
+
+        if (directoryDoesNotExists(directory)) {
+            if (!createDirectory(directory)) {
+                Log.e(ImageGenerator.class.getCanonicalName(), "Directory not created");
+            }
+        }
+
+        return directory;
     }
 
-    public static Bitmap rotateImage(Bitmap source, float angle) throws OutOfMemoryError{
+    public static File getPublicAlbumDirectoryAtPictures(String albumName) {
+        File directory = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), albumName);
+
+        if (directoryDoesNotExists(directory)) {
+            if (!createDirectory(directory)) {
+                Log.e(ImageGenerator.class.getCanonicalName(), "Directory not created");
+                return null;
+            }
+        }
+
+        return directory;
+    }
+
+    private static boolean directoryDoesNotExists(File directory) {
+        return !directory.exists();
+    }
+
+    private static boolean createDirectory(File directory) {
+        return directory.mkdirs();
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) throws OutOfMemoryError {
         Matrix matrix = new Matrix();
 
         if (angle % 180 == 0) {
@@ -43,18 +70,13 @@ public class ImageViewFileUtil {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-    public static void createTempDirectory(File dir) {
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-    }
-
     public static File from(Context context, Uri uri) throws IOException {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
-        String fileName = getFileName(context, uri);
-        String[] splitName = splitFileName(fileName);
-        File tempFile = File.createTempFile(splitName[0], splitName[1]);
-        tempFile = rename(tempFile, fileName);
+        String fileName         = getFileName(context, uri);
+        String[] splitName      = splitFileName(fileName);
+        File tempFile           = File.createTempFile(splitName[0], splitName[1]);
+        tempFile                = rename(tempFile, fileName);
+
         tempFile.deleteOnExit();
         FileOutputStream out = null;
         try {
@@ -134,6 +156,7 @@ public class ImageViewFileUtil {
 
         return new String[]{name, extension};
     }
+
 
 }
 

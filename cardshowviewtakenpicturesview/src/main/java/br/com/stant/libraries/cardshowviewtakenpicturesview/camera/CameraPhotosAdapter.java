@@ -16,7 +16,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPh
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
@@ -56,7 +56,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     public void removePhoto(View view, CameraPhoto cameraPhoto){
         int position = mPhotos.indexOf(cameraPhoto);
         mPhotos.remove(cameraPhoto);
-        File file = new File(getFile().toString() + "/" + cameraPhoto.getLocalImageFilename());
+        File file = new File(getPrivateTempDirectory().toString() + "/" + cameraPhoto.getLocalImageFilename());
         if(file.delete()){
             mCameraFragment.updateCounters();
         }
@@ -95,7 +95,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         void updateView(CameraPhoto cameraPhoto) {
             final Integer sampleSizeForSmallImages = 2;
 
-            getBitmapFromFile(getFile(), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
+            getBitmapFromFile(getPrivateTempDirectory(), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
                     (bitmap) -> this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap)
             );
 

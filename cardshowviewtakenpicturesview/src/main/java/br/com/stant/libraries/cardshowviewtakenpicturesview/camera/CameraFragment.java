@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
-import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
@@ -38,7 +37,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFr
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
@@ -65,7 +63,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotosAdapter mCameraPhotosAdapter;
-    private File mPath = ImageViewFileUtil.getFile();
+    private File mPath = ImageViewFileUtil.getPrivateTempDirectory();
     private ImageButton mButtonCapture;
     private CameraSetup mCameraSetup;
     private ImageView mButtonReturnPhotos;
@@ -105,7 +103,6 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ImageViewFileUtil.createTempDirectory(mPath);
 
         getActivity().getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,

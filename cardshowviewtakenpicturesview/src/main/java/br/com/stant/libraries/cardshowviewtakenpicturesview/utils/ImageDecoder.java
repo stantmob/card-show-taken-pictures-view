@@ -1,11 +1,8 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
-import android.graphics.drawable.Drawable;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.widget.ImageView;
 
@@ -13,14 +10,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
-import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static io.reactivex.Observable.just;
 
 public class ImageDecoder {
@@ -39,7 +35,7 @@ public class ImageDecoder {
         if (width >= height) {
             return desiredWidth;
         } else {
-            Double idealWidthAsDouble = ((width.doubleValue()/height) * desiredWidth);
+            Double idealWidthAsDouble = ((width.doubleValue() / height) * desiredWidth);
             return idealWidthAsDouble.intValue();
         }
     }
@@ -48,12 +44,12 @@ public class ImageDecoder {
         if (height >= width) {
             return desiredHeight;
         } else {
-            Double idealHeightAsDouble = ((height.doubleValue()/width) * desiredHeight);
+            Double idealHeightAsDouble = ((height.doubleValue() / width) * desiredHeight);
             return idealHeightAsDouble.intValue();
         }
     }
 
-    static Bitmap getBitmapFromFileSync(@NonNull String localPhoto, @NonNull Integer desiredSize){
+    static Bitmap getBitmapFromFileSync(@NonNull String localPhoto, @NonNull Integer desiredSize) {
         Options options = new Options();
 
         final int defaultSampleSize = 1;
@@ -126,7 +122,7 @@ public class ImageDecoder {
         if (cardShowTakenImage.hasOnlyRemoteUrl()) {
             setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
         } else if (cardShowTakenImage.hasLocalImage()) {
-            getBitmapFromFile(getFile(), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
+            getBitmapFromFile(getPrivateTempDirectory(), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
         } else {
             getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, imageView::setImageBitmap);
         }
@@ -135,23 +131,21 @@ public class ImageDecoder {
     private static void setBitmapFromInternet(ImageView imageView, String url) {
         if (url == null || url.isEmpty()) return;
 
-        try{
-
+        try {
             Glide.with(imageView.getContext()).applyDefaultRequestOptions(
                     new RequestOptions().placeholder(R.drawable.stant_city).centerInside()
-                    .override(500,500)).load(url).into(imageView);
-        }
-        catch (Exception e){
+                            .override(500, 500)).load(url).into(imageView);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    static Integer getImageQualityPercent(Bitmap bitmap){
+    static Integer getImageQualityPercent(Bitmap bitmap) {
         final int fullPercentage = 90;
         final Double idealSize   = 15000000.0;
 
         int fullSize      = bitmap.getByteCount();
-        Double percentage = fullPercentage*(idealSize/fullSize);
+        Double percentage = fullPercentage * (idealSize / fullSize);
 
         if (percentage > fullPercentage) {
             return fullPercentage;
@@ -160,10 +154,5 @@ public class ImageDecoder {
         return percentage.intValue();
     }
 
-    public static void subscribeSaveImageInPicturesThread(Context context, Bitmap bitmap) {
-        just(MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap, "stant", UUID.randomUUID().toString()))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe();
-    }
 
 }

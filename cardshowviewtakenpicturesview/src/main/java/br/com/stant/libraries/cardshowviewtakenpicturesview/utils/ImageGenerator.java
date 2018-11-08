@@ -87,7 +87,7 @@ public class ImageGenerator {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
-                saveInPictures(bitmap, orientation, uuid);
+                saveInPictures(scaledBitmap, orientation, uuid);
 
                 try {
                     rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, outputStream);

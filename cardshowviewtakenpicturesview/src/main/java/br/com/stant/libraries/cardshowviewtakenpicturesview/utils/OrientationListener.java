@@ -90,4 +90,5 @@ public abstract class OrientationListener extends OrientationEventListener {
 
     public abstract void onSimpleOrientationChanged(int orientation);
 
+
 }

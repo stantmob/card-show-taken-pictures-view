@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,6 +37,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraS
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
@@ -384,12 +386,18 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
-        getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), 1,
-                (bitmap) -> {
-                    mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
-                    mPreviewPicDialog.show();
-                }
-        );
+        getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), 1, new BitmapFromFileCallback() {
+            @Override
+            public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+                mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
+                mPreviewPicDialog.show();
+            }
+
+            @Override
+            public void fileNotFound() {
+
+            }
+        });
     }
 
     @Override

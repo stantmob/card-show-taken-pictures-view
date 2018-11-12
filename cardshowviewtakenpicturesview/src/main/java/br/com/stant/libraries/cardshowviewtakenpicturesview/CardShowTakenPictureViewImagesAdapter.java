@@ -54,6 +54,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     public void replaceData(List<CardShowTakenImage> imageUrlsList) {
         mCurrentCardShowTakenImageList = imageUrlsList;
+        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
         notifyDataSetChanged();
     }
 

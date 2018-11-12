@@ -52,9 +52,17 @@ public class ImageGenerator {
         final File file = new File(getPrivateTempDirectory(mContext) + "/" + photoTaken.getName());
 
         final Integer sampleSizeForSmallImages = 2;
-        getBitmapFromFile(photoTaken.getAbsolutePath(), sampleSizeForSmallImages,
-                (bitmap) -> cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString())
-        );
+        getBitmapFromFile(photoTaken.getAbsolutePath(), sampleSizeForSmallImages, new BitmapFromFileCallback() {
+            @Override
+            public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+                cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString());
+            }
+
+            @Override
+            public void fileNotFound() {
+
+            }
+        });
     }
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,

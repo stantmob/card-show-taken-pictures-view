@@ -10,6 +10,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -86,26 +88,41 @@ public class ImageDecoder {
         return inSampleSize;
     }
 
-    public static void getBitmapFromFile(String localPhoto, Integer sampleSize, BitmapFromFileCallback callback) {
+    public static void getBitmapFromFile(String filePath, Integer sampleSize, BitmapFromFileCallback callback) {
         Options options = getOptions(sampleSize);
 
-        just(BitmapFactory.decodeFile(localPhoto, options))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        callback::onBitmapDecoded
-                );
+        if (fileExits(filePath)) {
+            just(BitmapFactory.decodeFile(filePath, options))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            callback::onBitmapDecoded
+                    );
+        } else {
+            callback.fileNotFound();
+        }
     }
 
     public static void getBitmapFromFile(File localPath, String fileName, Integer sampleSize, BitmapFromFileCallback callback) {
         Options options = getOptions(sampleSize);
+        String filePath = localPath.toString() + "/" + fileName;
 
-        just(BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        callback::onBitmapDecoded
-                );
+        if (fileExits(filePath)) {
+            just(BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(
+                            callback::onBitmapDecoded
+                    );
+        } else {
+            callback.fileNotFound();
+        }
+    }
+
+    private static boolean fileExits(String filePath) {
+        File file = new File(filePath);
+
+        return file.exists() && !file.isDirectory();
     }
 
     private static Options getOptions(Integer sampleSize) {
@@ -122,9 +139,29 @@ public class ImageDecoder {
         if (cardShowTakenImage.hasOnlyRemoteUrl()) {
             setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
         } else if (cardShowTakenImage.hasLocalImage()) {
-            getBitmapFromFile(getPrivateTempDirectory(imageView.getContext()), cardShowTakenImage.getLocalImageFilename(), sampleSize, imageView::setImageBitmap);
+            getBitmapFromFile(getPrivateTempDirectory(imageView.getContext()), cardShowTakenImage.getLocalImageFilename(), sampleSize, new BitmapFromFileCallback() {
+                @Override
+                public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+                    imageView.setImageBitmap(bitmap);
+                }
+
+                @Override
+                public void fileNotFound() {
+
+                }
+            });
         } else {
-            getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, imageView::setImageBitmap);
+            getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, new BitmapFromFileCallback() {
+                @Override
+                public void onBitmapDecoded(Bitmap bitmap) {
+                    imageView.setImageBitmap(bitmap);
+                }
+
+                @Override
+                public void fileNotFound() {
+
+                }
+            });
         }
     }
 

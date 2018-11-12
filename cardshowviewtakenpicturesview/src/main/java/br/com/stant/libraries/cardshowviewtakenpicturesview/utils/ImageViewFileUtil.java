@@ -148,6 +148,17 @@ public class ImageViewFileUtil {
         return new String[]{name, extension};
     }
 
+    public static boolean deleteFile(Context context, String localImage) {
+        File directory = getPrivateTempDirectory(context);
+        File image     = new File(directory.getAbsolutePath() + File.separator + localImage);
+
+        if (image.exists() && !image.isDirectory()) {
+            return image.delete();
+        }
+
+        return false;
+    }
+
 
 }
 

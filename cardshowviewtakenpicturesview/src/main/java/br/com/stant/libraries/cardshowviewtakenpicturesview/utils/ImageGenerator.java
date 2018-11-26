@@ -10,9 +10,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
@@ -125,11 +130,14 @@ public class ImageGenerator {
     private void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
         if (isExternalStorageWritable()) {
             try {
+                final Calendar calendar = Calendar.getInstance();
+                final String todayDate  = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+
                 final File directory              = getPublicAlbumDirectoryAtPictures("Stant");
-                final File imageFile              = File.createTempFile(JPG_FILE_PREFIX + uuid, JPG_FILE_SUFFIX, directory);
+                final File imageFile              = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX + calendar.getTimeInMillis(), JPG_FILE_SUFFIX, directory);
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
 
-                just(bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream))
+                final Disposable subscribe = just(bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream))
                         .subscribeOn(Schedulers.newThread())
                         .subscribe(
                                 (compressed) -> {

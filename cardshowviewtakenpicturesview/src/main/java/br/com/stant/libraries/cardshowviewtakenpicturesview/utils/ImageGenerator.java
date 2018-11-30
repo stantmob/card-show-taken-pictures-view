@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,8 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
@@ -21,7 +20,6 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFileSync;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
@@ -72,19 +70,17 @@ public class ImageGenerator {
 
     public void generateCardShowTakenImageFromImageGallery(Uri data, Integer photoType,
                                                            CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        File photoTaken = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString());
-
         try {
-            photoTaken = ImageViewFileUtil.from(mContext, data);
+            final Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), data);
+
+            final Integer desiredSize = 1400;
+            final Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+
+            File tempImagePathToShow = createTempImageFileToShow(scaledBitmap, photoType, null);
+            cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        final Integer desiredSize = 800;
-        Bitmap bitmap             = getBitmapFromFileSync(photoTaken.getAbsolutePath(), desiredSize);
-
-        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, null);
-        cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
     }
 
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {

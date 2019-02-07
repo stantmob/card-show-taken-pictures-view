@@ -65,7 +65,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         this.mContext          = context;
         this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
 
-        mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.card_show_taken_picture_view, this, true);
+        mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
+                R.layout.card_show_taken_picture_view, this, true);
         mCardShowTakenPictureViewBinding.setHandler(this);
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
 

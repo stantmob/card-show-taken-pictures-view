@@ -106,7 +106,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
             getBitmapFromFile(getPrivateTempDirectory(mContext), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages, new BitmapFromFileCallback() {
                 @Override
-                public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+                public void onBitmapDecoded(Bitmap bitmap) {
                     mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap);
                 }
 

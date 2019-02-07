@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.DialogLoaderBinding;
 
-public class DialogLoader extends Dialog{
+public class DialogLoader extends Dialog {
 
     private Context mContext;
     private DialogLoaderBinding mDialogLoaderBinding;
@@ -23,7 +23,7 @@ public class DialogLoader extends Dialog{
         dialogSetup();
     }
 
-    private void dialogSetup(){
+    private void dialogSetup() {
         mDialogLoaderBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.dialog_loader, null, false);
         setContentView(mDialogLoaderBinding.getRoot());
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -31,12 +31,13 @@ public class DialogLoader extends Dialog{
         setCancelable(false);
     }
 
-    public void showLocalLoader(){
+    public void showLocalLoader() {
         show();
     }
 
-    public void hideLocalLoader(){
+    public void hideLocalLoader() {
         dismiss();
     }
+
 
 }

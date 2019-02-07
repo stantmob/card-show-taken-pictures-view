@@ -47,8 +47,8 @@
                 android:id="@+id/card_show_taken_picture_edit_icon_container_linear_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
                 android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -96,8 +96,8 @@
                     android:id="@+id/card_show_taken_picture_save_text_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
                     android:onClick="@{handler::saveImageStateViewConfiguration}"
                     android:text="@string/card_show_taken_picture_view.btn_save"
                     android:textSize="14sp"
@@ -159,7 +159,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="20dp"
                         android:orientation="horizontal"
-
                         android:visibility="@{handler.hasUpdatedAt() ? View.VISIBLE : View.GONE}">
 
                         <TextView
@@ -212,8 +211,8 @@
                         android:textColor="@color/gray"
                         android:textSize="12sp"
                         android:visibility="gone"
-                        tools:visibility="visible"
-                        tools:text="0/20" />
+                        tools:text="0/20"
+                        tools:visibility="visible" />
 
                 </LinearLayout>
 

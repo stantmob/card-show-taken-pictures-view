@@ -24,7 +24,7 @@ public class CameraActivity extends AppCompatActivity {
         Integer image_list_size = getIntent().getIntExtra(KEY_IMAGE_LIST_SIZE, 0);
         Boolean isMultipleGallerySelection = getIntent().getBooleanExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, false);
 
-        CameraFragment mCameraFragment = CameraFragment.newInstance(limitImages, image_list_size, isMultipleGallerySelection, null);
+        CameraFragment mCameraFragment = CameraFragment.Companion.newInstance(limitImages, image_list_size, isMultipleGallerySelection, null);
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
     }
 

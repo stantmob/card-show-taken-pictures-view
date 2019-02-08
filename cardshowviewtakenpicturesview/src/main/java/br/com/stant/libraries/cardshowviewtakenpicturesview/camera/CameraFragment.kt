@@ -30,6 +30,9 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraS
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.*
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile
@@ -40,7 +43,6 @@ import com.annimon.stream.Optional.ofNullable
 import io.fotoapparat.result.BitmapPhoto
 import io.fotoapparat.result.WhenDoneListener
 import java.io.File
-import java.io.IOException
 import java.io.Serializable
 import java.util.*
 
@@ -48,6 +50,8 @@ class CameraFragment : Fragment(), CameraContract {
 
     private lateinit var mCameraFragmentBinding: CameraFragmentBinding
     private lateinit var mCameraPhotoPreviewDialogBinding: CameraPhotoPreviewDialogBinding
+    private lateinit var mSaveOnlySnackbar: Snackbar
+    private lateinit var mStantSaveModeSnackbar: Snackbar
 
     private var mCameraPhotosAdapter: CameraPhotosAdapter? = null
     private var mPath: File?                               = null
@@ -56,8 +60,8 @@ class CameraFragment : Fragment(), CameraContract {
     private var mDialogLoader: DialogLoader?               = null
     private var mPreviewPicDialog: Dialog?                 = null
     private var mOrientationListener: OrientationListener? = null
-    private var mSaveOnlySnackbar: Snackbar?               = null
-    private var mSaveMode: String                          = STANT_MODE
+
+    private var mSaveMode: SaveMode                        = SaveMode(STANT_MODE)
 
     private val currentImagesQuantity: Int
         get() = mCameraPhotosAdapter?.itemCount ?: 0
@@ -123,7 +127,10 @@ class CameraFragment : Fragment(), CameraContract {
         super.onViewCreated(view, savedInstanceState)
 
         mSaveOnlySnackbar = Snackbar.make(mCameraFragmentBinding.root,
-                "Those images will be saved at \"Pictures/Stant/\" folder only",
+                getString(R.string.camera_snackbar_save_only_mode_message),
+                Snackbar.LENGTH_SHORT)
+        mStantSaveModeSnackbar = Snackbar.make(mCameraFragmentBinding.root,
+                getString(R.string.camera_snackbar_stant_save_mode_message),
                 Snackbar.LENGTH_SHORT)
 
         setButtonsClick(mCameraFragmentBinding.cameraFragmentCloseImageView,
@@ -155,14 +162,14 @@ class CameraFragment : Fragment(), CameraContract {
         closeButton.setOnClickListener { closeCamera() }
 
         changeSavePicturesReason.setOnClickListener{
-            mSaveMode = if (mSaveMode == STANT_MODE) {
+            mSaveMode = if (mSaveMode.mode == STANT_MODE) {
                 changeSavePicturesReason.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_stant_disabled))
                 showSaveOnlySnackBar()
-                SAVE_ONLY_MODE
+                SaveMode(SAVE_ONLY_MODE)
             } else {
                 changeSavePicturesReason.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_stant_enabled))
-                hideSaveOnlySnackBar()
-                STANT_MODE
+                showStantSaveModeSnackBar()
+                SaveMode(STANT_MODE)
             }
         }
 
@@ -192,11 +199,13 @@ class CameraFragment : Fragment(), CameraContract {
     }
 
     private fun showSaveOnlySnackBar() {
-        mSaveOnlySnackbar?.show()
-        }
+        mSaveOnlySnackbar.show()
+        mStantSaveModeSnackbar.dismiss()
+    }
 
-    private fun hideSaveOnlySnackBar() {
-        mSaveOnlySnackbar?.dismiss()
+    private fun showStantSaveModeSnackBar() {
+        mStantSaveModeSnackbar.show()
+        mSaveOnlySnackbar.dismiss()
     }
 
     private fun setAdapter(recyclerView: RecyclerView) {
@@ -392,7 +401,7 @@ class CameraFragment : Fragment(), CameraContract {
                 it?.let {
                     val bitmap: Bitmap = it.bitmap
                     val rotationDegrees: Int = it.rotationDegrees
-                    if (mSaveMode == SAVE_ONLY_MODE) {
+                    if (mSaveMode.mode == SAVE_ONLY_MODE) {
                         mImageGenerator?.saveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString())
                         mDialogLoader?.hideLocalLoader()
                     } else {
@@ -470,8 +479,6 @@ class CameraFragment : Fragment(), CameraContract {
         const val REQUEST_IMAGE_LIST_GALLERY_RESULT: Int = 1
         private const val REQUEST_CAMERA_PERMISSION: Int = 200
         const val BUNDLE_PHOTOS: String                  = "photos"
-        const val SAVE_ONLY_MODE                         = "save_only_mode"
-        const val STANT_MODE                             = "stant_mode"
 
         fun newInstance(limitOfImages: Int?, imageListSize: Int?,
                         isMultipleGallerySelection: Boolean?, bundlePhotos: Bundle?): CameraFragment {

@@ -9,8 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.File;
-import java.io.IOException;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +18,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.deleteFile;
@@ -27,7 +26,6 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
 
     private CameraFragment mCameraFragment;
-    private ItemViewHolder mViewHolder;
     private List<CameraPhoto> mPhotos;
     private final Context mContext;
 
@@ -37,8 +35,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         this.mContext        = context;
     }
 
+    @NotNull
     @Override
-    public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         return new ItemViewHolder(DataBindingUtil.inflate(
                 LayoutInflater.from(parent.getContext()),
                 R.layout.camera_photo_recycler_view_item,
@@ -47,11 +46,10 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
     @SuppressLint("CheckResult")
     @Override
-    public void onBindViewHolder(ItemViewHolder holder, int position) {
-        mViewHolder = holder;
+    public void onBindViewHolder(@NotNull ItemViewHolder holder, int position) {
         final CameraPhoto cameraPhoto = mPhotos.get(position);
 
-        mViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
+        holder.mCameraPhotosRecyclerViewBinding.setHandler(this);
 
         holder.updateView(cameraPhoto);
     }
@@ -72,19 +70,19 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         notifyItemRemoved(position);
     }
 
-    public void addPhoto(CameraPhoto cameraPhoto){
+    public void addPhoto(CameraPhoto cameraPhoto) {
         mPhotos.add(cameraPhoto);
         notifyItemInserted(mPhotos.size());
     }
 
     public void addAllPhotos(List<CameraPhoto> photos) {
-        for (CameraPhoto photo:
-             photos) {
+        for (CameraPhoto photo :
+                photos) {
             addPhoto(photo);
         }
     }
 
-    public void addPicture(CameraPhoto cardShowTakenImage){
+    public void addPicture(CameraPhoto cardShowTakenImage) {
         mPhotos.add(cardShowTakenImage);
         notifyItemInserted(mPhotos.size());
     }
@@ -94,6 +92,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
+
         private CameraPhotoRecyclerViewItemBinding mCameraPhotosRecyclerViewBinding;
 
         ItemViewHolder(CameraPhotoRecyclerViewItemBinding cameraPhotosRecyclerViewBinding) {
@@ -104,24 +103,28 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         void updateView(CameraPhoto cameraPhoto) {
             final Integer sampleSizeForSmallImages = 2;
 
-            getBitmapFromFile(getPrivateTempDirectory(mContext), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages, new BitmapFromFileCallback() {
-                @Override
-                public void onBitmapDecoded(Bitmap bitmap) {
-                    mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap);
-                }
+            getBitmapFromFile(getPrivateTempDirectory(mContext), cameraPhoto.getLocalImageFilename(), sampleSizeForSmallImages,
+                    new BitmapFromFileCallback() {
+                        @Override
+                        public void onBitmapDecoded(Bitmap bitmap) {
+                            mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap);
+                        }
 
-                @Override
-                public void fileNotFound() {
+                        @Override
+                        public void fileNotFound() {
 
-                }
-            });
+                        }
+                    }
+            );
 
             this.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             this.mCameraPhotosRecyclerViewBinding.executePendingBindings();
-            this.mCameraPhotosRecyclerViewBinding.
-                    cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
-                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto));
+            this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto)
+            );
         }
+
+
     }
 
 

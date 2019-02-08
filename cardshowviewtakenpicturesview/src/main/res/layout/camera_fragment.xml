@@ -93,7 +93,7 @@
             android:layout_height="32dp"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_stant_disabled"
+            android:src="@drawable/ic_stant_enabled"
             app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -155,7 +155,6 @@
             android:id="@+id/camera_fragment_bottom_linear_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:layout_alignParentBottom="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

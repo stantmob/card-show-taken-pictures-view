@@ -25,7 +25,7 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPublicAlbumDirectoryAtPictures;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
-import static io.reactivex.Observable.just;
+import static io.reactivex.Single.fromCallable;
 
 public class ImageGenerator {
 
@@ -133,7 +133,7 @@ public class ImageGenerator {
                 final File imageFile              = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX + calendar.getTimeInMillis(), JPG_FILE_SUFFIX, directory);
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
 
-                final Disposable subscribe = just(bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream))
+                final Disposable subscribe = fromCallable(() -> bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream))
                         .subscribeOn(Schedulers.newThread())
                         .subscribe(
                                 (compressed) -> {

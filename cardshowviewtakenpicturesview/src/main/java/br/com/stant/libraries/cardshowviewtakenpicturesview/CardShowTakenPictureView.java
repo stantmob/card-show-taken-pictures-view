@@ -8,7 +8,13 @@ import android.content.res.TypedArray;
 import android.databinding.BindingAdapter;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.VectorDrawable;
+import android.os.Build;
+import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
@@ -28,9 +34,9 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShow
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
@@ -41,6 +47,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IMAGE_LIST_SIZE               = "image_list_size";
     public static final String KEY_IMAGE_CAMERA_LIST             = "image_camera_list";
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
+    public static final String KEY_SAVE_ONLY_MODE                = "save_only_mode";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
     public boolean canEditState;
     private File mSdcardTempImagesDirectory = getPrivateTempDirectory(getContext());
@@ -59,13 +66,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
     private ImageGenerator imageGenerator;
     private boolean mIsMultipleGallerySelection = false;
+    private SaveOnlyMode mSaveOnlyMode;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mContext          = context;
         this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
 
-        mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.card_show_taken_picture_view, this, true);
+        mCardShowTakenPictureViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
+                R.layout.card_show_taken_picture_view, this, true);
         mCardShowTakenPictureViewBinding.setHandler(this);
         mCardShowTakenPictureViewBinding.setCardStateEnum(CardShowTakenPictureStateEnum.NORMAL);
 
@@ -81,8 +90,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private void setupDialog() {
-        mPreviewPicDialog = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-        mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext), R.layout.card_show_taken_picture_preview_dialog, null, false);
+        mPreviewPicDialog                         = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext),
+                R.layout.card_show_taken_picture_preview_dialog, null, false);
+
         mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
     }
@@ -114,13 +125,15 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void setStrokeColor(int color) {
-        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
+        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding
+                .cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
         mCardShowTakenPictureViewBinding.cardShowTakenPictureHeaderTitleTextView.setTextColor(color);
         drawable.setStroke(3, color);
     }
 
     public void setBackgroundColor(int color){
-        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding.cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
+        GradientDrawable drawable = (GradientDrawable) mCardShowTakenPictureViewBinding
+                .cardShowTakenPictureContainerLinearLayout.getBackground().mutate();
         drawable.setColor(color);
     }
 
@@ -131,6 +144,36 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity) {
         mCardShowTakenPictureViewBinding.setCurrentAndLimitPhotosQuantityText(
                 currentQuantity + "/" + mImagesQuantityLimit);
+    }
+
+    public void enableSaveOnlyMode(Drawable enabledIcon, String enabledWarning, Drawable disabledIcon, String disabledWarning) {
+        mSaveOnlyMode = new SaveOnlyMode(getBitmapFromDrawable(enabledIcon), enabledWarning,
+                getBitmapFromDrawable(disabledIcon), disabledWarning);
+    }
+
+    public Bitmap getBitmapFromDrawable(Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable) drawable).getBitmap();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (drawable instanceof VectorDrawable || drawable instanceof VectorDrawableCompat) {
+                return getBitmapFromVectorDrawable(drawable);
+            } else {
+                throw new IllegalArgumentException("Unsupported drawable type");
+            }
+        } else if (drawable instanceof VectorDrawableCompat) {
+            return getBitmapFromVectorDrawable(drawable);
+        } else {
+            throw new IllegalArgumentException("Unsupported drawable type");
+        }
+    }
+
+    private Bitmap getBitmapFromVectorDrawable(Drawable drawable) {
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
@@ -355,6 +398,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
         intent.putExtra(KEY_IMAGE_LIST_SIZE, mCardShowTakenPictureViewImagesAdapter.getItemCount());
         intent.putExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, mIsMultipleGallerySelection);
+        intent.putExtra(KEY_SAVE_ONLY_MODE, mSaveOnlyMode);
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);

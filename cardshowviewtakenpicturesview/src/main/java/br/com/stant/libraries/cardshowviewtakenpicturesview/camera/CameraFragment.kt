@@ -17,7 +17,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageButton
@@ -239,7 +239,7 @@ class CameraFragment : Fragment(), CameraContract {
                 }
             }
         } else {
-            changeSavePicturesMode.visibility = GONE
+            changeSavePicturesMode.visibility = INVISIBLE
             changeSavePicturesMode.setOnClickListener(null)
         }
 

@@ -42,9 +42,9 @@
             android:layout_marginTop="40dp"
             android:animateLayoutChanges="true"
             android:padding="5dp"
-            android:src="@drawable/ic_close_camera"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_camera" />
 
         <LinearLayout
             android:id="@+id/camera_fragment_chip_linear_layout"
@@ -93,7 +93,6 @@
             android:layout_height="32dp"
             android:layout_marginTop="40dp"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_stant_enabled"
             app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -112,14 +111,14 @@
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_flash_no" />
+                app:srcCompat="@drawable/ic_flash_no" />
 
             <ImageView
                 android:id="@+id/camera_fragment_switch_lens_image_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/ic_invert" />
+                app:srcCompat="@drawable/ic_invert" />
 
         </LinearLayout>
 
@@ -171,7 +170,7 @@
                 android:layout_height="60dp"
                 android:layout_gravity="start|center_vertical"
                 android:padding="12dp"
-                android:src="@drawable/ic_image" />
+                app:srcCompat="@drawable/ic_image" />
 
 
             <View
@@ -203,7 +202,7 @@
                         android:background="@drawable/cam_circle_selector"
                         android:padding="1dp"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/ic_camera"
+                        app:srcCompat="@drawable/ic_camera"
                         tools:ignore="ContentDescription" />
 
                 </RelativeLayout>
@@ -221,7 +220,7 @@
                 android:layout_height="60dp"
                 android:layout_gravity="end|center_vertical"
                 android:padding="12dp"
-                android:src="@drawable/ic_save" />
+                app:srcCompat="@drawable/ic_save" />
 
             <View
                 android:layout_width="0dp"

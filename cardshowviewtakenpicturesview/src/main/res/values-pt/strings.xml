@@ -21,9 +21,6 @@
     <string name="camera.photo_reached_limit">Limite de fotos atingido</string>
     <string name="camera.no_permission">Você não pode utilizar a câmera sem a permissão</string>
 
-    <string name="camera_snackbar.save_only_mode_message">Atenção! Suas fotos não serão salvas na galeria do Stant.</string>
-    <string name="camera_snackbar.stant_save_mode_message">Suas fotos agora serão salvas na galeria do Stant.</string>
-
     <string name="gallery.select_pictures">Selecione as Fotos</string>
 
     <string name="card_show_taken_picture_view.camera_quantity_limit">Só é possível adicionar %d fotos por vez, adicione mais posteriormente .</string>

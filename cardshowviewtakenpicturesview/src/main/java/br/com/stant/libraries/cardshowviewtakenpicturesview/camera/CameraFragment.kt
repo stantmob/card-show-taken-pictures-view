@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageButton
@@ -34,6 +35,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.Sav
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.*
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery
@@ -61,7 +63,12 @@ class CameraFragment : Fragment(), CameraContract {
     private var mPreviewPicDialog: Dialog?                 = null
     private var mOrientationListener: OrientationListener? = null
 
-    private var mSaveMode: SaveMode                        = SaveMode(STANT_MODE)
+    private var mPhotosLimit: Int                      = -1
+    private var mImageListSize: Int                    = 0
+    private var mIsMultipleGallerySelection            = false
+    private var CAMERA_IMAGES_QUANTITY_LIMIT: Int      = 10
+    private var mSaveOnlyMode: SaveOnlyMode?           = null
+    private var mSaveMode: SaveMode                    = SaveMode(STANT_MODE)
 
     private val currentImagesQuantity: Int
         get() = mCameraPhotosAdapter?.itemCount ?: 0
@@ -71,12 +78,46 @@ class CameraFragment : Fragment(), CameraContract {
             false
         } else mImageListSize + currentImagesQuantity > mPhotosLimit
 
+    companion object {
+
+        private const val KEY_PHOTOS_LIMIT               = "photos_limit"
+        private const val KEY_IMAGE_LIST_SIZE            = "image_list_size"
+        private const val KEY_MULTIPLE_GALLERY_SELECTION = "multiple_gallery_selection"
+        private const val KEY_SAVE_ONLY_MODE             = "save_only_mode"
+
+        const val REQUEST_IMAGE_LIST_GALLERY_RESULT: Int = 1
+        private const val REQUEST_CAMERA_PERMISSION: Int = 200
+        const val BUNDLE_PHOTOS: String                  = "photos"
+
+        fun newInstance(limitOfImages: Int,
+                        imageListSize: Int,
+                        isMultipleGallerySelection: Boolean,
+                        saveOnlyMode: SaveOnlyMode?): CameraFragment {
+            val cameraFragment = CameraFragment()
+
+            val arguments = Bundle()
+
+            arguments.putInt(KEY_PHOTOS_LIMIT, limitOfImages)
+            arguments.putInt(KEY_IMAGE_LIST_SIZE, imageListSize)
+            arguments.putBoolean(KEY_MULTIPLE_GALLERY_SELECTION, isMultipleGallerySelection)
+            saveOnlyMode?.let { arguments.putParcelable(KEY_SAVE_ONLY_MODE, it) }
+
+            cameraFragment.arguments = arguments
+
+            return cameraFragment
+        }
+
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         activity?.window?.setFlags(
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
                 WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
+
+        arguments?.let { unWrapArguments(it) }
 
         context?.let {
             setupDialog(it)
@@ -86,6 +127,28 @@ class CameraFragment : Fragment(), CameraContract {
             mImageGenerator      = ImageGenerator(it)
             mCameraPhotosAdapter = CameraPhotosAdapter(it, this)
         }
+    }
+
+    private fun unWrapArguments(arguments: Bundle) {
+        val limitOfImages               = arguments.getInt(KEY_PHOTOS_LIMIT)
+        val imageListSize               = arguments.getInt(KEY_IMAGE_LIST_SIZE)
+        val isMultipleGallerySelection  = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION)
+        val saveOnlyMode: SaveOnlyMode? = arguments.getParcelable(KEY_SAVE_ONLY_MODE)
+
+        mPhotosLimit                = limitOfImages
+        mImageListSize              = imageListSize
+        mIsMultipleGallerySelection = isMultipleGallerySelection
+        mSaveOnlyMode               = saveOnlyMode
+
+        val remainingImages = mPhotosLimit - mImageListSize
+
+        if (remainingImages < CAMERA_IMAGES_QUANTITY_LIMIT && isHasNotLimitOfImages(limitOfImages)) {
+            CAMERA_IMAGES_QUANTITY_LIMIT = remainingImages
+        }
+    }
+
+    private fun isHasNotLimitOfImages(limitOfImages: Int?): Boolean {
+        return limitOfImages != -1
     }
 
     private fun setupDialog(context: Context) {
@@ -126,12 +189,7 @@ class CameraFragment : Fragment(), CameraContract {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mSaveOnlySnackbar = Snackbar.make(mCameraFragmentBinding.root,
-                getString(R.string.camera_snackbar_save_only_mode_message),
-                Snackbar.LENGTH_SHORT)
-        mStantSaveModeSnackbar = Snackbar.make(mCameraFragmentBinding.root,
-                getString(R.string.camera_snackbar_stant_save_mode_message),
-                Snackbar.LENGTH_SHORT)
+        setupSaveModeSnackbars(mCameraFragmentBinding.root)
 
         setButtonsClick(mCameraFragmentBinding.cameraFragmentCloseImageView,
                 mCameraFragmentBinding.cameraFragmentChangeSavePicturesMode,
@@ -157,20 +215,32 @@ class CameraFragment : Fragment(), CameraContract {
         updateCounters()
     }
 
-    private fun setButtonsClick(closeButton: ImageView, changeSavePicturesReason: ImageView,
+    private fun setupSaveModeSnackbars(root: View) {
+        mSaveOnlyMode?.let {
+            mSaveOnlySnackbar = Snackbar.make(root, it.enabledWarning.toString(), Snackbar.LENGTH_SHORT)
+            mStantSaveModeSnackbar = Snackbar.make(root, it.disabledWarning.toString(), Snackbar.LENGTH_SHORT)
+        }
+    }
+
+    private fun setButtonsClick(closeButton: ImageView, changeSavePicturesMode: ImageView,
                                 captureButton: ImageButton, openGalleryButton: ImageView, savePhotosButton: ImageView) {
         closeButton.setOnClickListener { closeCamera() }
 
-        changeSavePicturesReason.setOnClickListener{
-            mSaveMode = if (mSaveMode.mode == STANT_MODE) {
-                changeSavePicturesReason.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_stant_disabled))
-                showSaveOnlySnackBar()
-                SaveMode(SAVE_ONLY_MODE)
-            } else {
-                changeSavePicturesReason.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_stant_enabled))
-                showStantSaveModeSnackBar()
-                SaveMode(STANT_MODE)
+        if (mSaveOnlyMode != null) {
+            changeSavePicturesMode.setOnClickListener {
+                mSaveMode = if (mSaveMode.mode == STANT_MODE) {
+                    changeSavePicturesMode.setImageBitmap(mSaveOnlyMode!!.enabledIcon)
+                    showSaveOnlySnackBar()
+                    SaveMode(SAVE_ONLY_MODE)
+                } else {
+                    changeSavePicturesMode.setImageBitmap(mSaveOnlyMode!!.disabledIcon)
+                    showStantSaveModeSnackBar()
+                    SaveMode(STANT_MODE)
+                }
             }
+        } else {
+            changeSavePicturesMode.visibility = GONE
+            changeSavePicturesMode.setOnClickListener(null)
         }
 
         captureButton.setOnClickListener {
@@ -212,10 +282,6 @@ class CameraFragment : Fragment(), CameraContract {
         recyclerView.isNestedScrollingEnabled = true
         recyclerView.isFocusable              = false
         recyclerView.adapter                  = mCameraPhotosAdapter
-
-        if (mCameraPhotos != null) {
-            mCameraPhotosAdapter?.addAllPhotos(mCameraPhotos)
-        }
     }
 
     private fun setCameraSetup(flashImageView: ImageView, zoomSeekBar: VerticalSeekBar,
@@ -330,14 +396,6 @@ class CameraFragment : Fragment(), CameraContract {
             }
 
             updateCounters()
-
-            val bundle = Bundle()
-            bundle.putSerializable(BUNDLE_PHOTOS, mCameraPhotosAdapter?.list as Serializable)
-
-            val fragmentTransaction = fragmentManager?.beginTransaction()
-            fragmentTransaction?.replace(R.id.camera_content_frame, CameraFragment.newInstance(mPhotosLimit,
-                    mImageListSize, mIsMultipleGallerySelection, bundle))
-            fragmentTransaction?.commit()
         }
     }
 
@@ -369,8 +427,6 @@ class CameraFragment : Fragment(), CameraContract {
 
     override fun closeCamera() {
         activity?.finish()
-
-        mCameraPhotos = null
     }
 
     override fun setPhotos(photos: ArrayList<CameraPhoto>?) {
@@ -440,8 +496,6 @@ class CameraFragment : Fragment(), CameraContract {
             it.setResult(Activity.RESULT_OK, returnIntent)
             it.finish()
         }
-
-        mCameraPhotos = null
     }
 
     override fun showPreviewPicDialog(cameraPhoto: CameraPhoto) {
@@ -466,47 +520,6 @@ class CameraFragment : Fragment(), CameraContract {
         val scale         = context?.resources?.displayMetrics?.density ?: 1f
 
         return (dpValue * scale + roundingValue).toInt()
-    }
-
-    companion object {
-
-        private var mPhotosLimit: Int                      = -1
-        private var mImageListSize: Int                    = 0
-        private var mCameraPhotos: ArrayList<CameraPhoto>? = null
-        private var mIsMultipleGallerySelection            = false
-        private var CAMERA_IMAGES_QUANTITY_LIMIT: Int      = 10
-
-        const val REQUEST_IMAGE_LIST_GALLERY_RESULT: Int = 1
-        private const val REQUEST_CAMERA_PERMISSION: Int = 200
-        const val BUNDLE_PHOTOS: String                  = "photos"
-
-        fun newInstance(limitOfImages: Int?, imageListSize: Int?,
-                        isMultipleGallerySelection: Boolean?, bundlePhotos: Bundle?): CameraFragment {
-            mPhotosLimit   = limitOfImages ?: -1
-            mImageListSize = imageListSize ?: 0
-
-            val remainingImages = mPhotosLimit - mImageListSize
-
-            if (isMultipleGallerySelection != null) {
-                mIsMultipleGallerySelection = isMultipleGallerySelection
-            }
-
-            if (remainingImages < CAMERA_IMAGES_QUANTITY_LIMIT && isHasNotLimitOfImages(limitOfImages)) {
-                CAMERA_IMAGES_QUANTITY_LIMIT = remainingImages
-            }
-
-            if (bundlePhotos != null) {
-                mCameraPhotos = bundlePhotos.getSerializable(BUNDLE_PHOTOS) as ArrayList<CameraPhoto>
-            }
-
-            return CameraFragment()
-        }
-
-        private fun isHasNotLimitOfImages(limitOfImages: Int?): Boolean {
-            return limitOfImages != -1
-        }
-
-
     }
 
 

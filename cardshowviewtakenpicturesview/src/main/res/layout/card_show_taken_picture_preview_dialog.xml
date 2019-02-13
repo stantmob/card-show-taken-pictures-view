@@ -26,7 +26,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-
             tools:src="@drawable/building" />
 
         <ImageView
@@ -39,9 +38,9 @@
             android:focusable="true"
             android:onClick="@{handler::closePreviewPicDialog}"
             android:padding="6dp"
-            android:src="@drawable/ic_close_dialog"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close_dialog" />
 
     </android.support.constraint.ConstraintLayout>
 

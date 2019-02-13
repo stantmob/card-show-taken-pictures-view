@@ -35,8 +35,8 @@
                 android:id="@+id/card_show_taken_picture_view_general_circular_image_view"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
-                android:layout_marginEnd="4dp"
                 android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
                 android:background="@drawable/border_circle_blue"
                 android:padding="8dp"
                 tools:src="@drawable/ic_cam" />
@@ -57,8 +57,9 @@
                     android:focusable="true"
                     android:onClick="@{(view)->handler.removeImage(view, cardShowTakenImage)}"
                     android:padding="4dp"
-                    android:src="@drawable/ic_close_dialog"
-                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
+                    app:srcCompat="@drawable/ic_close_dialog" />
+
             </android.support.v7.widget.CardView>
 
         </android.support.design.widget.CoordinatorLayout>

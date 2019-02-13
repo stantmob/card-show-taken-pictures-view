@@ -89,8 +89,8 @@
                     android:layout_gravity="end"
                     android:onClick="@{handler::showEditStateViewConfiguration}"
                     android:padding="5dp"
-                    android:src="@drawable/ic_edit_inspection_form_filled"
-                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}" />
+                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}"
+                    app:srcCompat="@drawable/ic_edit_inspection_form_filled" />
 
                 <TextView
                     android:id="@+id/card_show_taken_picture_save_text_view"
@@ -115,22 +115,22 @@
             android:orientation="horizontal"
             android:padding="9dp">
 
-            <com.github.siyamed.shapeimageview.CircularImageView
+            <ImageView
                 android:layout_width="55dp"
                 android:layout_height="55dp"
                 android:layout_gravity="center"
-                android:layout_margin="9dp"
                 android:background="@drawable/border_circle_grey"
                 android:onClick="@{handler::pickPictureToFinishAction}"
                 android:padding="15dp"
-                android:src="@drawable/ic_cam"
-                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
+                app:srcCompat="@drawable/ic_cam" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/card_show_taken_picture_image_list_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginStart="8dp"
                 android:minHeight="55dp"
                 android:orientation="horizontal"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager" />

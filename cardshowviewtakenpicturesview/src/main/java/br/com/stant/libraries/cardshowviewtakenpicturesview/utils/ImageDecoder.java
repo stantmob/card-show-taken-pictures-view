@@ -10,16 +10,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
-import static io.reactivex.Observable.just;
+import static io.reactivex.Single.just;
 
 public class ImageDecoder {
 
@@ -92,11 +92,17 @@ public class ImageDecoder {
         Options options = getOptions(sampleSize);
 
         if (fileExits(filePath)) {
-            just(BitmapFactory.decodeFile(filePath, options))
+            final Disposable subscribe = just(BitmapFactory.decodeFile(filePath, options))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            callback::onBitmapDecoded
+                            (bitmap) -> {
+                                try {
+                                    callback.onBitmapDecoded(bitmap);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                     );
         } else {
             callback.fileNotFound();
@@ -108,11 +114,17 @@ public class ImageDecoder {
         String filePath = localPath.toString() + "/" + fileName;
 
         if (fileExits(filePath)) {
-            just(BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
+            final Disposable subscribe = just(BitmapFactory.decodeFile(localPath.toString() + "/" + fileName, options))
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(
-                            callback::onBitmapDecoded
+                            (bitmap) -> {
+                                try {
+                                    callback.onBitmapDecoded(bitmap);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                     );
         } else {
             callback.fileNotFound();

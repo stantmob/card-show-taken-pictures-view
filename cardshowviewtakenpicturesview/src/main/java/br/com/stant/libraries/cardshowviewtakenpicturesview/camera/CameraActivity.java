@@ -24,7 +24,7 @@ public class CameraActivity extends AppCompatActivity {
         Boolean isMultipleGallerySelection = getIntent().getBooleanExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, false);
         SaveOnlyMode saveOnlyMode          = getIntent().getParcelableExtra(KEY_SAVE_ONLY_MODE);
 
-        CameraFragment mCameraFragment = CameraFragment.Companion.newInstance(limitImages, image_list_size,
+        CameraFragment mCameraFragment = CameraFragment.newInstance(limitImages, image_list_size,
                 isMultipleGallerySelection, saveOnlyMode);
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
     }

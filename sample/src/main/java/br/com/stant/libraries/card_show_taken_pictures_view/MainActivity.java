@@ -51,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
         mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+        mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam), "oii",
+                ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
     }
 
     @Override

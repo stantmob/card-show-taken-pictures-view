@@ -89,8 +89,8 @@
                     android:layout_gravity="end"
                     android:onClick="@{handler::showEditStateViewConfiguration}"
                     android:padding="5dp"
-                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}"
-                    app:srcCompat="@drawable/ic_edit_inspection_form_filled" />
+                    android:src="@drawable/ic_edit_inspection_form_filled"
+                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}" />
 
                 <TextView
                     android:id="@+id/card_show_taken_picture_save_text_view"
@@ -122,8 +122,8 @@
                 android:background="@drawable/border_circle_grey"
                 android:onClick="@{handler::pickPictureToFinishAction}"
                 android:padding="15dp"
-                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"
-                app:srcCompat="@drawable/ic_cam" />
+                android:src="@drawable/ic_cam"
+                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/card_show_taken_picture_image_list_recycler_view"

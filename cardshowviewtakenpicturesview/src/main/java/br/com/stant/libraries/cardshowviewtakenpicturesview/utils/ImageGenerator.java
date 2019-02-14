@@ -115,7 +115,13 @@ public class ImageGenerator {
         return file;
     }
 
-    public void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
+    public void scaleAndSaveInPictures(Bitmap bitmap, Integer orientation, String uuid) {
+        final Integer desiredSize = 1400;
+        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        saveInPictures(scaledBitmap, orientation, uuid);
+    }
+
+    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
         try {
             subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
         } catch (OutOfMemoryError outOfMemoryError) {

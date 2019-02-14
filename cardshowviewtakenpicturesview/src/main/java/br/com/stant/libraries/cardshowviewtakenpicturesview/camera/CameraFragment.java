@@ -550,7 +550,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                     Bitmap bitmap = bitmapPhoto.bitmap;
                     Integer rotationDegrees = bitmapPhoto.rotationDegrees;
                     if (mSaveMode.getMode().equalsIgnoreCase(SAVE_ONLY_MODE)) {
-                        mImageGenerator.saveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
+                        mImageGenerator.scaleAndSaveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
                         mDialogLoader.hideLocalLoader();
                     } else {
                         mImageGenerator.generateCardShowTakenImageFromCamera(bitmap, getLensPosition(), rotationDegrees,

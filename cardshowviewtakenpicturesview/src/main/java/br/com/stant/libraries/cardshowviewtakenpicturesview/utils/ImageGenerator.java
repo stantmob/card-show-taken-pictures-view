@@ -1,7 +1,9 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
@@ -22,6 +24,7 @@ import io.reactivex.schedulers.Schedulers;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.flipImage;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPublicAlbumDirectoryAtPictures;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
@@ -57,7 +60,7 @@ public class ImageGenerator {
         final Integer sampleSizeForSmallImages = 2;
         getBitmapFromFile(photoTaken.getAbsolutePath(), sampleSizeForSmallImages, new BitmapFromFileCallback() {
             @Override
-            public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+            public void onBitmapDecoded(Bitmap bitmap) {
                 cardShowTakenCompressedCallback.onSuccess(bitmap, photoTaken.getName(), file.toString());
             }
 
@@ -73,8 +76,11 @@ public class ImageGenerator {
         try {
             final Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), data);
 
+            String photoPath = getRealPathFromURI(mContext, data);
+
             final Integer desiredSize = 1400;
-            final Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+            final Bitmap scaledBitmap = rotateBitmapBasedOnExifInterface(photoPath,
+                    ImageDecoder.scaleBitmap(bitmap, desiredSize));
 
             File tempImagePathToShow = createTempImageFileToShow(scaledBitmap, photoType, null);
             cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
@@ -83,13 +89,76 @@ public class ImageGenerator {
         }
     }
 
+    private String getRealPathFromURI(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { "filePath" };
+            cursor        = context.getContentResolver().query(contentUri, proj, null,
+                    null, null);
+
+            int column_index;
+            column_index = cursor.getColumnIndexOrThrow("filePath");
+
+            if (cursor.moveToFirst()) {
+                return cursor.getString(column_index);
+            } else {
+                return "";
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    private Bitmap rotateBitmapBasedOnExifInterface(String photoPath, Bitmap bitmap) {
+        ExifInterface ei;
+        try {
+            if (photoPath == null) {
+                return bitmap;
+            }
+
+            ei = new ExifInterface(photoPath);
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
+
+            Bitmap rotatedBitmap;
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotatedBitmap = rotateImage(bitmap, 270);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotatedBitmap = rotateImage(bitmap, 180);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotatedBitmap = rotateImage(bitmap, 90);
+                    break;
+                case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                    rotatedBitmap = flipImage(bitmap, true, false);
+                    break;
+                case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                    rotatedBitmap = flipImage(bitmap, false, true);
+                    break;
+                default:
+                    rotatedBitmap = bitmap;
+            }
+
+            return rotatedBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return bitmap;
+        }
+    }
+
     private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
         String uuid = UUID.randomUUID().toString();
-        File file   = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
+        File file   = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString()
+                + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         final Integer desiredSize = 1400;
-        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
-        final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
+        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        final int quality   = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
             FileOutputStream fileOutputStream  = mContext.openFileOutput(file.getName(), Context.MODE_PRIVATE);
@@ -99,7 +168,8 @@ public class ImageGenerator {
                 saveInPictures(scaledBitmap, orientation, uuid);
 
                 try {
-                    rotateImage(scaledBitmap, orientation).compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
+                    rotateImage(scaledBitmap, orientation)
+                            .compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 } catch (OutOfMemoryError outOfMemoryError) {
                     scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 }
@@ -121,7 +191,7 @@ public class ImageGenerator {
         saveInPictures(scaledBitmap, orientation, uuid);
     }
 
-    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid){
+    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid) {
         try {
             subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
         } catch (OutOfMemoryError outOfMemoryError) {
@@ -135,11 +205,13 @@ public class ImageGenerator {
                 final Calendar calendar = Calendar.getInstance();
                 final String todayDate  = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
 
-                final File directory              = getPublicAlbumDirectoryAtPictures("Stant");
-                final File imageFile              = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX + calendar.getTimeInMillis(), JPG_FILE_SUFFIX, directory);
+                final File directory = getPublicAlbumDirectoryAtPictures("Stant");
+                final File imageFile = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX
+                        + calendar.getTimeInMillis(), JPG_FILE_SUFFIX, directory);
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
 
-                final Disposable subscribe = fromCallable(() -> bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream))
+                final Disposable subscribe = fromCallable(() -> bitmap.compress(Bitmap.CompressFormat.JPEG,
+                        100, fileOutputStream))
                         .subscribeOn(Schedulers.newThread())
                         .subscribe(
                                 (compressed) -> {
@@ -158,10 +230,7 @@ public class ImageGenerator {
 
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
 

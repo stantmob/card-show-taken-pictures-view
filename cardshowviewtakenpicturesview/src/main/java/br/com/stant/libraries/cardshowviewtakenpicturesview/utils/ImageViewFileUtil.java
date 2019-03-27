@@ -18,8 +18,8 @@ import java.io.OutputStream;
 
 public class ImageViewFileUtil {
 
-    public static final String JPG_FILE_SUFFIX   = ".jpg";
-    public static final String JPG_FILE_PREFIX   = "IMG-";
+    public static final String JPG_FILE_SUFFIX = ".jpg";
+    public static final String JPG_FILE_PREFIX = "IMG-";
 
     public static File getPrivateTempDirectory(Context context) {
         return context.getFilesDir();
@@ -47,7 +47,7 @@ public class ImageViewFileUtil {
         return directory.mkdirs();
     }
 
-    public static Bitmap rotateImage(Bitmap source, float angle) throws OutOfMemoryError {
+    static Bitmap rotateImage(Bitmap source, float angle) throws OutOfMemoryError {
         Matrix matrix = new Matrix();
 
         if (angle % 180 == 0) {
@@ -57,6 +57,13 @@ public class ImageViewFileUtil {
         }
 
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    static Bitmap flipImage(Bitmap bitmap, boolean horizontal, boolean vertical) {
+        Matrix matrix = new Matrix();
+        matrix.preScale(horizontal ? -1 : 1, vertical ? -1 : 1);
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
 
     public static boolean deleteFile(Context context, String localImage) {

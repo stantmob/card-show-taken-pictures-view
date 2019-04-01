@@ -3,7 +3,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
@@ -90,24 +91,31 @@ public class ImageGenerator {
     }
 
     private String getRealPathFromURI(Context context, Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = { "filePath" };
-            cursor        = context.getContentResolver().query(contentUri, proj, null,
-                    null, null);
+        final Cursor cursor = context.getContentResolver().query(contentUri, null, null,
+                null, null);
 
-            int column_index;
-            column_index = cursor.getColumnIndexOrThrow("filePath");
+        String photoPath = getRealPathFromCursor(cursor, "filePath");
+        if (photoPath.isEmpty()) {
+            photoPath = getRealPathFromCursor(cursor, "_data");
+        }
 
+        return photoPath;
+    }
+
+    private String getRealPathFromCursor(Cursor cursor, String columnName) {
+        if (cursor != null) {
             if (cursor.moveToFirst()) {
-                return cursor.getString(column_index);
+                int column_index = cursor.getColumnIndex(columnName);
+                if(column_index >= 0) {
+                    return cursor.getString(column_index);
+                } else {
+                    return "";
+                }
             } else {
                 return "";
             }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+        } else {
+            return "";
         }
     }
 
@@ -203,7 +211,7 @@ public class ImageGenerator {
         if (isExternalStorageWritable()) {
             try {
                 final Calendar calendar = Calendar.getInstance();
-                final String todayDate  = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+                final String todayDate  = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
 
                 final File directory = getPublicAlbumDirectoryAtPictures("Stant");
                 final File imageFile = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX

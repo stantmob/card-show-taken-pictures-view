@@ -431,7 +431,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                             }
 
                             @Override
-                            public void onError() {
+                            public void onError(String message) {
 
                             }
                         });

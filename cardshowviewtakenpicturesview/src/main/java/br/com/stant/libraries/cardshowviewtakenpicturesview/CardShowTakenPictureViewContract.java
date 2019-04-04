@@ -73,7 +73,7 @@ public interface CardShowTakenPictureViewContract {
     interface CardShowTakenCompressedCallback {
         void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath);
 
-        void onError();
+        void onError(String message);
     }
 
 

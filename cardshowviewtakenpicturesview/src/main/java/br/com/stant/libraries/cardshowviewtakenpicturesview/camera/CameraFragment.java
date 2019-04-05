@@ -559,6 +559,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void onStart() {
         super.onStart();
+        startFotoapparat();
+    }
+
+    private void startFotoapparat() {
         Handler handler = new Handler();
         handler.postDelayed(() -> mFotoapparat.start(), 60);
     }

@@ -25,4 +25,7 @@
 
     <string name="card_show_taken_picture_view.camera_quantity_limit">Só é possível adicionar %d fotos por vez, adicione mais posteriormente .</string>
 
+    <string name="camera_fragment.save_in_progress_has_been_canceled">O salvamento em progresso foi cancelado.</string>
+    <string name="camera_fragment.wait_until_the_photo_save_process_finishes">Por favor, aguarde até que o processo de salvar foto termine antes de tirar outra foto</string>
+
 </resources>

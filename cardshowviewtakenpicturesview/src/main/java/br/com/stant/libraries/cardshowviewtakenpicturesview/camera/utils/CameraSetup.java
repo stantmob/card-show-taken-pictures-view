@@ -24,7 +24,7 @@ import static io.fotoapparat.selector.AspectRatioSelectorsKt.standardRatio;
 import static io.fotoapparat.selector.FlashSelectorsKt.autoFlash;
 import static io.fotoapparat.selector.FlashSelectorsKt.autoRedEye;
 import static io.fotoapparat.selector.FlashSelectorsKt.off;
-import static io.fotoapparat.selector.FlashSelectorsKt.torch;
+import static io.fotoapparat.selector.FlashSelectorsKt.on;
 import static io.fotoapparat.selector.FocusModeSelectorsKt.autoFocus;
 import static io.fotoapparat.selector.FocusModeSelectorsKt.continuousFocusPicture;
 import static io.fotoapparat.selector.FocusModeSelectorsKt.fixed;
@@ -37,19 +37,19 @@ import static io.fotoapparat.selector.SensorSensitivitySelectorsKt.highestSensor
 
 public class CameraSetup {
 
-    private Context mContext;
-    private Fotoapparat mFotoapparat;
-    private CameraConfiguration mCameraConfiguration;
+    private final Context mContext;
+    private final Fotoapparat mFotoapparat;
+    private final CameraConfiguration mCameraConfiguration;
+
     private boolean mActiveCameraBack;
     private boolean mIsChecked;
-    private static Integer mLensPosition;
-    private View mToogleTorchView;
+    private Integer mLensPosition;
 
     public CameraSetup(Context context, CameraView cameraView, FocusView focusView) {
-        this.mContext             = context;
-        this.mFotoapparat         = createCamera(focusView, cameraView);
-        this.mCameraConfiguration = createSettings();
-        this.mLensPosition        = fromCameraBack;
+        mContext             = context;
+        mFotoapparat         = createCamera(focusView, cameraView);
+        mCameraConfiguration = createSettings();
+        mLensPosition        = fromCameraFront;
     }
 
     private Fotoapparat createCamera(FocusView focusView, CameraView cameraView) {
@@ -75,15 +75,15 @@ public class CameraSetup {
                         highestResolution()
                 ))
                 .focusMode(firstAvailable(
-                        continuousFocusPicture(),
                         autoFocus(),
+                        continuousFocusPicture(),
                         fixed()
                 ))
                 .flash(firstAvailable(
+                        off(),
                         autoRedEye(),
                         autoFlash(),
-                        torch(),
-                        off()
+                        on()
                 ))
                 .previewFpsRange(highestFps())
                 .sensorSensitivity(highestSensorSensitivity())
@@ -99,7 +99,7 @@ public class CameraSetup {
             boolean isNotChecked = !mIsChecked;
 
             if (isNotChecked) {
-                mFotoapparat.updateConfiguration(UpdateConfiguration.builder().flash(torch()).build());
+                mFotoapparat.updateConfiguration(UpdateConfiguration.builder().flash(on()).build());
                 changeViewImageResource((ImageView) view, R.drawable.ic_flash_yes);
                 mIsChecked = true;
             } else {
@@ -144,7 +144,7 @@ public class CameraSetup {
                     mIsChecked = false;
                     changeViewImageResource((ImageView) flashView, R.drawable.ic_flash_no);
 
-                    if (mActiveCameraBack){
+                    if (mActiveCameraBack) {
                         mFotoapparat.switchTo(back(), mCameraConfiguration);
                         mLensPosition = fromCameraBack;
                     } else {
@@ -161,7 +161,7 @@ public class CameraSetup {
         imageView.postDelayed(() -> imageView.setImageResource(resId), 120);
     }
 
-    public static Integer getLensPosition(){
+    public Integer getLensPosition() {
         return mLensPosition;
     }
 

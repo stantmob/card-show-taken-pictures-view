@@ -3,7 +3,6 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import androidx.exifinterface.media.ExifInterface;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
@@ -18,7 +17,10 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
+import androidx.exifinterface.media.ExifInterface;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -29,6 +31,7 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPublicAlbumDirectoryAtPictures;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
+import static com.annimon.stream.Optional.ofNullable;
 import static io.reactivex.Single.fromCallable;
 
 public class ImageGenerator {
@@ -45,9 +48,15 @@ public class ImageGenerator {
 
     public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
                                                      CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        File tempImagePathToShow = createTempImageFileToShow(bitmap, photoType, orientation);
-
-        cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
+        Single.fromCallable(() -> createTempImageFileToShow(bitmap, photoType, orientation))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        (file, throwable) -> ofNullable(throwable).ifPresentOrElse(
+                                (t) -> cardShowTakenCompressedCallback.onError(t.getMessage()),
+                                () -> cardShowTakenCompressedCallback.onSuccess(bitmap, file.getName(), file.toString())
+                        )
+                );
     }
 
     public void generateCardShowTakenImageFromCamera(File photoTaken,
@@ -106,7 +115,7 @@ public class ImageGenerator {
         if (cursor != null) {
             if (cursor.moveToFirst()) {
                 int column_index = cursor.getColumnIndex(columnName);
-                if(column_index >= 0) {
+                if (column_index >= 0) {
                     return cursor.getString(column_index);
                 } else {
                     return "";
@@ -165,8 +174,8 @@ public class ImageGenerator {
                 + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         final Integer desiredSize = 1400;
-        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
-        final int quality   = ImageDecoder.getImageQualityPercent(scaledBitmap);
+        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
             FileOutputStream fileOutputStream  = mContext.openFileOutput(file.getName(), Context.MODE_PRIVATE);

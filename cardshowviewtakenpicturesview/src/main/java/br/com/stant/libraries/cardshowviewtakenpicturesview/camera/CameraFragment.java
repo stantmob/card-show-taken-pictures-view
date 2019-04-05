@@ -10,6 +10,7 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -47,12 +48,16 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
+import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.PhotoResult;
+import io.fotoapparat.result.adapter.rxjava2.SingleAdapter;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 import static android.support.v4.content.ContextCompat.getDrawable;
 import static android.view.View.INVISIBLE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup.getLensPosition;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
@@ -67,10 +72,12 @@ public class CameraFragment extends Fragment implements CameraContract {
     private CameraPhotoPreviewDialogBinding mCameraPhotoPreviewDialogBinding;
     private Snackbar mSaveOnlySnackbar;
     private Snackbar mStantSaveModeSnackbar;
+    private ImageButton mCaptureImageButton;
 
     private CameraPhotosAdapter mCameraPhotosAdapter;
     private File mPath;
     private CameraSetup mCameraSetup;
+    private Fotoapparat mFotoapparat;
     private ImageGenerator mImageGenerator;
     private DialogLoader mDialogLoader;
     private Dialog mPreviewPicDialog;
@@ -83,10 +90,17 @@ public class CameraFragment extends Fragment implements CameraContract {
     private SaveMode mSaveMode;
     private SaveOnlyMode mSaveOnlyMode;
 
+    private Context mContext;
+
+    private Toast mCameraLimitQuantityToast;
+    private Toast mDisabledCameraButtonToast;
+    private Toast mSaveInProgressHasBeenCanceledToast;
+
     private final static String KEY_PHOTOS_LIMIT               = "photos_limit";
     private final static String KEY_IMAGE_LIST_SIZE            = "image_list_size";
     private final static String KEY_MULTIPLE_GALLERY_SELECTION = "multiple_gallery_selection";
     private final static String KEY_SAVE_ONLY_MODE             = "save_only_mode";
+    private final String integerStringFormat                   = "%d";
 
     final static Integer REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
     private final static Integer REQUEST_CAMERA_PERMISSION = 200;
@@ -96,8 +110,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                                              Boolean isMultipleGallerySelection,
                                              SaveOnlyMode saveOnlyMode) {
         CameraFragment cameraFragment = new CameraFragment();
-
-        Bundle arguments = new Bundle();
+        Bundle arguments              = new Bundle();
 
         arguments.putInt(KEY_PHOTOS_LIMIT, limitOfImages);
         arguments.putInt(KEY_IMAGE_LIST_SIZE, imageListSize);
@@ -110,11 +123,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public CameraFragment() {
-        mPhotosLimit                 = -1;
-        mImageListSize               = 0;
-        mIsMultipleGallerySelection  = false;
-        mImagesQuantityLimit         = 10;
-        mSaveMode                    = new SaveMode(STANT_MODE);
+        mPhotosLimit                = -1;
+        mImageListSize              = 0;
+        mIsMultipleGallerySelection = false;
+        mImagesQuantityLimit        = 10;
+        mSaveMode                   = new SaveMode(STANT_MODE);
     }
 
     @Override
@@ -130,9 +143,14 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         ofNullable(getArguments()).ifPresent(this::unWrapArguments);
 
-        ofNullable(getContext()).ifPresent(
+        ofNullable(getActivity()).ifPresentOrElse(
+                (activity) -> mContext = activity.getApplicationContext(),
+                () -> mContext = getContext()
+        );
+
+        ofNullable(mContext).ifPresent(
                 (context) -> {
-                    setupDialog(context);
+                    setupDialog(getContext());
 
                     mPath                = ImageViewFileUtil.getPrivateTempDirectory(context);
                     mDialogLoader        = new DialogLoader(context);
@@ -143,10 +161,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void unWrapArguments(Bundle arguments) {
-        Integer limitOfImages               = arguments.getInt(KEY_PHOTOS_LIMIT);
-        Integer imageListSize               = arguments.getInt(KEY_IMAGE_LIST_SIZE);
-        Boolean isMultipleGallerySelection  = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
-        SaveOnlyMode saveOnlyMode           = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
+        Integer limitOfImages              = arguments.getInt(KEY_PHOTOS_LIMIT);
+        Integer imageListSize              = arguments.getInt(KEY_IMAGE_LIST_SIZE);
+        Boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
+        SaveOnlyMode saveOnlyMode          = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
 
         mPhotosLimit                = limitOfImages;
         mImageListSize              = imageListSize;
@@ -205,11 +223,11 @@ public class CameraFragment extends Fragment implements CameraContract {
         float roundingValue = 0.5f;
         float scale         = 1f;
 
-        if (getContext() != null && getContext().getResources() != null) {
-            scale = getContext().getResources().getDisplayMetrics().density;
+        if (mContext != null && mContext.getResources() != null) {
+            scale = mContext.getResources().getDisplayMetrics().density;
         }
 
-        return (int)(dpValue * scale + roundingValue);
+        return (int) (dpValue * scale + roundingValue);
     }
 
     @Override
@@ -218,9 +236,10 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         setupSaveModeSnackbars(mCameraFragmentBinding.getRoot());
 
+        mCaptureImageButton = mCameraFragmentBinding.cameraFragmentCaptureImageButton;
+
         setButtonsClick(mCameraFragmentBinding.cameraFragmentCloseImageView,
                 mCameraFragmentBinding.cameraFragmentChangeSavePicturesMode,
-                mCameraFragmentBinding.cameraFragmentCaptureImageButton,
                 mCameraFragmentBinding.cameraFragmentGalleryImageView,
                 mCameraFragmentBinding.cameraFragmentSaveImageView);
 
@@ -232,7 +251,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         configureOrientationListener(mCameraFragmentBinding.cameraFragmentCloseImageView,
                 mCameraFragmentBinding.cameraFragmentChangeSavePicturesMode,
-                mCameraFragmentBinding.cameraFragmentCaptureImageButton,
+                mCaptureImageButton,
                 mCameraFragmentBinding.cameraFragmentGalleryImageView,
                 mCameraFragmentBinding.cameraFragmentSaveImageView,
                 mCameraFragmentBinding.cameraFragmentSwitchLensImageView,
@@ -257,24 +276,17 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private void setButtonsClick(ImageView closeButton,
                                  ImageView changeSavePicturesMode,
-                                 ImageButton captureButton,
                                  ImageView openGalleryButton,
                                  ImageView savePhotosButton) {
         closeButton.setOnClickListener((view) -> closeCamera());
 
         setChangeSavePicturesModeOnClickListener(changeSavePicturesMode, mSaveOnlyMode);
 
-        captureButton.setOnClickListener((view) -> {
-            if (cameraImagesQuantityIsNotOnLimit()) {
-                showToastWithCameraLimitQuantity();
-            } else {
-                takePicture();
-            }
-        });
+        enableCaptureButton();
 
         openGalleryButton.setOnClickListener((view) -> {
-            if (cameraImagesQuantityIsNotOnLimit()) {
-                showToastWithCameraLimitQuantity();
+            if (cameraImagesQuantityIsOverLimit()) {
+                showCameraLimitQuantityToast();
             } else {
                 openGallery();
             }
@@ -282,11 +294,51 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         savePhotosButton.setOnClickListener((view) -> {
             if (isOverLimit()) {
-                Toast.makeText(getContext(), getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.camera_photo_reached_limit), Toast.LENGTH_SHORT).show();
             } else {
                 returnImagesToCardShowTakenPicturesView();
             }
         });
+    }
+
+    private void enableCaptureButton() {
+        mCaptureImageButton.setOnClickListener((view) -> {
+            if (cameraImagesQuantityIsOverLimit()) {
+                showCameraLimitQuantityToast();
+            } else {
+                takePicture();
+            }
+        });
+    }
+
+    private void disableCaptureButton() {
+        mCaptureImageButton.setOnClickListener(
+                (view) -> showDisabledCameraButtonToast()
+        );
+    }
+
+    private void showCameraLimitQuantityToast() {
+        final String cameraQuantityLimitMessage = getCameraQuantityLimitMessage(mImagesQuantityLimit);
+
+        ofNullable(mCameraLimitQuantityToast).ifPresent(Toast::cancel);
+
+        mCameraLimitQuantityToast = createAndShowErrorToast(cameraQuantityLimitMessage);
+    }
+
+    private String getCameraQuantityLimitMessage(Integer imagesQuantityLimit) {
+        return String.format(mContext.getString(R.string.card_show_taken_picture_view_camera_quantity_limit), imagesQuantityLimit);
+    }
+
+    private void showDisabledCameraButtonToast() {
+        final String waitUntilThePhotoSaveProcessFinishesMessage = getWaitUntilThePhotoSaveProcessFinishesMessage();
+
+        ofNullable(mDisabledCameraButtonToast).ifPresent(Toast::cancel);
+
+        mDisabledCameraButtonToast = createAndShowErrorToast(waitUntilThePhotoSaveProcessFinishesMessage);
+    }
+
+    private String getWaitUntilThePhotoSaveProcessFinishesMessage() {
+        return mContext.getString(R.string.camera_fragment_wait_until_the_photo_save_process_finishes);
     }
 
     private void setChangeSavePicturesModeOnClickListener(ImageView changeSavePicturesMode, SaveOnlyMode saveOnlyMode) {
@@ -321,7 +373,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         mStantSaveModeSnackbar.show();
     }
 
-    private boolean cameraImagesQuantityIsNotOnLimit() {
+    private boolean cameraImagesQuantityIsOverLimit() {
         return getCurrentImagesQuantity() >= mImagesQuantityLimit;
     }
 
@@ -331,12 +383,6 @@ public class CameraFragment extends Fragment implements CameraContract {
         } else {
             return 0;
         }
-    }
-
-    private void showToastWithCameraLimitQuantity() {
-        Toast.makeText(getContext(),
-                String.format(getString(R.string.card_show_taken_picture_view_camera_quantity_limit),
-                        mImagesQuantityLimit), Toast.LENGTH_SHORT).show();
     }
 
     private void openGallery() {
@@ -349,7 +395,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,
-                getString(R.string.gallery_select_pictures)),
+                mContext.getString(R.string.gallery_select_pictures)),
                 REQUEST_IMAGE_LIST_GALLERY_RESULT);
     }
 
@@ -370,20 +416,38 @@ public class CameraFragment extends Fragment implements CameraContract {
     private void setCameraSetup(ImageView flashImageView,
                                 VerticalSeekBar zoomSeekBar,
                                 ImageView switchCameraImageView) {
-        mCameraSetup = new CameraSetup(getContext(),
-                mCameraFragmentBinding.cameraFragmentView,
-                mCameraFragmentBinding.cameraFragmentFocusView);
+        Activity activity = getActivity();
 
-        mCameraSetup.toggleTorchOnSwitch(flashImageView);
-        mCameraSetup.zoomSeekBar(zoomSeekBar);
-        mCameraSetup.switchCameraOnClick(switchCameraImageView, flashImageView);
+        if (activity != null) {
+            mCameraSetup = newCameraSetup(activity.getApplicationContext(), mCameraFragmentBinding);
+        } else {
+            mCameraSetup = newCameraSetup(mContext, mCameraFragmentBinding);
+        }
+
+        configureCameraSetup(mCameraSetup, flashImageView, zoomSeekBar, switchCameraImageView);
+        mFotoapparat = mCameraSetup.getFotoapparat();
+    }
+
+    private CameraSetup newCameraSetup(Context context, CameraFragmentBinding cameraFragmentBinding) {
+        return new CameraSetup(context,
+                cameraFragmentBinding.cameraFragmentView,
+                cameraFragmentBinding.cameraFragmentFocusView);
+    }
+
+    private void configureCameraSetup(CameraSetup cameraSetup,
+                                      ImageView flashImageView,
+                                      VerticalSeekBar zoomSeekBar,
+                                      ImageView switchCameraImageView) {
+        cameraSetup.toggleTorchOnSwitch(flashImageView);
+        cameraSetup.zoomSeekBar(zoomSeekBar);
+        cameraSetup.switchCameraOnClick(switchCameraImageView, flashImageView);
     }
 
     private void configureOrientationListener(ImageView closeButton, ImageView changeSavePicturesReason,
                                               ImageButton captureButton, ImageView openGalleryButton,
                                               ImageView savePhotosButton, ImageView switchCameraImageView,
                                               LinearLayout chipLinearLayout, ImageView flashImageView) {
-        mOrientationListener = new OrientationListener(getContext(), closeButton, changeSavePicturesReason, captureButton,
+        mOrientationListener = new OrientationListener(mContext, closeButton, changeSavePicturesReason, captureButton,
                 savePhotosButton, openGalleryButton, switchCameraImageView, chipLinearLayout, flashImageView) {
             @Override
             public void onSimpleOrientationChanged(int orientation) {
@@ -393,7 +457,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateCounters() {
-        if (cameraImagesQuantityIsNotOnLimit()) {
+        if (cameraImagesQuantityIsOverLimit()) {
             setDesignPhotoLimitIsTrue();
         } else {
             setDesignPhotoLimitIsFalse();
@@ -401,16 +465,18 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         ofNullable(getActivity()).ifPresent(
                 (activity) -> activity.runOnUiThread(() -> {
-                    mCameraFragmentBinding.cameraFragmentCurrentValue.setText(
-                            String.format(Locale.getDefault(),"%d", getCurrentImagesQuantity()));
-                    mCameraFragmentBinding.cameraFragmentLimitValue.setText(
-                            String.format(Locale.getDefault(),"%d", mImagesQuantityLimit));
+                    mCameraFragmentBinding.cameraFragmentCurrentValue.setText(convertIntegerToString(getCurrentImagesQuantity()));
+                    mCameraFragmentBinding.cameraFragmentLimitValue.setText(convertIntegerToString(mImagesQuantityLimit));
                 })
         );
     }
 
+    private String convertIntegerToString(Integer integer) {
+        return String.format(Locale.getDefault(), integerStringFormat, integer);
+    }
+
     private void setDesignPhotoLimitIsTrue() {
-        ofNullable(getContext()).executeIfPresent((context) -> {
+        ofNullable(mContext).executeIfPresent((context) -> {
             mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(context, R.color.white));
             mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(context, R.color.white));
             mCameraFragmentBinding.cameraFragmentChipDivisorTextView.setTextColor(getColor(context, R.color.white));
@@ -419,7 +485,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void setDesignPhotoLimitIsFalse() {
-        ofNullable(getContext()).executeIfPresent((context) -> {
+        ofNullable(mContext).executeIfPresent((context) -> {
             mCameraFragmentBinding.cameraFragmentCurrentValue.setTextColor(getColor(context, R.color.black));
             mCameraFragmentBinding.cameraFragmentLimitValue.setTextColor(getColor(context, R.color.black));
             mCameraFragmentBinding.cameraFragmentChipDivisorTextView.setTextColor(getColor(context, R.color.black));
@@ -465,12 +531,12 @@ public class CameraFragment extends Fragment implements CameraContract {
                     public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                         CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
 
-                        mCameraPhotosAdapter.addPicture(cameraPhoto);
+                        mCameraPhotosAdapter.addPicture(cameraPhoto, (position) -> mCameraPhotosAdapter.notifyItemInserted(position));
                         mCameraFragmentBinding.cameraPhotosRecyclerView.smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
                     }
 
                     @Override
-                    public void onError() {
+                    public void onError(String message) {
 
                     }
                 });
@@ -493,13 +559,18 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void onStart() {
         super.onStart();
-        mCameraSetup.getFotoapparat().start();
+        startFotoapparat();
+    }
+
+    private void startFotoapparat() {
+        Handler handler = new Handler();
+        handler.postDelayed(() -> mFotoapparat.start(), 60);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mCameraSetup.getFotoapparat().stop();
+        mFotoapparat.stop();
     }
 
     @Override
@@ -514,9 +585,8 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                ofNullable(getContext()).ifPresent((context) ->
-                        Toast.makeText(context, getString(R.string.camera_no_permission), Toast.LENGTH_SHORT)
-                                .show()
+                ofNullable(mContext).ifPresent((context) ->
+                        Toast.makeText(context, context.getString(R.string.camera_no_permission), Toast.LENGTH_SHORT).show()
                 );
                 ofNullable(getActivity()).ifPresent(Activity::finish);
             }
@@ -537,49 +607,112 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void takePicture() {
-        PhotoResult photoResult = mCameraSetup.getFotoapparat().takePicture();
+        PhotoResult photoResult = mFotoapparat.takePicture();
         String uuid             = UUID.randomUUID().toString();
         File photoPath          = new File(mPath.toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
-        mDialogLoader.showLocalLoader();
+        disableCaptureButton();
 
-        photoResult.saveToFile(photoPath);
-
-        photoResult.toBitmap().whenDone(
-                (bitmapPhoto) -> {
-                    Bitmap bitmap = bitmapPhoto.bitmap;
-                    Integer rotationDegrees = bitmapPhoto.rotationDegrees;
-                    if (mSaveMode.getMode().equalsIgnoreCase(SAVE_ONLY_MODE)) {
-                        mImageGenerator.scaleAndSaveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
-                        mDialogLoader.hideLocalLoader();
-                    } else {
-                        mImageGenerator.generateCardShowTakenImageFromCamera(bitmap, getLensPosition(), rotationDegrees,
-                                new CardShowTakenCompressedCallback() {
-
-                                    @Override
-                                    public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                        CameraPhoto cameraPhoto = new CameraPhoto(imageFilename,
-                                                tempImagePath, new Date(), new Date());
-
-                                        mCameraPhotosAdapter.addPicture(cameraPhoto);
-                                        mCameraFragmentBinding.cameraPhotosRecyclerView
-                                                .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
-
-                                        photoPath.delete();
-
-                                        updateCounters();
-
-                                        mDialogLoader.hideLocalLoader();
-                                    }
-
-                                    @Override
-                                    public void onError() {
-
-                                    }
-                                });
-                    }
+        if (saveModeOnlyNotSelected()) {
+            showSaveImageLoader();
         }
+
+        final Disposable subscribe = unwrapPhotoResultAndSaveBitmap(photoResult, photoPath);
+    }
+
+    private boolean saveModeOnlyNotSelected() {
+        return !mSaveMode.getMode().equalsIgnoreCase(SAVE_ONLY_MODE);
+    }
+
+    private void showSaveImageLoader() {
+        mCameraPhotosAdapter.showLoader(position -> mCameraPhotosAdapter.notifyItemInserted(position));
+        mCameraFragmentBinding.cameraPhotosRecyclerView
+                .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
+    }
+
+    private Disposable unwrapPhotoResultAndSaveBitmap(PhotoResult photoResult, File photoPath) {
+        return photoResult.toBitmap()
+                .adapt(SingleAdapter.toSingle())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        (bitmapPhoto) -> {
+                            Bitmap bitmap           = bitmapPhoto.bitmap;
+                            Integer rotationDegrees = bitmapPhoto.rotationDegrees;
+
+                            if (saveModeOnlySelected()) {
+                                mImageGenerator.scaleAndSaveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
+                                enableCaptureButton();
+                            } else {
+                                generateCardShowTakenImageFromCamera(bitmap, rotationDegrees, photoPath);
+                            }
+                        }, (throwable) -> {
+                            showSaveInProgressHasBeenCanceledToast();
+                            hideSaveImageLoaderOnFailed();
+                            enableCaptureButton();
+                        }
+                );
+    }
+
+    private boolean saveModeOnlySelected() {
+        return mSaveMode.getMode().equalsIgnoreCase(SAVE_ONLY_MODE);
+    }
+
+    private void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer rotationDegrees, File photoPath) {
+        mImageGenerator.generateCardShowTakenImageFromCamera(bitmap, mCameraSetup.getLensPosition(), rotationDegrees,
+                new CardShowTakenCompressedCallback() {
+
+                    @Override
+                    public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
+                        CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
+
+                        hideSaveImageLoaderOnSuccess(cameraPhoto);
+
+                        photoPath.delete();
+
+                        updateCounters();
+                        enableCaptureButton();
+                    }
+
+                    @Override
+                    public void onError(String message) {
+                        enableCaptureButton();
+                        hideSaveImageLoaderOnFailed();
+                    }
+                }
         );
+    }
+
+    private void hideSaveImageLoaderOnSuccess(CameraPhoto cameraPhoto) {
+        mCameraPhotosAdapter.hideLoader();
+        mCameraPhotosAdapter.addPicture(cameraPhoto,
+                (position) -> mCameraPhotosAdapter.notifyItemChanged(position));
+        mCameraFragmentBinding.cameraPhotosRecyclerView
+                .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
+    }
+
+    private void showSaveInProgressHasBeenCanceledToast() {
+        final String waitUntilThePhotoSaveProcessFinishesMessage = getSaveInProgressHasBeenCanceledMessage();
+
+        ofNullable(mSaveInProgressHasBeenCanceledToast).ifPresent(Toast::cancel);
+
+        mSaveInProgressHasBeenCanceledToast = createAndShowErrorToast(waitUntilThePhotoSaveProcessFinishesMessage);
+    }
+
+    private Toast createAndShowErrorToast(String message) {
+        Toast toast = Toast.makeText(mContext, message, Toast.LENGTH_SHORT);
+        toast.show();
+
+        return toast;
+    }
+
+    private String getSaveInProgressHasBeenCanceledMessage() {
+        return mContext.getString(R.string.camera_fragment_save_in_progress_has_been_canceled);
+    }
+
+    private void hideSaveImageLoaderOnFailed() {
+        mCameraPhotosAdapter.hideLoader();
+        mCameraPhotosAdapter.notifyItemRemoved(mCameraPhotosAdapter.getItemCount());
     }
 
     @Override

@@ -15,48 +15,85 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.CameraPhotoItemCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.LoadingIconItemViewHolderBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.viewholders.LoadingIconItemViewHolder;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.deleteFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
-public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapter.ItemViewHolder> {
+public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static int ITEM_VIEW_TYPE   = 0;
+    private static int FOOTER_VIEW_TYPE = 1;
     private CameraFragment mCameraFragment;
     private List<CameraPhoto> mPhotos;
     private final Context mContext;
+    private boolean mLoading;
 
     public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
-        this.mCameraFragment = cameraFragment;
-        this.mPhotos         = new ArrayList<>();
-        this.mContext        = context;
+        mCameraFragment = cameraFragment;
+        mPhotos         = new ArrayList<>();
+        mContext        = context;
+        mLoading        = false;
     }
 
     @NotNull
     @Override
-    public ItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
-        return new ItemViewHolder(DataBindingUtil.inflate(
-                LayoutInflater.from(parent.getContext()),
-                R.layout.camera_photo_recycler_view_item,
-                parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+        if (viewType == ITEM_VIEW_TYPE) {
+            return new ItemViewHolder(DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.getContext()),
+                    R.layout.camera_photo_recycler_view_item,
+                    parent, false));
+        } else if (viewType == FOOTER_VIEW_TYPE){
+            return new LoadingIconItemViewHolder(DataBindingUtil.inflate(
+                    LayoutInflater.from(parent.getContext()),
+                    R.layout.loading_icon_item_view_holder,
+                    parent,
+                    false));
+        } else {
+            throw new IllegalStateException("Invalid type, this type ot items " + viewType + " can't be handled");
+        }
     }
 
     @SuppressLint("CheckResult")
     @Override
-    public void onBindViewHolder(@NotNull ItemViewHolder holder, int position) {
-        final CameraPhoto cameraPhoto = mPhotos.get(position);
+    public void onBindViewHolder(@NotNull RecyclerView.ViewHolder viewHolder, int position) {
+        if (viewHolder instanceof ItemViewHolder) {
+            ItemViewHolder itemViewHolder = (ItemViewHolder) viewHolder;
 
-        holder.mCameraPhotosRecyclerViewBinding.setHandler(this);
+            final CameraPhoto cameraPhoto = mPhotos.get(position);
 
-        holder.updateView(cameraPhoto);
+            itemViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
+
+            itemViewHolder.updateView(cameraPhoto);
+        } else if (viewHolder instanceof LoadingIconItemViewHolder) {
+            LoadingIconItemViewHolder loadingIconItemViewHolder = (LoadingIconItemViewHolder) viewHolder;
+            loadingIconItemViewHolder.showProgressBar();
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (position < mPhotos.size() || isNotLoading()) {
+            return ITEM_VIEW_TYPE;
+        } else {
+            return FOOTER_VIEW_TYPE;
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mPhotos.size();
+        if (isNotLoading()) {
+            return mPhotos.size();
+        } else {
+            return mPhotos.size() + 1;
+        }
     }
 
     public void removePhoto(View view, CameraPhoto cameraPhoto) {
@@ -70,21 +107,29 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
         notifyItemRemoved(position);
     }
 
-    public void addPhoto(CameraPhoto cameraPhoto) {
-        mPhotos.add(cameraPhoto);
-        notifyItemInserted(mPhotos.size());
-    }
-
     public void addAllPhotos(List<CameraPhoto> photos) {
         for (CameraPhoto photo :
                 photos) {
-            addPhoto(photo);
+            addPicture(photo, this::notifyItemInserted);
         }
     }
 
-    public void addPicture(CameraPhoto cardShowTakenImage) {
-        mPhotos.add(cardShowTakenImage);
-        notifyItemInserted(mPhotos.size());
+    public void addPicture(CameraPhoto cameraPhoto, CameraPhotoItemCallback itemCallback) {
+        mPhotos.add(cameraPhoto);
+        itemCallback.successAtPositionCallback(mPhotos.size());
+    }
+
+    public void showLoader(CameraPhotoItemCallback itemCallback) {
+        mLoading = true;
+        itemCallback.successAtPositionCallback(mPhotos.size() + 1);
+    }
+
+    public void hideLoader() {
+        mLoading = false;
+    }
+
+    private boolean isNotLoading() {
+        return !mLoading;
     }
 
     public List<CameraPhoto> getList() {
@@ -97,7 +142,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
 
         ItemViewHolder(CameraPhotoRecyclerViewItemBinding cameraPhotosRecyclerViewBinding) {
             super(cameraPhotosRecyclerViewBinding.getRoot());
-            this.mCameraPhotosRecyclerViewBinding = cameraPhotosRecyclerViewBinding;
+            mCameraPhotosRecyclerViewBinding = cameraPhotosRecyclerViewBinding;
         }
 
         void updateView(CameraPhoto cameraPhoto) {
@@ -117,9 +162,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<CameraPhotosAdapte
                     }
             );
 
-            this.mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
-            this.mCameraPhotosRecyclerViewBinding.executePendingBindings();
-            this.mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+            mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
+            mCameraPhotosRecyclerViewBinding.executePendingBindings();
+            mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
                     view -> mCameraFragment.showPreviewPicDialog(cameraPhoto)
             );
         }

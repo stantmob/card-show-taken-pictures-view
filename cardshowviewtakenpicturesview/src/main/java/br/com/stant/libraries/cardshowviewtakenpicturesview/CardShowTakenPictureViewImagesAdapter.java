@@ -4,12 +4,16 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraPhotosAdapter;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -38,8 +42,9 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         this.mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
     }
 
+    @NotNull
     @Override
-    public ItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         CardShowTakenPictureViewImageRecycleItemBinding mCardShowTakenPictureViewImageRecycleItemBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(parent.getContext()),
                 R.layout.card_show_taken_picture_view_image_recycle_item,
@@ -50,12 +55,34 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     @Override
-    public void onBindViewHolder(ItemViewHolder holder, int position) {
+    public void onBindViewHolder(@NotNull ItemViewHolder itemViewHolder, int position) {
         CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
 
-        holder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
+        itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
 
-        holder.updateView(cardShowTakenImage);
+        configureDefaultConstraintLayoutTouchListener(itemViewHolder);
+
+        itemViewHolder.updateView(cardShowTakenImage);
+    }
+
+    private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
+        itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setOnTouchListener(
+                (view, motionEvent) -> {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                                mItemTouchHelper.startDrag(itemViewHolder);
+                            }
+
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            view.performClick();
+                            break;
+                    }
+
+                    return true;
+                }
+        );
     }
 
     public void replaceData(List<CardShowTakenImage> imageUrlsList) {

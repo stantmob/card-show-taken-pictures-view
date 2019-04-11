@@ -77,29 +77,33 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             itemViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
 
-            itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setOnTouchListener(
-                    (view, motionEvent) -> {
-                        switch (motionEvent.getAction()) {
-                            case MotionEvent.ACTION_DOWN:
-                                if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                                    mTouchHelper.startDrag(itemViewHolder);
-                                }
-
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                view.performClick();
-                                break;
-                        }
-
-                        return true;
-                    }
-            );
+            configureDefaultConstraintLayoutTouchListener(itemViewHolder);
 
             itemViewHolder.updateView(cameraPhoto);
         } else if (viewHolder instanceof LoadingIconItemViewHolder) {
             LoadingIconItemViewHolder loadingIconItemViewHolder = (LoadingIconItemViewHolder) viewHolder;
             loadingIconItemViewHolder.showProgressBar();
         }
+    }
+
+    private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
+        itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setOnTouchListener(
+                (view, motionEvent) -> {
+                    switch (motionEvent.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                                mTouchHelper.startDrag(itemViewHolder);
+                            }
+
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            view.performClick();
+                            break;
+                    }
+
+                    return true;
+                }
+        );
     }
 
     @Override

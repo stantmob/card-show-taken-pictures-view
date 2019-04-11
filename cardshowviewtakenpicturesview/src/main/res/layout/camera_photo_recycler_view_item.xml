@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -14,44 +15,45 @@
 
     </data>
 
-    <RelativeLayout
-        android:id="@+id/camera_show_photo_relative_layout"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:layout_margin="10dp">
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/camera_show_photo_constraint_layout"
+        android:layout_width="66dp"
+        android:layout_height="66dp">
 
         <com.github.siyamed.shapeimageview.CircularImageView
-            android:id="@+id/card_show_taken_picture_view_general_circular_image_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
+            android:id="@+id/camera_photo_view_item_photo_circular_image_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            android:background="@drawable/border_circle_blue"
             android:src="@drawable/stant_city"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_cam" />
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="5dp">
+        <android.support.v7.widget.CardView
+            android:id="@+id/camera_photo_view_item_close_icon_container"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:onClick="@{(view) -> handler.removePhoto(view, photo)}"
+            app:cardBackgroundColor="@color/gray"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_close_dialog" />
 
-            <LinearLayout
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/shape_round_gray"
-                android:gravity="center"
-                android:onClick="@{(view) -> handler.removePhoto(view, photo)}">
+        </android.support.v7.widget.CardView>
 
-                <ImageView
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_close_dialog" />
-
-            </LinearLayout>
-
-        </RelativeLayout>
-
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </layout>

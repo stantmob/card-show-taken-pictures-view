@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,8 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.adapter.rxjava2.SingleAdapter;
@@ -243,7 +246,13 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentGalleryImageView,
                 mCameraFragmentBinding.cameraFragmentSaveImageView);
 
-        setAdapter(mCameraFragmentBinding.cameraPhotosRecyclerView);
+        final RecyclerView cameraPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
+
+        configureRecyclerView(cameraPhotosRecyclerView);
+
+        cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
+
+        attachDragAndDropTouchHelper(cameraPhotosRecyclerView);
 
         setCameraSetup(mCameraFragmentBinding.cameraFragmentSwitchFlashImageView,
                 mCameraFragmentBinding.cameraFragmentZoomSeekBar,
@@ -407,10 +416,18 @@ public class CameraFragment extends Fragment implements CameraContract {
         }
     }
 
-    private void setAdapter(RecyclerView cameraPhotosRecyclerView) {
+    private void configureRecyclerView(RecyclerView cameraPhotosRecyclerView) {
         cameraPhotosRecyclerView.setNestedScrollingEnabled(true);
         cameraPhotosRecyclerView.setFocusable(false);
-        cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
+        cameraPhotosRecyclerView.setHasFixedSize(true);
+    }
+
+    private void attachDragAndDropTouchHelper(RecyclerView cameraPhotosRecyclerView) {
+        DragAndDropTouchHelper dragAndDropTouchHelper = new DragAndDropTouchHelper(mCameraPhotosAdapter);
+        ItemTouchHelper itemTouchHelper               = new ItemTouchHelper(dragAndDropTouchHelper);
+
+        mCameraPhotosAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(cameraPhotosRecyclerView);
     }
 
     private void setCameraSetup(ImageView flashImageView,

@@ -1,6 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener;
 
-import android.graphics.Canvas;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 

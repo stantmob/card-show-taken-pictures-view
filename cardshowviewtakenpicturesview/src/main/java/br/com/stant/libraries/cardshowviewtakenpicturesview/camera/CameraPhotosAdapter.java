@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.Cam
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VibratorUtils;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.ItemTouchHelperViewHolder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.viewholders.LoadingIconItemViewHolder;
@@ -160,16 +160,18 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return mPhotos;
     }
 
-    @Override
-    public void onViewMoved(int oldPosition, int newPosition) {
-        CameraPhoto targetCameraPhoto = mPhotos.get(oldPosition);
-        mPhotos.remove(oldPosition);
-        mPhotos.add(newPosition, targetCameraPhoto);
-        notifyItemMoved(oldPosition, newPosition);
-    }
-
     public void setTouchHelper(ItemTouchHelper touchHelper) {
         mTouchHelper = touchHelper;
+    }
+
+    @Override
+    public void onViewMoved(int oldPosition, int newPosition) {
+        if (newPosition < mPhotos.size() && oldPosition < mPhotos.size()) {
+            CameraPhoto targetCameraPhoto = mPhotos.get(oldPosition);
+            mPhotos.remove(oldPosition);
+            mPhotos.add(newPosition, targetCameraPhoto);
+            notifyItemMoved(oldPosition, newPosition);
+        }
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -205,10 +207,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             );
         }
 
-
-
         @Override
         public void onItemSelected() {
+            VibratorUtils.vibrate(mContext, 400);
             mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(0.75f);
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.GONE);
         }

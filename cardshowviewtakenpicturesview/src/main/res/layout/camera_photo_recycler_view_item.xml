@@ -37,7 +37,6 @@
             android:id="@+id/camera_photo_view_item_close_icon_container"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_alignParentEnd="true"
             android:gravity="center"
             android:onClick="@{(view) -> handler.removePhoto(view, photo)}"
             app:cardBackgroundColor="@color/gray"

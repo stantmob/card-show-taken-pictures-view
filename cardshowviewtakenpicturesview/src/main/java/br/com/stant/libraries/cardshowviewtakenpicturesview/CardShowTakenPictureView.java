@@ -17,6 +17,8 @@ import android.os.Build;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,9 +39,11 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
+import static com.annimon.stream.Optional.ofNullable;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -82,7 +86,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setOrientation(HORIZONTAL);
 
-        setAdapter();
+        setImageListAdapter(mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView);
+
+        attachDragAndDropTouchHelper(mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView);
 
         setupDialog();
         setupEditMode();
@@ -98,12 +104,23 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
     }
 
-    private void setAdapter() {
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(new ArrayList<>(0), this);
+    private void setImageListAdapter(RecyclerView cardShowTakenPictureImageListRecyclerView) {
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(this);
 
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
+        cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
+        cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
+    }
+
+    private void attachDragAndDropTouchHelper(RecyclerView cardShowTakenPictureImageListRecyclerView) {
+        ofNullable(mCardShowTakenPictureViewImagesAdapter).ifPresent(
+                (adapter) -> {
+                    DragAndDropTouchHelper dragAndDropTouchHelper = new DragAndDropTouchHelper(adapter);
+                    ItemTouchHelper itemTouchHelper               = new ItemTouchHelper(dragAndDropTouchHelper);
+
+                    adapter.setTouchHelper(itemTouchHelper);
+                    itemTouchHelper.attachToRecyclerView(cardShowTakenPictureImageListRecyclerView);
+                }
+        );
     }
 
     private void setupLayoutOptions() {

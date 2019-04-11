@@ -2,6 +2,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,25 +11,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VibratorUtils;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.ItemTouchHelperViewHolder;
 import io.reactivex.Observable;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 
-public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder> {
+public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<CardShowTakenPictureViewImagesAdapter.ItemViewHolder>
+        implements DragAndDropHandler {
 
+    private CardShowTakenPictureView mView;
     private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
     private List<CardShowTakenImage> mOriginalTempCardShowTakenImageList;
     private List<CardShowTakenImage> mCardShowTakenImageListAsAdded;
     private List<CardShowTakenImage> mCardShowTakenImageListAsRemoved;
-    private CardShowTakenPictureView mView;
+    private ItemTouchHelper mItemTouchHelper;
 
-    public CardShowTakenPictureViewImagesAdapter(List<CardShowTakenImage> imageUrlsList, CardShowTakenPictureView view) {
-        this.mCurrentCardShowTakenImageList      = imageUrlsList;
+    public CardShowTakenPictureViewImagesAdapter(CardShowTakenPictureView view) {
         this.mView                               = view;
-        this.mOriginalTempCardShowTakenImageList = new ArrayList<>();
-        this.mCardShowTakenImageListAsAdded      = new ArrayList<>();
-        this.mCardShowTakenImageListAsRemoved    = new ArrayList<>();
+        this.mCurrentCardShowTakenImageList      = new ArrayList<>(0);
+        this.mOriginalTempCardShowTakenImageList = new ArrayList<>(0);
+        this.mCardShowTakenImageListAsAdded      = new ArrayList<>(0);
+        this.mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
     }
 
     @Override
@@ -39,8 +46,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                 parent,
                 false);
 
-        final ItemViewHolder vh = new ItemViewHolder(mCardShowTakenPictureViewImageRecycleItemBinding);
-        return vh;
+        return new ItemViewHolder(mCardShowTakenPictureViewImageRecycleItemBinding);
     }
 
     @Override
@@ -129,7 +135,19 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         return mCurrentCardShowTakenImageList.size();
     }
 
-    class ItemViewHolder extends RecyclerView.ViewHolder {
+    public void setTouchHelper(ItemTouchHelper itemTouchHelper) {
+        mItemTouchHelper = itemTouchHelper;
+    }
+
+    @Override
+    public void onViewMoved(int oldPosition, int newPosition) {
+        CardShowTakenImage targetCardShowTakenImage = mCurrentCardShowTakenImageList.get(oldPosition);
+        mCurrentCardShowTakenImageList.remove(oldPosition);
+        mCurrentCardShowTakenImageList.add(newPosition, targetCardShowTakenImage);
+        notifyItemMoved(oldPosition, newPosition);
+    }
+
+    class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
         private CardShowTakenPictureViewImageRecycleItemBinding mServiceInspectionsFormFilledRecycleItemBinding;
 
@@ -141,15 +159,32 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         void updateView(CardShowTakenImage cardShowTakenImage) {
             this.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
 
-            setImageBitmapToImageView(this.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView, cardShowTakenImage, 8);
+            setImageBitmapToImageView(this.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView,
+                    cardShowTakenImage, 8);
 
             this.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
             this.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView
                     .setOnClickListener(
                             v -> mView.showPreviewPicDialog(cardShowTakenImage)
-            );
+                    );
             this.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
         }
+
+        @Override
+        public void onItemSelected() {
+            VibratorUtils.vibrate(mView.getContext(), 400);
+            mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setAlpha(0.75f);
+            mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPicturesItemDeleteIconContainerCardView.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onItemClear() {
+            mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setAlpha(1);
+            mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPicturesItemDeleteIconContainerCardView
+                    .setVisibility(mView.getActualCardState() == CardShowTakenPictureStateEnum.EDIT ? View.VISIBLE: View.GONE);
+        }
+
+
     }
 
 

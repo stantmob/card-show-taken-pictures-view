@@ -41,7 +41,7 @@ public class CardShowTakenPictureViewImagesAdapterTest {
 //
 //        @Test
 //        public void It_should_add_correct_picture(){
-//            String result = cardShowTakenPictureViewImagesAdapter.getData().get(0);
+//            String result = cardShowTakenPictureViewImagesAdapter.getCurrentImages().get(0);
 //            String expected = imageUrl1;
 //
 //            Assert.assertEquals(expected,result);

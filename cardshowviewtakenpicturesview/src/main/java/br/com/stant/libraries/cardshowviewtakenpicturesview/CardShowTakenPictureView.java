@@ -108,6 +108,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(this);
 
         cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
+        cardShowTakenPictureImageListRecyclerView.setHasFixedSize(true);
         cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
     }
 
@@ -248,7 +249,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         if (mOnSavedCardListener != null) {
-            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getCurrentImages(),
+                    mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
                     mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
         }
 
@@ -322,7 +324,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public boolean hasImageByIdentifier(String identifier) {
-        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getData();
+        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
         for (CardShowTakenImage cardShowTakenImage : cardShowTakenPictures) {
             if (identifier.equals(cardShowTakenImage.getIdentifier()))
                 return true;
@@ -364,7 +366,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public List<CardShowTakenImage> getCardImages() {
-        return mCardShowTakenPictureViewImagesAdapter.getData();
+        return mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
     }
 
     @Override

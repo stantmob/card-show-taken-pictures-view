@@ -31,35 +31,41 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setExampleImages();
-        mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(new CardShowTakenPictureViewContract.OnSavedCardListener() {
-            @Override
-            public void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved) {
+        mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(
+                new CardShowTakenPictureViewContract.OnSavedCardListener() {
+                    @Override
+                    public void onSaved(List<CardShowTakenImage> currentImages,
+                                        List<CardShowTakenImage> imagesAsAdded,
+                                        List<CardShowTakenImage> imagesAsRemoved) {
 
-            }
+                    }
 
-            @Override
-            public void onCancel() {
+                    @Override
+                    public void onCancel() {
 
-            }
-        });
+                    }
+                }
+        );
 
-        if(gallery != null)
+        if (gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
-        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,"Denis Vieira", new Date());
+        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,
+                "Denis Vieira", new Date());
 //        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
-        mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
-        mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
-        mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam), "oii",
-                ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+        mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.colorPrimary));
+        mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.colorPrimary));
+        mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
+                "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         mBinding.cardShowViewTakenPicturesView.addImageOnActivityResult(requestCode, resultCode, data);
     }
-
 
 
 }

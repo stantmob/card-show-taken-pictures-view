@@ -59,7 +59,7 @@ public interface CardShowTakenPictureViewContract {
     List<CardShowTakenImage> getCardImagesAsRemoved();
 
     interface OnSavedCardListener {
-        void onSaved(List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);
+        void onSaved(List<CardShowTakenImage> currentImages, List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);
 
         void onCancel();
     }

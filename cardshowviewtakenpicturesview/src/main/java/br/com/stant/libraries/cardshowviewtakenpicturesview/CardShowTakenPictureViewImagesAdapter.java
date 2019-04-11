@@ -4,7 +4,6 @@ import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraPhotosAdapter;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -66,22 +64,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
-        itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setOnTouchListener(
-                (view, motionEvent) -> {
-                    switch (motionEvent.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                                mItemTouchHelper.startDrag(itemViewHolder);
-                            }
-
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            view.performClick();
-                            break;
+        itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnLongClickListener(
+                view -> {
+                    if (!mView.canEditState) {
+                        mItemTouchHelper.startDrag(itemViewHolder);
                     }
-
                     return true;
                 }
+
         );
     }
 
@@ -91,7 +81,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         notifyDataSetChanged();
     }
 
-    public List<CardShowTakenImage> getData() {
+    public List<CardShowTakenImage> getCurrentImages() {
         return mCurrentCardShowTakenImageList;
     }
 

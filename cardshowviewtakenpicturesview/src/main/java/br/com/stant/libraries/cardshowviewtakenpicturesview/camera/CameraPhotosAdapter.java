@@ -87,20 +87,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
-        itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setOnTouchListener(
-                (view, motionEvent) -> {
-                    switch (motionEvent.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            if (motionEvent.getActionMasked() == MotionEvent.ACTION_DOWN) {
-                                mTouchHelper.startDrag(itemViewHolder);
-                            }
-
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            view.performClick();
-                            break;
-                    }
-
+        itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnLongClickListener(
+                (view) -> {
+                    mTouchHelper.startDrag(itemViewHolder);
                     return true;
                 }
         );

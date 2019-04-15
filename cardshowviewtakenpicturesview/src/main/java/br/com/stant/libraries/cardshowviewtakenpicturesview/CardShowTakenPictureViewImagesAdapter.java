@@ -32,12 +32,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private List<CardShowTakenImage> mCardShowTakenImageListAsRemoved;
     private ItemTouchHelper mItemTouchHelper;
 
+    private static final int vibrationDuration = 400;
+
     public CardShowTakenPictureViewImagesAdapter(CardShowTakenPictureView view) {
-        this.mView                               = view;
-        this.mCurrentCardShowTakenImageList      = new ArrayList<>(0);
-        this.mOriginalTempCardShowTakenImageList = new ArrayList<>(0);
-        this.mCardShowTakenImageListAsAdded      = new ArrayList<>(0);
-        this.mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
+        mView                               = view;
+        mCurrentCardShowTakenImageList      = new ArrayList<>(0);
+        mOriginalTempCardShowTakenImageList = new ArrayList<>(0);
+        mCardShowTakenImageListAsAdded      = new ArrayList<>(0);
+        mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
     }
 
     @NotNull
@@ -66,12 +68,11 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
         itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnLongClickListener(
                 view -> {
-                    if (!mView.canEditState) {
+                    if (mView.isNotCanEditState()) {
                         mItemTouchHelper.startDrag(itemViewHolder);
                     }
                     return true;
                 }
-
         );
     }
 
@@ -102,7 +103,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     void saveOriginalList() {
-        mOriginalTempCardShowTakenImageList = ((List) ((ArrayList) mCurrentCardShowTakenImageList).clone());
+        mOriginalTempCardShowTakenImageList = (List) ((ArrayList) mCurrentCardShowTakenImageList).clone();
         mCardShowTakenImageListAsAdded      = new ArrayList<>();
         mCardShowTakenImageListAsRemoved    = new ArrayList<>();
     }
@@ -113,29 +114,21 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mCurrentCardShowTakenImageList.remove(cardShowTakenImage);
         mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
 
-        if (hasCardShowTakenImageAsAdded(cardShowTakenImage))
+        if (cardShowTakenImage != null) {
             mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+        }
 
         notifyItemRemoved(position);
 
         mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
     }
 
-    private boolean hasCardShowTakenImageAsAdded(CardShowTakenImage cardShowTakenImage) {
-        Observable<CardShowTakenImage> cardShowTakenImageObservable = Observable.just(cardShowTakenImage);
-
-        cardShowTakenImageObservable.filter(cardShowTakenImageAsAdded -> cardShowTakenImage.equals(cardShowTakenImageAsAdded));
-
-        CardShowTakenImage cardShowTakenImageAsRemoved = cardShowTakenImageObservable.blockingFirst();
-
-        return cardShowTakenImageAsRemoved != null;
-    }
-
     public void addPicture(CardShowTakenImage cardShowTakenImage) {
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
-        notifyItemInserted(mCurrentCardShowTakenImageList.size());
+
         mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        notifyItemInserted(mCurrentCardShowTakenImageList.size());
     }
 
     public void addPictures(List<CardShowTakenImage> cardShowTakenImages) {
@@ -159,8 +152,10 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     @Override
     public void onViewMoved(int oldPosition, int newPosition) {
         CardShowTakenImage targetCardShowTakenImage = mCurrentCardShowTakenImageList.get(oldPosition);
+
         mCurrentCardShowTakenImageList.remove(oldPosition);
         mCurrentCardShowTakenImageList.add(newPosition, targetCardShowTakenImage);
+
         notifyItemMoved(oldPosition, newPosition);
     }
 
@@ -170,26 +165,26 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
         ItemViewHolder(CardShowTakenPictureViewImageRecycleItemBinding serviceInspectionsFormFilledRecycleItemBinding) {
             super(serviceInspectionsFormFilledRecycleItemBinding.getRoot());
-            this.mServiceInspectionsFormFilledRecycleItemBinding = serviceInspectionsFormFilledRecycleItemBinding;
+            mServiceInspectionsFormFilledRecycleItemBinding = serviceInspectionsFormFilledRecycleItemBinding;
         }
 
         void updateView(CardShowTakenImage cardShowTakenImage) {
-            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
+            mServiceInspectionsFormFilledRecycleItemBinding.setCardStateEnum(mView.getActualCardState());
 
-            setImageBitmapToImageView(this.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView,
+            setImageBitmapToImageView(mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView,
                     cardShowTakenImage, 8);
 
-            this.mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
-            this.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView
+            mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
+            mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView
                     .setOnClickListener(
                             v -> mView.showPreviewPicDialog(cardShowTakenImage)
                     );
-            this.mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
+            mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
         }
 
         @Override
         public void onItemSelected() {
-            VibratorUtils.vibrate(mView.getContext(), 400);
+            VibratorUtils.vibrate(mView.getContext(), vibrationDuration);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setAlpha(0.75f);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPicturesItemDeleteIconContainerCardView.setVisibility(View.GONE);
         }
@@ -198,7 +193,11 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         public void onItemClear() {
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setAlpha(1);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPicturesItemDeleteIconContainerCardView
-                    .setVisibility(mView.getActualCardState() == CardShowTakenPictureStateEnum.EDIT ? View.VISIBLE: View.GONE);
+                    .setVisibility(getItemDeleteIconVisibility());
+        }
+
+        private int getItemDeleteIconVisibility() {
+            return mView.getActualCardState() == CardShowTakenPictureStateEnum.EDIT ? View.VISIBLE : View.GONE;
         }
 
 

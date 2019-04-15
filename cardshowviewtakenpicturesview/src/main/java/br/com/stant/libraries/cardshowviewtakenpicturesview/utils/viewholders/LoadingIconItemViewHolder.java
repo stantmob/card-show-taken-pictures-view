@@ -2,25 +2,25 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.viewholders;
 
 import android.support.v7.widget.RecyclerView;
 
-import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.LoadingIconItemViewHolderBinding;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureLoadingItemViewHolderBinding;
 
 public class LoadingIconItemViewHolder extends RecyclerView.ViewHolder {
 
-    private LoadingIconItemViewHolderBinding mLoadingIconItemViewHolderBinding;
+    private CardShowTakenPictureLoadingItemViewHolderBinding mBinding;
 
-    public LoadingIconItemViewHolder(LoadingIconItemViewHolderBinding loadingIconItemViewHolderBinding) {
-        super(loadingIconItemViewHolderBinding.getRoot());
-        mLoadingIconItemViewHolderBinding = loadingIconItemViewHolderBinding;
+    public LoadingIconItemViewHolder(CardShowTakenPictureLoadingItemViewHolderBinding cardShowTakenPictureLoadingItemViewHolderBinding) {
+        super(cardShowTakenPictureLoadingItemViewHolderBinding.getRoot());
+        mBinding = cardShowTakenPictureLoadingItemViewHolderBinding;
     }
 
     public void showProgressBar() {
-        mLoadingIconItemViewHolderBinding.progressBar.show();
-        mLoadingIconItemViewHolderBinding.executePendingBindings();
+        mBinding.progressBar.show();
+        mBinding.executePendingBindings();
     }
 
     public void hideProgressBar() {
-        mLoadingIconItemViewHolderBinding.progressBar.hide();
-        mLoadingIconItemViewHolderBinding.executePendingBindings();
+        mBinding.progressBar.hide();
+        mBinding.executePendingBindings();
     }
 
 

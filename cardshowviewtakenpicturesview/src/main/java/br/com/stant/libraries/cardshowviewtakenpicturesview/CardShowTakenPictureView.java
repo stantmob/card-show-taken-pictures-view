@@ -53,7 +53,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
     public static final String KEY_SAVE_ONLY_MODE                = "save_only_mode";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
-    public boolean canEditState;
+
+    private boolean canEditState;
     private File mSdcardTempImagesDirectory = getPrivateTempDirectory(getContext());
     private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
@@ -470,6 +471,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public boolean hasPictureByName() {
         return mCardShowTakenPictureViewBinding.getPictureByName() != null;
+    }
+
+    public boolean isCanEditState() {
+        return canEditState;
+    }
+
+    public boolean isNotCanEditState() {
+        return !canEditState;
     }
 
 

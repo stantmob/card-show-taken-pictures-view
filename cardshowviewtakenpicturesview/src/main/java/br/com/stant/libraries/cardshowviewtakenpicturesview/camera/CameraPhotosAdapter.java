@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -41,6 +40,8 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private boolean mLoading;
     private ItemTouchHelper mTouchHelper;
 
+    private static final int vibrationDuration = 400;
+
     public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
         mCameraFragment = cameraFragment;
         mPhotos         = new ArrayList<>();
@@ -59,7 +60,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         } else if (viewType == FOOTER_VIEW_TYPE) {
             return new LoadingIconItemViewHolder(DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()),
-                    R.layout.loading_icon_item_view_holder,
+                    R.layout.card_show_taken_picture_loading_item_view_holder,
                     parent,
                     false));
         } else {
@@ -90,6 +91,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnLongClickListener(
                 (view) -> {
                     mTouchHelper.startDrag(itemViewHolder);
+
                     return true;
                 }
         );
@@ -159,12 +161,18 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onViewMoved(int oldPosition, int newPosition) {
-        if (newPosition < mPhotos.size() && oldPosition < mPhotos.size()) {
+        if (positionIsOnThePhotosArrayIndexBounds(newPosition) && positionIsOnThePhotosArrayIndexBounds(oldPosition)) {
             CameraPhoto targetCameraPhoto = mPhotos.get(oldPosition);
+
             mPhotos.remove(oldPosition);
             mPhotos.add(newPosition, targetCameraPhoto);
+
             notifyItemMoved(oldPosition, newPosition);
         }
+    }
+
+    private boolean positionIsOnThePhotosArrayIndexBounds(int position) {
+        return position < mPhotos.size();
     }
 
     class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
@@ -202,7 +210,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         @Override
         public void onItemSelected() {
-            VibratorUtils.vibrate(mContext, 400);
+            VibratorUtils.vibrate(mContext, vibrationDuration);
             mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(0.75f);
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.GONE);
         }
@@ -212,6 +220,8 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(1);
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.VISIBLE);
         }
+
+
     }
 
 

@@ -49,7 +49,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.PhotoResult;
@@ -749,7 +748,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), 1, new BitmapFromFileCallback() {
             @Override
             public void onBitmapDecoded(Bitmap bitmap) {
-                mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
+                mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogMainImageView.setImageBitmap(bitmap);
                 mPreviewPicDialog.show();
             }
 

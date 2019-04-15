@@ -40,8 +40,6 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private boolean mLoading;
     private ItemTouchHelper mTouchHelper;
 
-    private static final int vibrationDuration = 400;
-
     public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
         mCameraFragment = cameraFragment;
         mPhotos         = new ArrayList<>();
@@ -212,7 +210,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         @Override
         public void onItemSelected() {
-            VibratorUtils.vibrate(mContext, vibrationDuration);
+            VibratorUtils.vibrate(mContext, 400);
 
             mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(0.75f);
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.GONE);

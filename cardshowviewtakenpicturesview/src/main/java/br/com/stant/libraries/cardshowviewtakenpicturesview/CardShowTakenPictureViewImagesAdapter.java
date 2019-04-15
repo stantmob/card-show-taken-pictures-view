@@ -31,8 +31,6 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private List<CardShowTakenImage> mCardShowTakenImageListAsRemoved;
     private ItemTouchHelper mItemTouchHelper;
 
-    private static final int vibrationDuration = 400;
-
     public CardShowTakenPictureViewImagesAdapter(CardShowTakenPictureView view) {
         mView                               = view;
         mCurrentCardShowTakenImageList      = new ArrayList<>(0);
@@ -183,7 +181,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
         @Override
         public void onItemSelected() {
-            VibratorUtils.vibrate(mView.getContext(), vibrationDuration);
+            VibratorUtils.vibrate(mView.getContext(), 400);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureContainerConstraintLayout.setAlpha(0.75f);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPicturesItemDeleteIconContainerCardView.setVisibility(View.GONE);
         }

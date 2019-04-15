@@ -78,7 +78,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             itemViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
 
-            configureDefaultConstraintLayoutTouchListener(itemViewHolder);
+            setImageViewLongClickListener(itemViewHolder);
 
             itemViewHolder.updateView(cameraPhoto);
         } else if (viewHolder instanceof LoadingIconItemViewHolder) {
@@ -87,10 +87,12 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
+    private void setImageViewLongClickListener(ItemViewHolder itemViewHolder) {
         itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnLongClickListener(
                 (view) -> {
-                    mTouchHelper.startDrag(itemViewHolder);
+                    if (mCameraFragment.dragAndDropModeIsEnabled()) {
+                        mTouchHelper.startDrag(itemViewHolder);
+                    }
 
                     return true;
                 }
@@ -211,6 +213,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @Override
         public void onItemSelected() {
             VibratorUtils.vibrate(mContext, vibrationDuration);
+
             mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(0.75f);
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.GONE);
         }

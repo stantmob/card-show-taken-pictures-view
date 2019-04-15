@@ -91,6 +91,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private Integer mImagesQuantityLimit;
     private SaveMode mSaveMode;
     private SaveOnlyMode mSaveOnlyMode;
+    private Boolean mDragAndDropMode;
 
     private Context mContext;
 
@@ -102,6 +103,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private final static String KEY_IMAGE_LIST_SIZE            = "image_list_size";
     private final static String KEY_MULTIPLE_GALLERY_SELECTION = "multiple_gallery_selection";
     private final static String KEY_SAVE_ONLY_MODE             = "save_only_mode";
+    private final static String KEY_DRAG_AND_DROP_MODE         = "drag_and_drop_mode";
     private final String integerStringFormat                   = "%d";
 
     final static Integer REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
@@ -110,7 +112,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
                                              Boolean isMultipleGallerySelection,
-                                             SaveOnlyMode saveOnlyMode) {
+                                             SaveOnlyMode saveOnlyMode,
+                                             Boolean dragAndDropMode) {
         CameraFragment cameraFragment = new CameraFragment();
         Bundle arguments              = new Bundle();
 
@@ -118,6 +121,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         arguments.putInt(KEY_IMAGE_LIST_SIZE, imageListSize);
         arguments.putBoolean(KEY_MULTIPLE_GALLERY_SELECTION, isMultipleGallerySelection);
         arguments.putParcelable(KEY_SAVE_ONLY_MODE, saveOnlyMode);
+        arguments.putBoolean(KEY_DRAG_AND_DROP_MODE, dragAndDropMode);
 
         cameraFragment.setArguments(arguments);
 
@@ -167,11 +171,13 @@ public class CameraFragment extends Fragment implements CameraContract {
         Integer imageListSize              = arguments.getInt(KEY_IMAGE_LIST_SIZE);
         Boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
         SaveOnlyMode saveOnlyMode          = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
+        Boolean dragAndDropMode            = arguments.getBoolean(KEY_DRAG_AND_DROP_MODE);
 
         mPhotosLimit                = limitOfImages;
         mImageListSize              = imageListSize;
         mIsMultipleGallerySelection = isMultipleGallerySelection;
         mSaveOnlyMode               = saveOnlyMode;
+        mDragAndDropMode            = dragAndDropMode;
 
         Integer remainingImages = mPhotosLimit - mImageListSize;
 
@@ -762,6 +768,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void closePreviewPicDialog(View View) {
         mPreviewPicDialog.cancel();
+    }
+
+    public Boolean dragAndDropModeIsEnabled() {
+        return mDragAndDropMode;
     }
 
 

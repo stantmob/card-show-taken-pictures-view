@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 "Denis Vieira", new Date());
 //        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
+        mBinding.cardShowViewTakenPicturesView.enableDragAndDrop();
         mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(),
                 R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),

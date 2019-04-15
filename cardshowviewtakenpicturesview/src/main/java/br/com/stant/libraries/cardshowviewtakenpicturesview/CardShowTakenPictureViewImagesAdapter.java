@@ -18,7 +18,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VibratorUtils;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.ItemTouchHelperViewHolder;
-import io.reactivex.Observable;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 
@@ -68,7 +67,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     private void configureDefaultConstraintLayoutTouchListener(ItemViewHolder itemViewHolder) {
         itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnLongClickListener(
                 view -> {
-                    if (mView.isNotCanEditState()) {
+                    if (mView.isNotCanEditState() && mView.dragAndDropModeIsEnabled()) {
                         mItemTouchHelper.startDrag(itemViewHolder);
                     }
                     return true;

@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
 import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.adapter.rxjava2.SingleAdapter;
@@ -89,6 +91,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private Integer mImagesQuantityLimit;
     private SaveMode mSaveMode;
     private SaveOnlyMode mSaveOnlyMode;
+    private Boolean mDragAndDropMode;
 
     private Context mContext;
 
@@ -100,6 +103,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private final static String KEY_IMAGE_LIST_SIZE            = "image_list_size";
     private final static String KEY_MULTIPLE_GALLERY_SELECTION = "multiple_gallery_selection";
     private final static String KEY_SAVE_ONLY_MODE             = "save_only_mode";
+    private final static String KEY_DRAG_AND_DROP_MODE         = "drag_and_drop_mode";
     private final String integerStringFormat                   = "%d";
 
     final static Integer REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
@@ -108,7 +112,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
                                              Boolean isMultipleGallerySelection,
-                                             SaveOnlyMode saveOnlyMode) {
+                                             SaveOnlyMode saveOnlyMode,
+                                             Boolean dragAndDropMode) {
         CameraFragment cameraFragment = new CameraFragment();
         Bundle arguments              = new Bundle();
 
@@ -116,6 +121,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         arguments.putInt(KEY_IMAGE_LIST_SIZE, imageListSize);
         arguments.putBoolean(KEY_MULTIPLE_GALLERY_SELECTION, isMultipleGallerySelection);
         arguments.putParcelable(KEY_SAVE_ONLY_MODE, saveOnlyMode);
+        arguments.putBoolean(KEY_DRAG_AND_DROP_MODE, dragAndDropMode);
 
         cameraFragment.setArguments(arguments);
 
@@ -165,11 +171,13 @@ public class CameraFragment extends Fragment implements CameraContract {
         Integer imageListSize              = arguments.getInt(KEY_IMAGE_LIST_SIZE);
         Boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
         SaveOnlyMode saveOnlyMode          = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
+        Boolean dragAndDropMode            = arguments.getBoolean(KEY_DRAG_AND_DROP_MODE);
 
         mPhotosLimit                = limitOfImages;
         mImageListSize              = imageListSize;
         mIsMultipleGallerySelection = isMultipleGallerySelection;
         mSaveOnlyMode               = saveOnlyMode;
+        mDragAndDropMode            = dragAndDropMode;
 
         Integer remainingImages = mPhotosLimit - mImageListSize;
 
@@ -243,7 +251,13 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentGalleryImageView,
                 mCameraFragmentBinding.cameraFragmentSaveImageView);
 
-        setAdapter(mCameraFragmentBinding.cameraPhotosRecyclerView);
+        final RecyclerView cameraPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
+
+        configureRecyclerView(cameraPhotosRecyclerView);
+
+        cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
+
+        attachDragAndDropTouchHelper(cameraPhotosRecyclerView);
 
         setCameraSetup(mCameraFragmentBinding.cameraFragmentSwitchFlashImageView,
                 mCameraFragmentBinding.cameraFragmentZoomSeekBar,
@@ -407,10 +421,18 @@ public class CameraFragment extends Fragment implements CameraContract {
         }
     }
 
-    private void setAdapter(RecyclerView cameraPhotosRecyclerView) {
+    private void configureRecyclerView(RecyclerView cameraPhotosRecyclerView) {
         cameraPhotosRecyclerView.setNestedScrollingEnabled(true);
         cameraPhotosRecyclerView.setFocusable(false);
-        cameraPhotosRecyclerView.setAdapter(mCameraPhotosAdapter);
+        cameraPhotosRecyclerView.setHasFixedSize(true);
+    }
+
+    private void attachDragAndDropTouchHelper(RecyclerView cameraPhotosRecyclerView) {
+        DragAndDropTouchHelper dragAndDropTouchHelper = new DragAndDropTouchHelper(mCameraPhotosAdapter);
+        ItemTouchHelper itemTouchHelper               = new ItemTouchHelper(dragAndDropTouchHelper);
+
+        mCameraPhotosAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(cameraPhotosRecyclerView);
     }
 
     private void setCameraSetup(ImageView flashImageView,
@@ -729,10 +751,12 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
-        getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), 1, new BitmapFromFileCallback() {
+        final int sampleSizeForPreviewImages = 1;
+
+        getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), sampleSizeForPreviewImages, new BitmapFromFileCallback() {
             @Override
             public void onBitmapDecoded(Bitmap bitmap) {
-                mCameraPhotoPreviewDialogBinding.previewImageView.setImageBitmap(bitmap);
+                mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogMainImageView.setImageBitmap(bitmap);
                 mPreviewPicDialog.show();
             }
 
@@ -746,6 +770,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void closePreviewPicDialog(View View) {
         mPreviewPicDialog.cancel();
+    }
+
+    public Boolean dragAndDropModeIsEnabled() {
+        return mDragAndDropMode;
     }
 
 

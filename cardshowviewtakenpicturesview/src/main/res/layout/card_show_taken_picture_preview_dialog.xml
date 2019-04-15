@@ -22,6 +22,7 @@
             android:id="@+id/preview_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:scaleType="centerInside"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +30,7 @@
             tools:src="@drawable/building" />
 
         <ImageView
-            android:id="@+id/close_preview_image"
+            android:id="@+id/camera_photo_preview_dialog_close_icon_image_view"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_margin="8dp"

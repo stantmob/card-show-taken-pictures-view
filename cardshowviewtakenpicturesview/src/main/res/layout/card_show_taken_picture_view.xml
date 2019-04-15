@@ -116,12 +116,13 @@
             android:padding="9dp">
 
             <ImageView
-                android:layout_width="55dp"
-                android:layout_height="55dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/border_circle_grey"
                 android:onClick="@{handler::pickPictureToFinishAction}"
-                android:padding="15dp"
+                android:padding="12dp"
                 android:src="@drawable/ic_cam"
                 android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
 
@@ -130,8 +131,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginStart="8dp"
-                android:minHeight="55dp"
+                android:focusable="false"
+                android:minHeight="66dp"
                 android:orientation="horizontal"
                 app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 

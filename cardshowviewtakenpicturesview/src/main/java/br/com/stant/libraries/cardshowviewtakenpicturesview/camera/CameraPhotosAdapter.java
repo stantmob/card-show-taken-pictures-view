@@ -5,6 +5,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +18,19 @@ import java.util.List;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.CameraPhotoItemCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.LoadingIconItemViewHolderBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VibratorUtils;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropHandler;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.ItemTouchHelperViewHolder;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.viewholders.LoadingIconItemViewHolder;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.deleteFile;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
-public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements DragAndDropHandler {
 
     private static int ITEM_VIEW_TYPE   = 0;
     private static int FOOTER_VIEW_TYPE = 1;
@@ -34,6 +38,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<CameraPhoto> mPhotos;
     private final Context mContext;
     private boolean mLoading;
+    private ItemTouchHelper mTouchHelper;
 
     public CameraPhotosAdapter(Context context, CameraFragment cameraFragment) {
         mCameraFragment = cameraFragment;
@@ -50,10 +55,10 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     LayoutInflater.from(parent.getContext()),
                     R.layout.camera_photo_recycler_view_item,
                     parent, false));
-        } else if (viewType == FOOTER_VIEW_TYPE){
+        } else if (viewType == FOOTER_VIEW_TYPE) {
             return new LoadingIconItemViewHolder(DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()),
-                    R.layout.loading_icon_item_view_holder,
+                    R.layout.card_show_taken_picture_loading_item_view_holder,
                     parent,
                     false));
         } else {
@@ -71,11 +76,25 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             itemViewHolder.mCameraPhotosRecyclerViewBinding.setHandler(this);
 
+            setImageViewLongClickListener(itemViewHolder);
+
             itemViewHolder.updateView(cameraPhoto);
         } else if (viewHolder instanceof LoadingIconItemViewHolder) {
             LoadingIconItemViewHolder loadingIconItemViewHolder = (LoadingIconItemViewHolder) viewHolder;
             loadingIconItemViewHolder.showProgressBar();
         }
+    }
+
+    private void setImageViewLongClickListener(ItemViewHolder itemViewHolder) {
+        itemViewHolder.mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnLongClickListener(
+                (view) -> {
+                    if (mCameraFragment.dragAndDropModeIsEnabled()) {
+                        mTouchHelper.startDrag(itemViewHolder);
+                    }
+
+                    return true;
+                }
+        );
     }
 
     @Override
@@ -136,7 +155,27 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return mPhotos;
     }
 
-    class ItemViewHolder extends RecyclerView.ViewHolder {
+    public void setTouchHelper(ItemTouchHelper touchHelper) {
+        mTouchHelper = touchHelper;
+    }
+
+    @Override
+    public void onViewMoved(int oldPosition, int newPosition) {
+        if (positionIsOnThePhotosArrayIndexBounds(newPosition) && positionIsOnThePhotosArrayIndexBounds(oldPosition)) {
+            CameraPhoto targetCameraPhoto = mPhotos.get(oldPosition);
+
+            mPhotos.remove(oldPosition);
+            mPhotos.add(newPosition, targetCameraPhoto);
+
+            notifyItemMoved(oldPosition, newPosition);
+        }
+    }
+
+    private boolean positionIsOnThePhotosArrayIndexBounds(int position) {
+        return position < mPhotos.size();
+    }
+
+    class ItemViewHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
 
         private CameraPhotoRecyclerViewItemBinding mCameraPhotosRecyclerViewBinding;
 
@@ -152,7 +191,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     new BitmapFromFileCallback() {
                         @Override
                         public void onBitmapDecoded(Bitmap bitmap) {
-                            mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setImageBitmap(bitmap);
+                            mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setImageBitmap(bitmap);
                         }
 
                         @Override
@@ -164,9 +203,23 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             mCameraPhotosRecyclerViewBinding.executePendingBindings();
-            mCameraPhotosRecyclerViewBinding.cardShowTakenPictureViewGeneralCircularImageView.setOnClickListener(
+            mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnClickListener(
                     view -> mCameraFragment.showPreviewPicDialog(cameraPhoto)
             );
+        }
+
+        @Override
+        public void onItemSelected() {
+            VibratorUtils.vibrate(mContext, 400);
+
+            mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(0.75f);
+            mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.GONE);
+        }
+
+        @Override
+        public void onItemClear() {
+            mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setAlpha(1);
+            mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemCloseIconContainer.setVisibility(View.VISIBLE);
         }
 
 

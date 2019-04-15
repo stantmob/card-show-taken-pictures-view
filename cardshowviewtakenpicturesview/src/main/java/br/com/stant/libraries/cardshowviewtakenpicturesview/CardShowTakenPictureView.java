@@ -17,6 +17,8 @@ import android.os.Build;
 import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,9 +39,11 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
+import static com.annimon.stream.Optional.ofNullable;
 
 public class CardShowTakenPictureView extends LinearLayout implements CardShowTakenPictureViewContract {
 
@@ -48,8 +52,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IMAGE_CAMERA_LIST             = "image_camera_list";
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
     public static final String KEY_SAVE_ONLY_MODE                = "save_only_mode";
+    public static final String KEY_DRAG_AND_DROP_MODE            = "drag_and_drop_mode";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
-    public boolean canEditState;
+
+    private boolean canEditState;
     private File mSdcardTempImagesDirectory = getPrivateTempDirectory(getContext());
     private File mPhotoTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
@@ -67,6 +73,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private ImageGenerator imageGenerator;
     private boolean mIsMultipleGallerySelection = false;
     private SaveOnlyMode mSaveOnlyMode;
+    private boolean mDragAndDropMode = false;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -82,7 +89,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         setOrientation(HORIZONTAL);
 
-        setAdapter();
+        setImageListAdapter(mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView);
+
+        attachDragAndDropTouchHelper(mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView);
 
         setupDialog();
         setupEditMode();
@@ -98,12 +107,24 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
     }
 
-    private void setAdapter() {
-        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(new ArrayList<>(0), this);
+    private void setImageListAdapter(RecyclerView cardShowTakenPictureImageListRecyclerView) {
+        mCardShowTakenPictureViewImagesAdapter = new CardShowTakenPictureViewImagesAdapter(this);
 
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setFocusable(false);
-        mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
+        cardShowTakenPictureImageListRecyclerView.setNestedScrollingEnabled(true);
+        cardShowTakenPictureImageListRecyclerView.setHasFixedSize(true);
+        cardShowTakenPictureImageListRecyclerView.setAdapter(mCardShowTakenPictureViewImagesAdapter);
+    }
+
+    private void attachDragAndDropTouchHelper(RecyclerView cardShowTakenPictureImageListRecyclerView) {
+        ofNullable(mCardShowTakenPictureViewImagesAdapter).ifPresent(
+                (adapter) -> {
+                    DragAndDropTouchHelper dragAndDropTouchHelper = new DragAndDropTouchHelper(adapter);
+                    ItemTouchHelper itemTouchHelper               = new ItemTouchHelper(dragAndDropTouchHelper);
+
+                    adapter.setTouchHelper(itemTouchHelper);
+                    itemTouchHelper.attachToRecyclerView(cardShowTakenPictureImageListRecyclerView);
+                }
+        );
     }
 
     private void setupLayoutOptions() {
@@ -151,6 +172,10 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                 getBitmapFromDrawable(disabledIcon), disabledWarning);
     }
 
+    public void enableDragAndDrop() {
+        mDragAndDropMode = true;
+    }
+
     public Bitmap getBitmapFromDrawable(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
             return ((BitmapDrawable) drawable).getBitmap();
@@ -170,6 +195,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private Bitmap getBitmapFromVectorDrawable(Drawable drawable) {
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
 
@@ -179,9 +205,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
     public static void setBinding(CardShowTakenPictureView view,
                                   String mPictureByName, Date updatedAt) {
-
-        if (mPictureByName != null)
+        if (mPictureByName != null) {
             view.mCardShowTakenPictureViewBinding.setPictureByName(mPictureByName);
+        }
 
         if (updatedAt != null) {
             String pattern = "MM/dd/yyyy";
@@ -231,7 +257,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         if (mOnSavedCardListener != null) {
-            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getCurrentImages(),
+                    mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
                     mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
         }
 
@@ -305,7 +332,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public boolean hasImageByIdentifier(String identifier) {
-        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getData();
+        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
         for (CardShowTakenImage cardShowTakenImage : cardShowTakenPictures) {
             if (identifier.equals(cardShowTakenImage.getIdentifier()))
                 return true;
@@ -347,7 +374,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public List<CardShowTakenImage> getCardImages() {
-        return mCardShowTakenPictureViewImagesAdapter.getData();
+        return mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
     }
 
     @Override
@@ -362,6 +389,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public void setExampleImages() {
         List<CardShowTakenImage> images = new ArrayList<>();
+
         images.add(new CardShowTakenImage(null, "https://www.cityofsydney.nsw.gov.au/__data/assets/image/0009/105948/Noise__construction.jpg", new Date(), new Date()));
         images.add(new CardShowTakenImage(null, "http://facility-egy.com/wp-content/uploads/2016/07/Safety-is-important-to-the-construction-site.png", new Date(), new Date()));
 
@@ -381,6 +409,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         if (mImagesQuantityLimit != null) {
             return mCardShowTakenPictureViewImagesAdapter.getItemCount() != mImagesQuantityLimit;
         }
+
         return true;
     }
 
@@ -395,10 +424,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     @Override
     public void dispatchTakePictureOrPickGalleryIntent() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
+
         intent.putExtra(KEY_LIMIT_IMAGES, mImagesQuantityLimit);
         intent.putExtra(KEY_IMAGE_LIST_SIZE, mCardShowTakenPictureViewImagesAdapter.getItemCount());
         intent.putExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, mIsMultipleGallerySelection);
         intent.putExtra(KEY_SAVE_ONLY_MODE, mSaveOnlyMode);
+        intent.putExtra(KEY_DRAG_AND_DROP_MODE, mDragAndDropMode);
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);
@@ -451,6 +482,18 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public boolean hasPictureByName() {
         return mCardShowTakenPictureViewBinding.getPictureByName() != null;
+    }
+
+    public boolean isCanEditState() {
+        return canEditState;
+    }
+
+    public boolean isNotCanEditState() {
+        return !canEditState;
+    }
+
+    public boolean dragAndDropModeIsEnabled() {
+        return mDragAndDropMode;
     }
 
 

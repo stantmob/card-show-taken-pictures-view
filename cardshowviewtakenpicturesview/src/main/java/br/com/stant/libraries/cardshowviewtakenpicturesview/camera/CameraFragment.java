@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils.CameraSetup;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraFragmentBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoPreviewDialogBinding;
@@ -750,7 +752,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     @Override
-    public void showPreviewPicDialog(CameraPhoto cameraPhoto) {
+    public void showPreviewPicDialog(CameraPhoto cameraPhoto, OnCaptionSavedCallback onCaptionSavedCallback) {
         final int sampleSizeForPreviewImages = 1;
 
         getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), sampleSizeForPreviewImages, new BitmapFromFileCallback() {
@@ -770,6 +772,13 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void closePreviewPicDialog(View View) {
         mPreviewPicDialog.cancel();
+    }
+
+    @Override
+    public void saveCaption(View view) {
+        String captionText = mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.getText().toString();
+        Toast.makeText(getContext(), captionText, Toast.LENGTH_LONG).show();
+        mPreviewPicDialog.dismiss();
     }
 
     public Boolean dragAndDropModeIsEnabled() {

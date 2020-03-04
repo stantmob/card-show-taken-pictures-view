@@ -49,6 +49,8 @@
             android:layout_marginBottom="5dp"
             android:hint="@string/photo_preview_dialog.caption_hint"
             android:maxLength="40"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView

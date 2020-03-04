@@ -16,7 +16,7 @@ public interface CameraContract {
 
     void returnImagesToCardShowTakenPicturesView();
 
-    void showPreviewPicDialog(CameraPhoto cameraPhoto, OnCaptionSavedCallback onCaptionSavedCallback);
+    void showPreviewPicDialog(CameraPhoto cameraPhoto, Integer cameraPhotoPosition, OnCaptionSavedCallback onCaptionSavedCallback);
 
     void closePreviewPicDialog(View View);
 

@@ -21,6 +21,10 @@ public class CameraPhoto implements Serializable{
         return localImageFilename;
     }
 
+    public String getCaption() {
+        return caption;
+    }
+
     public String getTempImagePathToShow() {
         return tempImagePathToShow;
     }

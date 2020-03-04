@@ -205,10 +205,10 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             mCameraPhotosRecyclerViewBinding.executePendingBindings();
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnClickListener(
-                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto, new OnCaptionSavedCallback() {
+                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto, getAdapterPosition(), new OnCaptionSavedCallback() {
                         @Override
-                        public void onCaptionSaved(@NotNull String caption) {
-                            cameraPhoto.setPhotoCaption(caption);
+                        public void onCaptionSaved(@NotNull String caption, int photoPosition) {
+                            mPhotos.get(photoPosition).setPhotoCaption(caption);
                         }
                     })
             );

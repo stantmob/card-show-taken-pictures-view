@@ -111,6 +111,9 @@ public class CameraFragment extends Fragment implements CameraContract {
     final static Integer REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
     private final static Integer REQUEST_CAMERA_PERMISSION = 200;
 
+    private OnCaptionSavedCallback mOnCaptionSavedCallback;
+    private Integer mPhotoPosition;
+
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
                                              Boolean isMultipleGallerySelection,
@@ -752,13 +755,17 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     @Override
-    public void showPreviewPicDialog(CameraPhoto cameraPhoto, OnCaptionSavedCallback onCaptionSavedCallback) {
+    public void showPreviewPicDialog(CameraPhoto cameraPhoto, Integer photoPositionOnAdapter, OnCaptionSavedCallback onCaptionSavedCallback) {
         final int sampleSizeForPreviewImages = 1;
+
+        mPhotoPosition          = photoPositionOnAdapter;
+        mOnCaptionSavedCallback = onCaptionSavedCallback;
 
         getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), sampleSizeForPreviewImages, new BitmapFromFileCallback() {
             @Override
             public void onBitmapDecoded(Bitmap bitmap) {
                 mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogMainImageView.setImageBitmap(bitmap);
+                mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.setText(cameraPhoto.getCaption());
                 mPreviewPicDialog.show();
             }
 
@@ -777,7 +784,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void saveCaption(View view) {
         String captionText = mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.getText().toString();
-        Toast.makeText(getContext(), captionText, Toast.LENGTH_LONG).show();
+        mOnCaptionSavedCallback.onCaptionSaved(captionText, mPhotoPosition);
         mPreviewPicDialog.dismiss();
     }
 

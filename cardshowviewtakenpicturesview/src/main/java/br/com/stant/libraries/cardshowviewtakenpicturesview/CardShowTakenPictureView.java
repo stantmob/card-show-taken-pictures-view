@@ -31,6 +31,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPicturePreviewDialogBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
@@ -74,6 +75,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private boolean mIsMultipleGallerySelection = false;
     private SaveOnlyMode mSaveOnlyMode;
     private boolean mDragAndDropMode = false;
+    private OnCaptionSavedCallback mOnCaptionSavedCallback;
+    private Integer mPhotoPosition;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -225,8 +228,14 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     @Override
-    public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage) {
+    public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage,
+                                     Integer photoPosition,
+                                     OnCaptionSavedCallback onCaptionSavedCallback) {
+        mPhotoPosition          = photoPosition;
+        mOnCaptionSavedCallback = onCaptionSavedCallback;
+
         setImageBitmapToImageView(mCardShowTakenPicturePreviewDialogBinding.previewImage, cardShowTakenImage, 1);
+        mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.setText(cardShowTakenImage.getCaption());
 
         mPreviewPicDialog.show();
     }
@@ -455,7 +464,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap, imageFilename, tempImagePath, cameraPhoto.getCreatedAt(), cameraPhoto.getUpdatedAt());
+                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap,
+                                        imageFilename, tempImagePath, cameraPhoto.getCreatedAt(),
+                                        cameraPhoto.getUpdatedAt(), cameraPhoto.getCaption());
 
                                 mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                                 mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
@@ -490,6 +501,12 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     public boolean isNotCanEditState() {
         return !canEditState;
+    }
+
+    public void saveCaption(View view) {
+        String captionText = mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.getText().toString();
+        mOnCaptionSavedCallback.onCaptionSaved(captionText, mPhotoPosition);
+        mPreviewPicDialog.dismiss();
     }
 
     public boolean dragAndDropModeIsEnabled() {

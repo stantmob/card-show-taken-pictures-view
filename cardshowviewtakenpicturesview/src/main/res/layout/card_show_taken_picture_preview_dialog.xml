@@ -46,22 +46,23 @@
         <EditText
             android:id="@+id/camera_photo_preview_dialog_edit_caption"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
+            android:layout_height="50dp"
+            android:background="@color/black_transparent"
             android:hint="@string/photo_preview_dialog.caption_hint"
             android:maxLength="40"
+            android:paddingStart="16dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <ImageView
             android:id="@+id/camera_photo_preview_dialog_save_caption"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="12dp"
             android:onClick="@{handler::saveCaption}"
-            android:src="@color/orange_stant"
+            android:src="@drawable/ic_right"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 

@@ -9,6 +9,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ActivityUtils;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_DRAG_AND_DROP_MODE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_LIST_SIZE;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_CAPTION_ENABLED;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_MULTIPLE_GALLERY_SELECTION;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_LIMIT_IMAGES;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_SAVE_ONLY_MODE;
@@ -25,9 +26,10 @@ public class CameraActivity extends AppCompatActivity {
         Boolean isMultipleGallerySelection = getIntent().getBooleanExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, false);
         SaveOnlyMode saveOnlyMode          = getIntent().getParcelableExtra(KEY_SAVE_ONLY_MODE);
         Boolean dragAndDropMode            = getIntent().getBooleanExtra(KEY_DRAG_AND_DROP_MODE, false);
+        Boolean isCaptionEnabled           = getIntent().getBooleanExtra(KEY_IS_CAPTION_ENABLED, false);
 
         CameraFragment mCameraFragment = CameraFragment.newInstance(limitImages, image_list_size,
-                isMultipleGallerySelection, saveOnlyMode, dragAndDropMode);
+                isMultipleGallerySelection, saveOnlyMode, dragAndDropMode, isCaptionEnabled);
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
     }
 

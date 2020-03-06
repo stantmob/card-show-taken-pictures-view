@@ -62,6 +62,7 @@ import io.reactivex.schedulers.Schedulers;
 import static android.support.v4.content.ContextCompat.getDrawable;
 import static android.view.View.INVISIBLE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_CAPTION_ENABLED;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
@@ -113,12 +114,14 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
     private Integer mPhotoPosition;
+    private Boolean mIsCaptionEnabled = false;
 
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
                                              Boolean isMultipleGallerySelection,
                                              SaveOnlyMode saveOnlyMode,
-                                             Boolean dragAndDropMode) {
+                                             Boolean dragAndDropMode,
+                                             Boolean isCaptionEnabled) {
         CameraFragment cameraFragment = new CameraFragment();
         Bundle arguments              = new Bundle();
 
@@ -127,6 +130,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         arguments.putBoolean(KEY_MULTIPLE_GALLERY_SELECTION, isMultipleGallerySelection);
         arguments.putParcelable(KEY_SAVE_ONLY_MODE, saveOnlyMode);
         arguments.putBoolean(KEY_DRAG_AND_DROP_MODE, dragAndDropMode);
+        arguments.putBoolean(KEY_IS_CAPTION_ENABLED, isCaptionEnabled);
 
         cameraFragment.setArguments(arguments);
 
@@ -177,12 +181,14 @@ public class CameraFragment extends Fragment implements CameraContract {
         Boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
         SaveOnlyMode saveOnlyMode          = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
         Boolean dragAndDropMode            = arguments.getBoolean(KEY_DRAG_AND_DROP_MODE);
+        Boolean isCaptionEnabled           = arguments.getBoolean(KEY_IS_CAPTION_ENABLED);
 
         mPhotosLimit                = limitOfImages;
         mImageListSize              = imageListSize;
         mIsMultipleGallerySelection = isMultipleGallerySelection;
         mSaveOnlyMode               = saveOnlyMode;
         mDragAndDropMode            = dragAndDropMode;
+        mIsCaptionEnabled           = isCaptionEnabled;
 
         Integer remainingImages = mPhotosLimit - mImageListSize;
 
@@ -200,6 +206,12 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         mCameraPhotoPreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.camera_photo_preview_dialog, null, false);
+
+        if (mIsCaptionEnabled) {
+            mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.VISIBLE);
+        } else {
+            mCameraPhotoPreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.GONE);
+        }
 
         mCameraPhotoPreviewDialogBinding.setHandler(this);
         mPreviewPicDialog.setContentView(mCameraPhotoPreviewDialogBinding.getRoot());

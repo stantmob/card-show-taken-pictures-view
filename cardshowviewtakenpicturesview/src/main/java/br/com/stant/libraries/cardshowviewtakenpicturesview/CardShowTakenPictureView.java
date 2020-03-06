@@ -54,6 +54,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     public static final String KEY_IS_MULTIPLE_GALLERY_SELECTION = "is_multiple_gallery_selection";
     public static final String KEY_SAVE_ONLY_MODE                = "save_only_mode";
     public static final String KEY_DRAG_AND_DROP_MODE            = "drag_and_drop_mode";
+    public static final String KEY_IS_CAPTION_ENABLED            = "is_caption_enabled";
     public static final int REQUEST_IMAGE_LIST_RESULT            = 2;
 
     private boolean canEditState;
@@ -77,6 +78,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private boolean mDragAndDropMode = false;
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
     private Integer mPhotoPosition;
+    private Boolean mIsCaptionEnabled = false;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -101,12 +103,23 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         setupLayoutOptions();
     }
 
+    private void enableCaption(Boolean useCaption) {
+        mIsCaptionEnabled = useCaption;
+    }
+
     private void setupDialog() {
         mPreviewPicDialog                         = new Dialog(getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
         mCardShowTakenPicturePreviewDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(mContext),
                 R.layout.card_show_taken_picture_preview_dialog, null, false);
 
         mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
+
+        if (mIsCaptionEnabled) {
+            mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.VISIBLE);
+        } else {
+            mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.GONE);
+        }
+
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
     }
 
@@ -439,6 +452,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         intent.putExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, mIsMultipleGallerySelection);
         intent.putExtra(KEY_SAVE_ONLY_MODE, mSaveOnlyMode);
         intent.putExtra(KEY_DRAG_AND_DROP_MODE, mDragAndDropMode);
+        intent.putExtra(KEY_IS_CAPTION_ENABLED, mIsCaptionEnabled);
 
         if (mFragment != null) {
             mFragment.startActivityForResult(intent, REQUEST_IMAGE_LIST_RESULT);

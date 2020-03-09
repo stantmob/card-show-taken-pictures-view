@@ -103,7 +103,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         setupLayoutOptions();
     }
 
-    private void enableCaption(Boolean useCaption) {
+    public void enableCaption(Boolean useCaption) {
         mIsCaptionEnabled = useCaption;
     }
 

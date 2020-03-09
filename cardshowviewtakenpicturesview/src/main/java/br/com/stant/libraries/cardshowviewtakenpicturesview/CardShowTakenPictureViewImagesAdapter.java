@@ -76,7 +76,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     public void replaceData(List<CardShowTakenImage> imageUrlsList) {
         mCurrentCardShowTakenImageList = imageUrlsList;
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
         notifyDataSetChanged();
     }
 
@@ -118,14 +118,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
         notifyItemRemoved(position);
 
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
     }
 
     public void addPicture(CardShowTakenImage cardShowTakenImage) {
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
 
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
         notifyItemInserted(mCurrentCardShowTakenImageList.size());
     }
 

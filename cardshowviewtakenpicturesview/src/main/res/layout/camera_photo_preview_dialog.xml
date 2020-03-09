@@ -55,7 +55,7 @@
                 android:layout_height="50dp"
                 android:background="@color/black_transparent"
                 android:gravity="center_vertical"
-                android:hint="@string/photo_preview_dialog.caption_hint"
+                android:hint="@string/image_preview_dialog.caption_hint"
                 android:maxLength="40"
                 android:paddingStart="16dp"
                 android:textColor="@color/white"

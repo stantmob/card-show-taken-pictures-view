@@ -59,7 +59,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     private boolean canEditState;
     private File mSdcardTempImagesDirectory = getPrivateTempDirectory(getContext());
-    private File mPhotoTaken;
+    private File mImageTaken;
     private CardShowTakenPictureViewBinding mCardShowTakenPictureViewBinding;
     private CardShowTakenPicturePreviewDialogBinding mCardShowTakenPicturePreviewDialogBinding;
     private Context mContext;
@@ -77,7 +77,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     private SaveOnlyMode mSaveOnlyMode;
     private boolean mDragAndDropMode = false;
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
-    private Integer mPhotoPosition;
+    private Integer mImagePosition;
     private Boolean mIsCaptionEnabled = false;
 
     public CardShowTakenPictureView(Context context, AttributeSet attrs) {
@@ -115,9 +115,9 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPicturePreviewDialogBinding.setHandler(this);
 
         if (mIsCaptionEnabled) {
-            mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.VISIBLE);
+            mCardShowTakenPicturePreviewDialogBinding.cameraImagePreviewDialogCaptionContainer.setVisibility(View.VISIBLE);
         } else {
-            mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogCaptionContainer.setVisibility(View.GONE);
+            mCardShowTakenPicturePreviewDialogBinding.cameraImagePreviewDialogCaptionContainer.setVisibility(View.GONE);
         }
 
         mPreviewPicDialog.setContentView(mCardShowTakenPicturePreviewDialogBinding.getRoot());
@@ -178,7 +178,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mIsMultipleGallerySelection = isMultipleGallerySelection;
     }
 
-    public void updateCurrentAndLimitPhotosQuantityText(Integer currentQuantity) {
+    public void updateCurrentAndLimitImagesQuantityText(Integer currentQuantity) {
         mCardShowTakenPictureViewBinding.setCurrentAndLimitPhotosQuantityText(
                 currentQuantity + "/" + mImagesQuantityLimit);
     }
@@ -242,13 +242,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage,
-                                     Integer photoPosition,
+                                     Integer imagePosition,
                                      OnCaptionSavedCallback onCaptionSavedCallback) {
-        mPhotoPosition          = photoPosition;
+        mImagePosition = imagePosition;
         mOnCaptionSavedCallback = onCaptionSavedCallback;
 
         setImageBitmapToImageView(mCardShowTakenPicturePreviewDialogBinding.previewImage, cardShowTakenImage, 1);
-        mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.setText(cardShowTakenImage.getCaption());
+        mCardShowTakenPicturePreviewDialogBinding.cameraImagePreviewDialogEditCaption.setText(cardShowTakenImage.getCaption());
 
         mPreviewPicDialog.show();
     }
@@ -344,7 +344,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         mCardShowTakenPictureViewBinding.cardShowTakenPictureCurrentPhotosQuantityTextView.setVisibility(VISIBLE);
 
-        updateCurrentAndLimitPhotosQuantityText(currentImagesQuantity);
+        updateCurrentAndLimitImagesQuantityText(currentImagesQuantity);
     }
 
     @Override
@@ -466,21 +466,21 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         if (requestCode == REQUEST_IMAGE_LIST_RESULT && resultCode == Activity.RESULT_OK && data != null) {
 
-            ArrayList<CameraPhoto> cameraPhotos = (ArrayList<CameraPhoto>) data.getSerializableExtra(KEY_IMAGE_CAMERA_LIST);
+            ArrayList<CameraPhoto> cameraImages = (ArrayList<CameraPhoto>) data.getSerializableExtra(KEY_IMAGE_CAMERA_LIST);
 
-            for (CameraPhoto cameraPhoto : cameraPhotos) {
+            for (CameraPhoto cameraImage : cameraImages) {
 
-                String localImage = cameraPhoto.getLocalImageFilename();
+                String localImage = cameraImage.getLocalImageFilename();
 
-                File mPhotoDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage);
+                File mImageDirectory = new File(mSdcardTempImagesDirectory.toString() + "/" + localImage);
 
-                imageGenerator.generateCardShowTakenImageFromCamera(mPhotoDirectory,
+                imageGenerator.generateCardShowTakenImageFromCamera(mImageDirectory,
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap,
-                                        imageFilename, tempImagePath, cameraPhoto.getCreatedAt(),
-                                        cameraPhoto.getUpdatedAt(), cameraPhoto.getCaption());
+                                        imageFilename, tempImagePath, cameraImage.getCreatedAt(),
+                                        cameraImage.getUpdatedAt(), cameraImage.getCaption());
 
                                 mCardShowTakenPictureViewImagesAdapter.addPicture(cardShowTakenImage);
                                 mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView.smoothScrollToPosition(mCardShowTakenPictureViewImagesAdapter.getItemCount() - 1);
@@ -496,7 +496,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
             mCardShowTakenPictureViewImagesAdapter.notifyDataSetChanged();
 
         } else {
-            mPhotoTaken = null;
+            mImageTaken = null;
         }
 
     }
@@ -518,8 +518,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     public void saveCaption(View view) {
-        String captionText = mCardShowTakenPicturePreviewDialogBinding.cameraPhotoPreviewDialogEditCaption.getText().toString();
-        mOnCaptionSavedCallback.onCaptionSaved(captionText, mPhotoPosition);
+        String captionText = mCardShowTakenPicturePreviewDialogBinding.cameraImagePreviewDialogEditCaption.getText().toString();
+        mOnCaptionSavedCallback.onCaptionSaved(captionText, mImagePosition);
         mPreviewPicDialog.dismiss();
     }
 

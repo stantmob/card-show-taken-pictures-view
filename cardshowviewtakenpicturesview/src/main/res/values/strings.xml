@@ -25,6 +25,6 @@
 
     <string name="camera_fragment.save_in_progress_has_been_canceled">The save in progress has been canceled.</string>
     <string name="camera_fragment.wait_until_the_photo_save_process_finishes">Please wait until the photo save process finishes before taking another photo</string>
-    <string name="photo_preview_dialog.caption_hint">Add caption...</string>
+    <string name="image_preview_dialog.caption_hint">Add caption...</string>
 
 </resources>

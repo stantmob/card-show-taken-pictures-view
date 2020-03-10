@@ -5,6 +5,7 @@
     <color name="orange_stant">#ee3923</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="black_transparent">#99000000</color>
     <color name="red">#F44336</color>
 
 </resources>

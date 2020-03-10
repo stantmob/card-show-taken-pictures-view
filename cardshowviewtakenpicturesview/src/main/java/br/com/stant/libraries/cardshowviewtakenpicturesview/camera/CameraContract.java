@@ -4,6 +4,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 
 public interface CameraContract {
@@ -15,9 +16,11 @@ public interface CameraContract {
 
     void returnImagesToCardShowTakenPicturesView();
 
-    void showPreviewPicDialog(CameraPhoto cameraPhoto);
+    void showPreviewPicDialog(CameraPhoto cameraPhoto, Integer cameraPhotoPosition, OnCaptionSavedCallback onCaptionSavedCallback);
 
     void closePreviewPicDialog(View View);
+
+    void saveCaption(View view);
 
 
 }

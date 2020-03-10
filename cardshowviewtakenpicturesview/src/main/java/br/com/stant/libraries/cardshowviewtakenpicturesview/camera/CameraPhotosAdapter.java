@@ -17,6 +17,7 @@ import java.util.List;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.CameraPhotoItemCallback;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPhotoRecyclerViewItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
@@ -204,7 +205,12 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCameraPhotosRecyclerViewBinding.setPhoto(cameraPhoto);
             mCameraPhotosRecyclerViewBinding.executePendingBindings();
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnClickListener(
-                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto)
+                    view -> mCameraFragment.showPreviewPicDialog(cameraPhoto, getAdapterPosition(), new OnCaptionSavedCallback() {
+                        @Override
+                        public void onCaptionSaved(@NotNull String caption, int photoPosition) {
+                            mPhotos.get(photoPosition).setPhotoCaption(caption);
+                        }
+                    })
             );
         }
 

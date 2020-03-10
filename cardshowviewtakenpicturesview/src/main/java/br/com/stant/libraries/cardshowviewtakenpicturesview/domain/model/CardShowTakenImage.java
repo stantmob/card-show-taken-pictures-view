@@ -12,23 +12,26 @@ public class CardShowTakenImage {
     private Bitmap bitmapImageFromIntentPath;
     private Date createdAt;
     private Date updatedAt;
+    private String caption;
 
     public CardShowTakenImage(Bitmap bitmapImageFromIntentPath, String localImageFilename,
-                              String tempImagePathToShow, Date createdAt, Date updatedAt) {
+                              String tempImagePathToShow, Date createdAt, Date updatedAt, String caption) {
         this.bitmapImageFromIntentPath = bitmapImageFromIntentPath;
         this.localImageFilename        = localImageFilename;
         this.tempImagePathToShow       = tempImagePathToShow;
         this.createdAt                 = createdAt;
         this.updatedAt                 = updatedAt;
+        this.caption                   = caption;
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
-                              Date createdAt, Date updatedAt) {
+                              Date createdAt, Date updatedAt, String caption) {
         this.identifier         = identifier;
         this.remoteImageUrl     = remoteImageUrl;
         this.localImageFilename = localImageFilename;
         this.createdAt          = createdAt;
         this.updatedAt          = updatedAt;
+        this.caption            = caption;
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt, Date updatedAt) {
@@ -73,4 +76,14 @@ public class CardShowTakenImage {
     public Date getCreatedAt() {
         return createdAt;
     }
+
+    public String getCaption() {
+        return caption;
+    }
+
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
+
 }

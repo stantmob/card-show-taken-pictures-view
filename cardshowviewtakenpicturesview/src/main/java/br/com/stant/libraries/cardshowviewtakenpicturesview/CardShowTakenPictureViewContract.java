@@ -6,6 +6,7 @@ import android.view.View;
 
 import java.util.List;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
@@ -22,7 +23,7 @@ public interface CardShowTakenPictureViewContract {
 
     void checkIfHasImages();
 
-    void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage);
+    void showPreviewPicDialog(CardShowTakenImage cardShowTakenImage, Integer photoPosition, OnCaptionSavedCallback onCaptionSavedCallback);
 
     void closePreviewPicDialog(View View);
 

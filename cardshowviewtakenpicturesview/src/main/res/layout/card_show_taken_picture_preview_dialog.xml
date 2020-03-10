@@ -30,7 +30,7 @@
             tools:src="@drawable/building" />
 
         <ImageView
-            android:id="@+id/camera_photo_preview_dialog_close_icon_image_view"
+            android:id="@+id/camera_image_preview_dialog_close_icon_image_view"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_margin="8dp"
@@ -42,6 +42,39 @@
             android:src="@drawable/ic_close_dialog"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/camera_image_preview_dialog_caption_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/camera_image_preview_dialog_edit_caption"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/black_transparent"
+                android:hint="@string/image_preview_dialog.caption_hint"
+                android:maxLength="40"
+                android:paddingStart="16dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/camera_image_preview_dialog_save_caption"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="15dp"
+                android:onClick="@{handler::saveCaption}"
+                android:src="@drawable/ic_right"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </android.support.constraint.ConstraintLayout>
 
     </android.support.constraint.ConstraintLayout>
 

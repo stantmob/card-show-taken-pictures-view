@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.callbacks.OnCaptionSavedCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureViewImageRecycleItemBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -75,7 +76,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     public void replaceData(List<CardShowTakenImage> imageUrlsList) {
         mCurrentCardShowTakenImageList = imageUrlsList;
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
         notifyDataSetChanged();
     }
 
@@ -117,14 +118,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
         notifyItemRemoved(position);
 
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
     }
 
     public void addPicture(CardShowTakenImage cardShowTakenImage) {
         mCurrentCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
 
-        mView.updateCurrentAndLimitPhotosQuantityText(getItemCount());
+        mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
         notifyItemInserted(mCurrentCardShowTakenImageList.size());
     }
 
@@ -174,7 +175,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
             mServiceInspectionsFormFilledRecycleItemBinding.setCardShowTakenImage(cardShowTakenImage);
             mServiceInspectionsFormFilledRecycleItemBinding.cardShowTakenPictureViewGeneralCircularImageView
                     .setOnClickListener(
-                            v -> mView.showPreviewPicDialog(cardShowTakenImage)
+                            v -> mView.showPreviewPicDialog(cardShowTakenImage, getAdapterPosition(), new OnCaptionSavedCallback() {
+                                @Override
+                                public void onCaptionSaved(@NotNull String caption, int photoPosition) {
+                                    mCurrentCardShowTakenImageList.get(photoPosition).setCaption(caption);
+                                }
+                            })
                     );
             mServiceInspectionsFormFilledRecycleItemBinding.executePendingBindings();
         }

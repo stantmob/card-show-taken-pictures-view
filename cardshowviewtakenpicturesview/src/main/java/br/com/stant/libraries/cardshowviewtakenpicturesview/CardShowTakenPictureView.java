@@ -98,13 +98,13 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
         attachDragAndDropTouchHelper(mCardShowTakenPictureViewBinding.cardShowTakenPictureImageListRecyclerView);
 
-        setupDialog();
         setupEditMode();
         setupLayoutOptions();
     }
 
     public void enableCaption(Boolean useCaption) {
         mIsCaptionEnabled = useCaption;
+        setupDialog();
     }
 
     private void setupDialog() {

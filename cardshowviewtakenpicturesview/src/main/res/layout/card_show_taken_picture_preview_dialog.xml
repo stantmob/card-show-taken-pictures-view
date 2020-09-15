@@ -57,7 +57,7 @@
                 android:background="@color/black_transparent"
                 android:hint="@string/image_preview_dialog.caption_hint"
                 android:inputType="text"
-                android:maxLength="40"
+                android:maxLength="30"
                 android:paddingStart="16dp"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"

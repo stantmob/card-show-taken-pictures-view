@@ -1,6 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils.viewholders;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardShowTakenPictureLoadingItemViewHolderBinding;
 

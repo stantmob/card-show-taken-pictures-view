@@ -1,7 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;

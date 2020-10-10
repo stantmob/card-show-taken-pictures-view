@@ -1,7 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils;
 
 import android.content.Context;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;

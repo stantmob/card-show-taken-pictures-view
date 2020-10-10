@@ -1,32 +1,19 @@
 package br.com.stant.libraries.card_show_taken_pictures_view;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.test.espresso.matcher.ViewMatchers;
-import android.support.test.filters.LargeTest;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.espresso.matcher.ViewMatchers;
+import androidx.test.filters.LargeTest;
+import androidx.test.rule.ActivityTestRule;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
-import br.com.stant.libraries.card_show_taken_pictures_view.testutils.IntentFactory;
-
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.action.ViewActions.click;
-import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static br.com.stant.libraries.card_show_taken_pictures_view.testutils.RecyclerViewMatcher.withRecyclerView;
-import static br.com.stant.libraries.card_show_taken_pictures_view.testutils.TestUtils.checkIfIdIsDisplayed;
-import static br.com.stant.libraries.card_show_taken_pictures_view.testutils.TestUtils.findAndClick;
+import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 
 /**
  * Created by stant on 04/07/17.

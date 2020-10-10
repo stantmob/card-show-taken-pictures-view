@@ -3,7 +3,7 @@ package br.com.stant.libraries.card_show_taken_pictures_view.testutils;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 /**
  * Created by erivan on 09/01/17.

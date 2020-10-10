@@ -1,13 +1,13 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview;
 
-import android.databinding.DataBindingUtil;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +40,9 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public ItemViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+    public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         CardShowTakenPictureViewImageRecycleItemBinding mCardShowTakenPictureViewImageRecycleItemBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(parent.getContext()),
                 R.layout.card_show_taken_picture_view_image_recycle_item,
@@ -53,7 +53,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     @Override
-    public void onBindViewHolder(@NotNull ItemViewHolder itemViewHolder, int position) {
+    public void onBindViewHolder(@NonNull ItemViewHolder itemViewHolder, int position) {
         CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
 
         itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
@@ -177,7 +177,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                     .setOnClickListener(
                             v -> mView.showPreviewPicDialog(cardShowTakenImage, getAdapterPosition(), new OnCaptionSavedCallback() {
                                 @Override
-                                public void onCaptionSaved(@NotNull String caption, int photoPosition) {
+                                public void onCaptionSaved(@NonNull String caption, int photoPosition) {
                                     mCurrentCardShowTakenImageList.get(photoPosition).setCaption(caption);
                                 }
                             })

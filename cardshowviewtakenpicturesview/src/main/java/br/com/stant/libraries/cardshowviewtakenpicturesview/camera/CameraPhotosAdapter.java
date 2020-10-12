@@ -2,15 +2,15 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.jetbrains.annotations.NotNull;
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +48,9 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         mLoading        = false;
     }
 
-    @NotNull
+    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == ITEM_VIEW_TYPE) {
             return new ItemViewHolder(DataBindingUtil.inflate(
                     LayoutInflater.from(parent.getContext()),
@@ -67,9 +67,8 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
     }
 
-    @SuppressLint("CheckResult")
     @Override
-    public void onBindViewHolder(@NotNull RecyclerView.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof ItemViewHolder) {
             ItemViewHolder itemViewHolder = (ItemViewHolder) viewHolder;
 
@@ -207,7 +206,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setOnClickListener(
                     view -> mCameraFragment.showPreviewPicDialog(cameraPhoto, getAdapterPosition(), new OnCaptionSavedCallback() {
                         @Override
-                        public void onCaptionSaved(@NotNull String caption, int photoPosition) {
+                        public void onCaptionSaved(@NonNull String caption, int photoPosition) {
                             mPhotos.get(photoPosition).setPhotoCaption(caption);
                         }
                     })

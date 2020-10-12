@@ -15,7 +15,7 @@
 
     </data>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/camera_show_photo_constraint_layout"
         android:layout_width="66dp"
         android:layout_height="66dp">
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_cam" />
 
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:id="@+id/camera_photo_view_item_close_icon_container"
             android:layout_width="20dp"
             android:layout_height="20dp"
@@ -51,8 +51,8 @@
                 android:layout_gravity="center"
                 android:src="@drawable/ic_close_dialog" />
 
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

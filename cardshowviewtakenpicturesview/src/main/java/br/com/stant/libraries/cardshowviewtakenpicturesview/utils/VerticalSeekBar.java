@@ -3,10 +3,9 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
-public class VerticalSeekBar extends android.support.v7.widget.AppCompatSeekBar {
+public class VerticalSeekBar extends androidx.appcompat.widget.AppCompatSeekBar {
 
     public VerticalSeekBar(Context context) {
         super(context);

@@ -6,28 +6,29 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
 import java.io.Serializable;
@@ -59,8 +60,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.support.v4.content.ContextCompat.getDrawable;
 import static android.view.View.INVISIBLE;
+import static androidx.core.content.ContextCompat.getDrawable;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_CAPTION_ENABLED;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE;
@@ -656,7 +657,7 @@ public class CameraFragment extends Fragment implements CameraContract {
             showSaveImageLoader();
         }
 
-        final Disposable subscribe = unwrapPhotoResultAndSaveBitmap(photoResult, photoPath);
+        unwrapPhotoResultAndSaveBitmap(photoResult, photoPath);
     }
 
     private boolean saveModeOnlyNotSelected() {
@@ -669,14 +670,14 @@ public class CameraFragment extends Fragment implements CameraContract {
                 .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
     }
 
-    private Disposable unwrapPhotoResultAndSaveBitmap(PhotoResult photoResult, File photoPath) {
-        return photoResult.toBitmap()
+    private void unwrapPhotoResultAndSaveBitmap(PhotoResult photoResult, File photoPath) {
+        Disposable subscribe = photoResult.toBitmap()
                 .adapt(SingleAdapter.toSingle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         (bitmapPhoto) -> {
-                            Bitmap bitmap           = bitmapPhoto.bitmap;
+                            Bitmap bitmap = bitmapPhoto.bitmap;
                             Integer rotationDegrees = bitmapPhoto.rotationDegrees;
 
                             if (saveModeOnlySelected()) {
@@ -725,7 +726,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     private void hideSaveImageLoaderOnSuccess(CameraPhoto cameraPhoto) {
         mCameraPhotosAdapter.hideLoader();
         mCameraPhotosAdapter.addPicture(cameraPhoto,
-                (position) -> mCameraPhotosAdapter.notifyItemChanged(position));
+                (position) -> mCameraPhotosAdapter.notifyItemChanged(position - 1)
+        );
         mCameraFragmentBinding.cameraPhotosRecyclerView
                 .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
     }

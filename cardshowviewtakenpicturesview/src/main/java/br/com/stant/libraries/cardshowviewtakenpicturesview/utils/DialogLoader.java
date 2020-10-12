@@ -2,10 +2,10 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;

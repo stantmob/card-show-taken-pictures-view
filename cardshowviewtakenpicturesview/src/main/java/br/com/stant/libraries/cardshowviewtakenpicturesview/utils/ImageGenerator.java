@@ -85,8 +85,10 @@ public class ImageGenerator {
                                                            CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         try {
             final Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), data);
-
             String photoPath = getRealPathFromURI(mContext, data);
+            if (photoPath.isEmpty()) {
+                photoPath = getRealPathFromURI(mContext, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            }
 
             final Integer desiredSize = 1400;
             final Bitmap scaledBitmap = rotateBitmapBasedOnExifInterface(photoPath,
@@ -137,12 +139,13 @@ public class ImageGenerator {
 
             ei = new ExifInterface(photoPath);
             int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_UNDEFINED);
+                    ExifInterface.ORIENTATION_NORMAL);
 
             Bitmap rotatedBitmap;
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
+                case ExifInterface.ORIENTATION_UNDEFINED:
                     rotatedBitmap = rotateImage(bitmap, 270);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:

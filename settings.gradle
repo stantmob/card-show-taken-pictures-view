@@ -1,1 +1,1 @@
-include ':sample', ':cardshowviewtakenpicturesview'
+include ':sample', ':cardshowviewtakenpicturesview', 'Library'

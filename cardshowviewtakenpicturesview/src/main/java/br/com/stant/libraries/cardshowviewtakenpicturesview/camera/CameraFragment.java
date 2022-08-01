@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -543,13 +544,13 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_LIST_GALLERY_RESULT && resultCode == Activity.RESULT_OK) {
 
-        if (requestCode == REQUEST_IMAGE_LIST_GALLERY_RESULT && resultCode == Activity.RESULT_OK && data != null) {
-            if (data.getData() != null) {
+            if ((data != null) && (data.getData() != null)) {
                 Uri imageUri = data.getData();
-
-                generateImageCallback(imageUri);
+                if (imageUri.getLastPathSegment() != null) {
+                    generateImageCallback(imageUri);
+                }
             } else if (data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
 

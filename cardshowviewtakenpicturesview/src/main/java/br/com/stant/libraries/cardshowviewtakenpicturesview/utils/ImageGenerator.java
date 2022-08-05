@@ -1,7 +1,6 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -12,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -85,10 +85,7 @@ public class ImageGenerator {
                                                            CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
         try {
             final Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), data);
-            String photoPath = getRealPathFromURI(mContext, data);
-            if (photoPath.isEmpty()) {
-                photoPath = getRealPathFromURI(mContext, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            }
+            InputStream photoPath = mContext.getContentResolver().openInputStream(data);
 
             final Integer desiredSize = 1400;
             final Bitmap scaledBitmap = rotateBitmapBasedOnExifInterface(photoPath,
@@ -101,36 +98,7 @@ public class ImageGenerator {
         }
     }
 
-    private String getRealPathFromURI(Context context, Uri contentUri) {
-        final Cursor cursor = context.getContentResolver().query(contentUri, null, null,
-                null, null);
-
-        String photoPath = getRealPathFromCursor(cursor, "filePath");
-        if (photoPath.isEmpty()) {
-            photoPath = getRealPathFromCursor(cursor, "_data");
-        }
-
-        return photoPath;
-    }
-
-    private String getRealPathFromCursor(Cursor cursor, String columnName) {
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                int column_index = cursor.getColumnIndex(columnName);
-                if (column_index >= 0) {
-                    return cursor.getString(column_index);
-                } else {
-                    return "";
-                }
-            } else {
-                return "";
-            }
-        } else {
-            return "";
-        }
-    }
-
-    private Bitmap rotateBitmapBasedOnExifInterface(String photoPath, Bitmap bitmap) {
+    private Bitmap rotateBitmapBasedOnExifInterface(InputStream photoPath, Bitmap bitmap) {
         ExifInterface ei;
         try {
             if (photoPath == null) {
@@ -145,7 +113,6 @@ public class ImageGenerator {
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                case ExifInterface.ORIENTATION_UNDEFINED:
                     rotatedBitmap = rotateImage(bitmap, 270);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:

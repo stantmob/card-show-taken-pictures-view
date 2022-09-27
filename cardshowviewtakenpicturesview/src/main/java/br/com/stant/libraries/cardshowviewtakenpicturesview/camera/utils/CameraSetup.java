@@ -1,20 +1,5 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera.utils;
 
-import android.content.Context;
-import androidx.annotation.DrawableRes;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.Toast;
-
-import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
-import io.fotoapparat.Fotoapparat;
-import io.fotoapparat.configuration.CameraConfiguration;
-import io.fotoapparat.configuration.UpdateConfiguration;
-import io.fotoapparat.parameter.ScaleType;
-import io.fotoapparat.view.CameraView;
-import io.fotoapparat.view.FocusView;
-
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCameraBack;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromCameraFront;
 import static io.fotoapparat.log.LoggersKt.fileLogger;
@@ -35,6 +20,24 @@ import static io.fotoapparat.selector.ResolutionSelectorsKt.highestResolution;
 import static io.fotoapparat.selector.SelectorsKt.firstAvailable;
 import static io.fotoapparat.selector.SensorSensitivitySelectorsKt.highestSensorSensitivity;
 
+import android.content.Context;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.DrawableRes;
+
+import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
+import io.fotoapparat.Fotoapparat;
+import io.fotoapparat.configuration.CameraConfiguration;
+import io.fotoapparat.configuration.UpdateConfiguration;
+import io.fotoapparat.parameter.ScaleType;
+import io.fotoapparat.view.CameraView;
+import io.fotoapparat.view.FocusView;
+
 public class CameraSetup {
 
     private final Context mContext;
@@ -42,14 +45,15 @@ public class CameraSetup {
     private final CameraConfiguration mCameraConfiguration;
 
     private boolean mActiveCameraBack;
-    private boolean mIsChecked;
+    public boolean mIsFlashChecked;
+    public boolean mIsDataInfoChecked;
     private Integer mLensPosition;
 
     public CameraSetup(Context context, CameraView cameraView, FocusView focusView) {
-        mContext             = context;
-        mFotoapparat         = createCamera(focusView, cameraView);
+        mContext = context;
+        mFotoapparat = createCamera(focusView, cameraView);
         mCameraConfiguration = createSettings();
-        mLensPosition        = fromCameraFront;
+        mLensPosition = fromCameraFront;
     }
 
     private Fotoapparat createCamera(FocusView focusView, CameraView cameraView) {
@@ -96,16 +100,32 @@ public class CameraSetup {
 
     public void toggleTorchOnSwitch(View view) {
         view.setOnClickListener(v -> {
-            boolean isNotChecked = !mIsChecked;
+            boolean isNotChecked = !mIsFlashChecked;
 
             if (isNotChecked) {
                 mFotoapparat.updateConfiguration(UpdateConfiguration.builder().flash(on()).build());
                 changeViewImageResource((ImageView) view, R.drawable.ic_flash_yes);
-                mIsChecked = true;
+                mIsFlashChecked = true;
             } else {
                 mFotoapparat.updateConfiguration(UpdateConfiguration.builder().flash(off()).build());
                 changeViewImageResource((ImageView) view, R.drawable.ic_flash_no);
-                mIsChecked = false;
+                mIsFlashChecked = false;
+            }
+        });
+    }
+
+    public void toggleDataInfoOnSwitch(View view, LinearLayout linearLayout) {
+        view.setOnClickListener(v -> {
+            boolean isNotChecked = !mIsDataInfoChecked;
+
+            if (isNotChecked) {
+                linearLayout.setVisibility(View.VISIBLE);
+                changeViewImageResource((ImageView) view, R.drawable.ic_baseline_data_on);
+                mIsDataInfoChecked = true;
+            } else {
+                linearLayout.setVisibility(View.GONE);
+                changeViewImageResource((ImageView) view, R.drawable.ic_baseline_data_off);
+                mIsDataInfoChecked = false;
             }
         });
     }
@@ -141,7 +161,7 @@ public class CameraSetup {
     private void switchCameraOnClickVerify(View view, View flashView) {
         view.setOnClickListener(
                 (v) -> {
-                    mIsChecked = false;
+                    mIsFlashChecked = false;
                     changeViewImageResource((ImageView) flashView, R.drawable.ic_flash_no);
 
                     if (mActiveCameraBack) {

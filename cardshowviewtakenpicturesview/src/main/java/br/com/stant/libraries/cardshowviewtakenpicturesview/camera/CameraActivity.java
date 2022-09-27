@@ -1,6 +1,7 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
@@ -16,22 +17,34 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTaken
 
 public class CameraActivity extends AppCompatActivity {
 
+    private CameraFragment mCameraFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera_activity);
 
-        Integer limitImages                = getIntent().getIntExtra(KEY_LIMIT_IMAGES, -1);
-        Integer image_list_size            = getIntent().getIntExtra(KEY_IMAGE_LIST_SIZE, 0);
+        Integer limitImages = getIntent().getIntExtra(KEY_LIMIT_IMAGES, -1);
+        Integer image_list_size = getIntent().getIntExtra(KEY_IMAGE_LIST_SIZE, 0);
         Boolean isMultipleGallerySelection = getIntent().getBooleanExtra(KEY_IS_MULTIPLE_GALLERY_SELECTION, false);
-        SaveOnlyMode saveOnlyMode          = getIntent().getParcelableExtra(KEY_SAVE_ONLY_MODE);
-        Boolean dragAndDropMode            = getIntent().getBooleanExtra(KEY_DRAG_AND_DROP_MODE, false);
-        Boolean isCaptionEnabled           = getIntent().getBooleanExtra(KEY_IS_CAPTION_ENABLED, false);
+        SaveOnlyMode saveOnlyMode = getIntent().getParcelableExtra(KEY_SAVE_ONLY_MODE);
+        Boolean dragAndDropMode = getIntent().getBooleanExtra(KEY_DRAG_AND_DROP_MODE, false);
+        Boolean isCaptionEnabled = getIntent().getBooleanExtra(KEY_IS_CAPTION_ENABLED, false);
 
-        CameraFragment mCameraFragment = CameraFragment.newInstance(limitImages, image_list_size,
-                isMultipleGallerySelection, saveOnlyMode, dragAndDropMode, isCaptionEnabled);
+        mCameraFragment = CameraFragment.newInstance(
+                limitImages,
+                image_list_size,
+                isMultipleGallerySelection,
+                saveOnlyMode,
+                dragAndDropMode,
+                isCaptionEnabled
+        );
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
+
+        operateImageDataInfo();
     }
 
-
+    private void operateImageDataInfo() {
+//        mCameraFragment.updateImageDataTextView("TEST 123");
+    }
 }

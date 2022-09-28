@@ -12,6 +12,7 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGe
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -20,6 +21,11 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,18 +41,24 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -59,6 +71,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPh
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
@@ -290,6 +303,8 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentSwitchFlashImageView);
 
         updateCounters();
+
+        onGeolocationStarted();
     }
 
     private void setupSaveModeSnackbars(View root) {
@@ -821,5 +836,86 @@ public class CameraFragment extends Fragment implements CameraContract {
         return mDragAndDropMode;
     }
 
+    /**
+     * @suppress MissingPermission is used because the permissions are first checked before use
+     */
+    @SuppressLint("MissingPermission")
+    private void onGeolocationStarted() {
+        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
+        if (gpsEnabled) {
+            if (AppPermissions.hasLocationPermissionsOn(mContext)) {
+                Task<Location> locationResult = LocationServices.getFusedLocationProviderClient(requireActivity())
+                        .getCurrentLocation(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY, null);
+                locationResult.addOnSuccessListener(location -> {
+                    if (location != null) {
+                        setLocation(location);
+                    } else {
+                        setLocation(forceLocation(locationManager));
+                    }
+                });
+            } else {
+                AppPermissions.requestPermissionsFor(requireActivity());
+            }
+        } else {
+            Toast.makeText(mContext, mContext.getString(R.string.geolocation_location_not_enabled_alert_text), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setLocation(Location location) {
+        if (location == null) {
+            this.updateImageDataTextView(mContext.getString(R.string.geolocation_location_not_available_text));
+            return;
+        }
+
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1);
+            if (!addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String thoroughfare = address.getThoroughfare() + " " + address.getSubThoroughfare();
+                String district = address.getSubLocality();
+                String city = address.getSubAdminArea();
+                String state = address.getAdminArea();
+                this.updateImageDataTextView(
+                        currentLatitude
+                                + ", "
+                                + currentLongitude
+                                + "\n"
+                                + thoroughfare
+                                + "\n"
+                                + district
+                                + "\n"
+                                + city
+                                + "\n"
+                                + state
+                );
+            } else {
+                this.updateImageDataTextView(mContext.getString(R.string.geolocation_location_not_available_text));
+            }
+        } catch (IOException e) {
+            this.updateImageDataTextView(
+                    "Lat. " + location.getLatitude()
+                            + "\n"
+                            + "Lon. " + location.getLongitude()
+            );
+        }
+    }
+
+    private Location forceLocation(LocationManager locationManager) {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(15 * 1000);
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(mContext, mContext.getString(R.string.permission_information_dialog_message), Toast.LENGTH_LONG).show();
+        }
+        String bestProvider = locationManager.getBestProvider(new Criteria(), true);
+        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, this::setLocation);
+        return locationManager.getLastKnownLocation(bestProvider);
+    }
 }

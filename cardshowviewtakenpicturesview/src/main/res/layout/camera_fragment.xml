@@ -175,10 +175,10 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="2"
-                android:text="@string/camera_fragment.image_data_info_mock"
                 android:textColor="#FBFBFB"
                 android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="@string/camera_fragment.image_data_info_mock" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

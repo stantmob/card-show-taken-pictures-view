@@ -65,6 +65,8 @@ dependencies {
     })
 
     testImplementation 'junit:junit:4.13'
+
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
 }
 repositories {
     mavenCentral()

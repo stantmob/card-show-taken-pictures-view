@@ -27,6 +27,8 @@
     <string name="camera_fragment.wait_until_the_photo_save_process_finishes">Please wait until the photo save process finishes before taking another photo</string>
     <string name="camera_fragment.date_time_format">MMM dd yyyy HH:mm:ss</string>
     <string name="camera_fragment.image_data_info_mock" translatable="false">Local Address\nLocal Neighborhood\nLocal City\nLocal State</string>
+    <string name="geolocation.location_not_enabled_alert_text">Device location inactive. Enable it for photo location data.</string>
+    <string name="geolocation.location_not_available_text">Location currently unavailable</string>
     <string name="image_preview_dialog.caption_hint">Add caption…</string>
 
 </resources>

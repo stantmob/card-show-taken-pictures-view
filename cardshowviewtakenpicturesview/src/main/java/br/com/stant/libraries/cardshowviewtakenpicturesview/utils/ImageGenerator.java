@@ -1,11 +1,24 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.utils;
 
+import static com.annimon.stream.Optional.ofNullable;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.flipImage;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPublicAlbumDirectoryAtPictures;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
+import static io.reactivex.Single.fromCallable;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+
+import androidx.exifinterface.media.ExifInterface;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,38 +30,29 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
-import androidx.exifinterface.media.ExifInterface;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract.CardShowTakenCompressedCallback;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.flipImage;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPublicAlbumDirectoryAtPictures;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.rotateImage;
-import static com.annimon.stream.Optional.ofNullable;
-import static io.reactivex.Single.fromCallable;
-
 public class ImageGenerator {
 
-    public static final Integer fromCameraBack  = 1;
-    public static final Integer fromGallery     = 2;
+    public static final Integer fromCameraBack = 1;
+    public static final Integer fromGallery = 2;
     public static final Integer fromCameraFront = 3;
 
-    private Context mContext;
+    private final Context mContext;
 
     public ImageGenerator(Context context) {
         this.mContext = context;
     }
 
-    public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation,
+    @SuppressLint("CheckResult")
+    public void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer photoType, Integer orientation, String tagText,
                                                      CardShowTakenCompressedCallback cardShowTakenCompressedCallback) {
-        Single.fromCallable(() -> createTempImageFileToShow(bitmap, photoType, orientation))
+        //noinspection ResultOfMethodCallIgnored
+        Single.fromCallable(() -> createTempImageFileToShow(bitmap, photoType, orientation, tagText))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -91,7 +95,7 @@ public class ImageGenerator {
             final Bitmap scaledBitmap = rotateBitmapBasedOnExifInterface(photoPath,
                     ImageDecoder.scaleBitmap(bitmap, desiredSize));
 
-            File tempImagePathToShow = createTempImageFileToShow(scaledBitmap, photoType, null);
+            File tempImagePathToShow = createTempImageFileToShow(scaledBitmap, photoType, null, "");
             cardShowTakenCompressedCallback.onSuccess(bitmap, tempImagePathToShow.getName(), tempImagePathToShow.toString());
         } catch (IOException e) {
             e.printStackTrace();
@@ -113,13 +117,13 @@ public class ImageGenerator {
 
             switch (orientation) {
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    rotatedBitmap = rotateImage(bitmap, 270);
+                    rotatedBitmap = rotateImage(bitmap, 270, "");
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    rotatedBitmap = rotateImage(bitmap, 180);
+                    rotatedBitmap = rotateImage(bitmap, 180, "");
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    rotatedBitmap = rotateImage(bitmap, 90);
+                    rotatedBitmap = rotateImage(bitmap, 90, "");
                     break;
                 case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
                     rotatedBitmap = flipImage(bitmap, true, false);
@@ -138,24 +142,24 @@ public class ImageGenerator {
         }
     }
 
-    private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation) {
+    private File createTempImageFileToShow(Bitmap bitmap, Integer typePhoto, Integer orientation, String tagText) {
         String uuid = UUID.randomUUID().toString();
-        File file   = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString()
+        File file = new File(ImageViewFileUtil.getPrivateTempDirectory(mContext).toString()
                 + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         final Integer desiredSize = 1400;
-        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
-        final int quality         = ImageDecoder.getImageQualityPercent(scaledBitmap);
+        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        final int quality = ImageDecoder.getImageQualityPercent(scaledBitmap);
 
         try {
-            FileOutputStream fileOutputStream  = mContext.openFileOutput(file.getName(), Context.MODE_PRIVATE);
+            FileOutputStream fileOutputStream = mContext.openFileOutput(file.getName(), Context.MODE_PRIVATE);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             if (typePhoto.equals(fromCameraBack) || typePhoto.equals(fromCameraFront)) {
-                saveInPictures(scaledBitmap, orientation, uuid);
+                saveInPictures(scaledBitmap, orientation, uuid, tagText);
 
                 try {
-                    rotateImage(scaledBitmap, orientation)
+                    rotateImage(scaledBitmap, orientation, tagText)
                             .compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
                 } catch (OutOfMemoryError outOfMemoryError) {
                     scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
@@ -172,31 +176,32 @@ public class ImageGenerator {
         return file;
     }
 
-    public void scaleAndSaveInPictures(Bitmap bitmap, Integer orientation, String uuid) {
+    public void scaleAndSaveInPictures(Bitmap bitmap, Integer orientation, String uuid, String tagText) {
         final Integer desiredSize = 1400;
-        Bitmap scaledBitmap       = ImageDecoder.scaleBitmap(bitmap, desiredSize);
-        saveInPictures(scaledBitmap, orientation, uuid);
+        Bitmap scaledBitmap = ImageDecoder.scaleBitmap(bitmap, desiredSize);
+        saveInPictures(scaledBitmap, orientation, uuid, tagText);
     }
 
-    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid) {
+    private void saveInPictures(Bitmap bitmap, Integer orientation, String uuid, String tagText) {
         try {
-            subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation), uuid);
+            subscribeSaveImageInPicturesThread(rotateImage(bitmap, orientation, tagText), uuid);
         } catch (OutOfMemoryError outOfMemoryError) {
             subscribeSaveImageInPicturesThread(bitmap, uuid);
         }
     }
 
-    private void subscribeSaveImageInPicturesThread(Bitmap bitmap, String uuid) {
+    private void subscribeSaveImageInPicturesThread(Bitmap bitmap, @SuppressWarnings("unused") String uuid) {
         if (isExternalStorageWritable()) {
             try {
                 final Calendar calendar = Calendar.getInstance();
-                final String todayDate  = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
+                final String todayDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.getTime());
 
                 final File directory = getPublicAlbumDirectoryAtPictures("Stant");
                 final File imageFile = File.createTempFile(todayDate + "-" + JPG_FILE_PREFIX
                         + calendar.getTimeInMillis(), JPG_FILE_SUFFIX, directory);
                 FileOutputStream fileOutputStream = new FileOutputStream(imageFile);
 
+                //noinspection unused
                 final Disposable subscribe = fromCallable(() -> bitmap.compress(Bitmap.CompressFormat.JPEG,
                         100, fileOutputStream))
                         .subscribeOn(Schedulers.newThread())

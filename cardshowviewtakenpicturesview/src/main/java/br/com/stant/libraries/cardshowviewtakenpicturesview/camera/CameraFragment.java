@@ -75,6 +75,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageWatermarkUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
@@ -127,6 +128,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
     private Integer mPhotoPosition;
     private Boolean mIsCaptionEnabled = false;
+
+    private String currentTagText = "";
 
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
@@ -516,6 +519,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public void updateImageDataTextView(String value) {
+        this.currentTagText = mCameraFragmentBinding.imageDateTextView.getText() + "\n" + value;
         mCameraFragmentBinding.imageLocalTextView.setText(value);
     }
 
@@ -710,7 +714,12 @@ public class CameraFragment extends Fragment implements CameraContract {
                             Integer rotationDegrees = bitmapPhoto.rotationDegrees;
 
                             if (saveModeOnlySelected()) {
-                                mImageGenerator.scaleAndSaveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
+                                String tagText = mCameraSetup.mIsDataInfoChecked ? this.currentTagText : "";
+                                mImageGenerator.scaleAndSaveInPictures(
+                                        bitmap,
+                                        rotationDegrees,
+                                        UUID.randomUUID().toString(),
+                                        tagText);
                                 enableCaptureButton();
                             } else {
                                 generateCardShowTakenImageFromCamera(bitmap, rotationDegrees, photoPath);
@@ -728,7 +737,12 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer rotationDegrees, File photoPath) {
-        mImageGenerator.generateCardShowTakenImageFromCamera(bitmap, mCameraSetup.getLensPosition(), rotationDegrees,
+        String tagText = mCameraSetup.mIsDataInfoChecked ? this.currentTagText : "";
+        mImageGenerator.generateCardShowTakenImageFromCamera(
+                bitmap,
+                mCameraSetup.getLensPosition(),
+                rotationDegrees,
+                tagText,
                 new CardShowTakenCompressedCallback() {
 
                     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -909,7 +923,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private Location forceLocation(LocationManager locationManager) {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        locationRequest.setInterval(15 * 1000);
+        locationRequest.setInterval(7 * 1000);
         if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(mContext, mContext.getString(R.string.permission_information_dialog_message), Toast.LENGTH_LONG).show();

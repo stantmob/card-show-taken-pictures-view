@@ -47,7 +47,7 @@ public class ImageViewFileUtil {
         return directory.mkdirs();
     }
 
-    static Bitmap rotateImage(Bitmap source, float angle) throws OutOfMemoryError {
+    static Bitmap rotateImage(Bitmap source, float angle, String tagText) throws OutOfMemoryError {
         Matrix matrix = new Matrix();
 
         if (angle % 180 == 0) {
@@ -56,7 +56,14 @@ public class ImageViewFileUtil {
             matrix.postRotate(angle + 180);
         }
 
-        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+        Bitmap createdBitmap = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+        createdBitmap = ImageWatermarkUtil.Companion.addWatermark(
+                createdBitmap,
+                tagText,
+                new ImageWatermarkUtil.WatermarkOptions()
+        );
+
+        return createdBitmap;
     }
 
     static Bitmap flipImage(Bitmap bitmap, boolean horizontal, boolean vertical) {

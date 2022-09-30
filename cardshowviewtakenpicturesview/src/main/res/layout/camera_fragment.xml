@@ -144,10 +144,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp"
+            android:padding="8dp"
             android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/camera_photos_recycler_view"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/camera_fragment_zoom_seek_bar"
             app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible">
 

@@ -25,6 +25,7 @@ import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -75,7 +76,6 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageWatermarkUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.VerticalSeekBar;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.listener.DragAndDropTouchHelper;
@@ -929,7 +929,27 @@ public class CameraFragment extends Fragment implements CameraContract {
             Toast.makeText(mContext, mContext.getString(R.string.permission_information_dialog_message), Toast.LENGTH_LONG).show();
         }
         String bestProvider = locationManager.getBestProvider(new Criteria(), true);
-        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, this::setLocation);
+        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                setLocation(location);
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                LocationListener.super.onStatusChanged(provider, status, extras);
+            }
+
+            @Override
+            public void onProviderEnabled(@NonNull String provider) {
+                LocationListener.super.onProviderEnabled(provider);
+            }
+
+            @Override
+            public void onProviderDisabled(@NonNull String provider) {
+                LocationListener.super.onProviderDisabled(provider);
+            }
+        });
         return locationManager.getLastKnownLocation(bestProvider);
     }
 }

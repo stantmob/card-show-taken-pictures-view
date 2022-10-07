@@ -86,7 +86,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 @SuppressWarnings("deprecation")
-public class CameraFragment extends Fragment implements CameraContract {
+public class CameraFragment extends Fragment implements CameraContract, LocationListener {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotoPreviewDialogBinding mCameraPhotoPreviewDialogBinding;
@@ -128,6 +128,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
     private Integer mPhotoPosition;
     private Boolean mIsCaptionEnabled = false;
+    private LocationManager locationManager;
 
     private String currentTagText = "";
 
@@ -642,6 +643,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onStop() {
         super.onStop();
         mFotoapparat.stop();
+
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
     }
 
     @Override
@@ -855,7 +860,7 @@ public class CameraFragment extends Fragment implements CameraContract {
      */
     @SuppressLint("MissingPermission")
     private void onGeolocationStarted() {
-        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
         if (gpsEnabled) {
@@ -866,7 +871,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                     if (location != null) {
                         setLocation(location);
                     } else {
-                        setLocation(forceLocation(locationManager));
+                        setLocation(forceLocation());
                     }
                 });
             } else {
@@ -920,7 +925,7 @@ public class CameraFragment extends Fragment implements CameraContract {
         }
     }
 
-    private Location forceLocation(LocationManager locationManager) {
+    private Location forceLocation() {
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         locationRequest.setInterval(7 * 1000);
@@ -929,27 +934,21 @@ public class CameraFragment extends Fragment implements CameraContract {
             Toast.makeText(mContext, mContext.getString(R.string.permission_information_dialog_message), Toast.LENGTH_LONG).show();
         }
         String bestProvider = locationManager.getBestProvider(new Criteria(), true);
-        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, new LocationListener() {
-            @Override
-            public void onLocationChanged(@NonNull Location location) {
-                setLocation(location);
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                LocationListener.super.onStatusChanged(provider, status, extras);
-            }
-
-            @Override
-            public void onProviderEnabled(@NonNull String provider) {
-                LocationListener.super.onProviderEnabled(provider);
-            }
-
-            @Override
-            public void onProviderDisabled(@NonNull String provider) {
-                LocationListener.super.onProviderDisabled(provider);
-            }
-        });
+        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, this);
         return locationManager.getLastKnownLocation(bestProvider);
     }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        setLocation(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) { }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) { }
 }

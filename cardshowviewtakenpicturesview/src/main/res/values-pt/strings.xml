@@ -27,6 +27,9 @@
 
     <string name="camera_fragment.save_in_progress_has_been_canceled">O salvamento em progresso foi cancelado.</string>
     <string name="camera_fragment.wait_until_the_photo_save_process_finishes">Por favor, aguarde até que o processo de salvar foto termine antes de tirar outra foto</string>
-    <string name="image_preview_dialog.caption_hint">Adicionar legenda...</string>
+    <string name="camera_fragment.date_time_format">dd \'de\' MMM \'de\' yyyy  HH:mm:ss</string>
+    <string name="geolocation.location_not_enabled_alert_text">Localização do dispositivo inativa. Ative-a para dados de localização da foto.</string>
+    <string name="geolocation.location_not_available_text">Localização indisponível no momento</string>
+    <string name="image_preview_dialog.caption_hint">Adicionar legenda…</string>
 
 </resources>

@@ -9,9 +9,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
-import androidx.core.app.ActivityCompat;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,15 @@ public class AppPermissions {
     public static final Integer PERMISSIONS_CODE = 1;
     private static boolean doNotAskIsChecked = false;
     private static String[] deniedPermissions;
-    private static String[] PERMISSIONS = {Manifest.permission.READ_PHONE_STATE
+    private static final String[] PERMISSIONS = {Manifest.permission.READ_PHONE_STATE
             , Manifest.permission.CAMERA
             , Manifest.permission.READ_EXTERNAL_STORAGE
-            , Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            , Manifest.permission.WRITE_EXTERNAL_STORAGE
+            , Manifest.permission.ACCESS_COARSE_LOCATION
+            , Manifest.permission.ACCESS_FINE_LOCATION};
 
-    public static void requestPermissions(Activity activity) {
-        if(isNotApiAndroidM()) return;
+    public static void requestPermissionsFor(Activity activity) {
+        if (isNotApiAndroidM()) return;
 
         buildPermissionDialog(activity).show();
     }
@@ -44,8 +47,7 @@ public class AppPermissions {
 
         if (donNotAskIsChecked()) {
             configureDialogs(activity, informationDialog, View.VISIBLE, R.string.permission_information_dialog_never_checked_message);
-        }
-        else {
+        } else {
             configureDialogs(activity, informationDialog, View.GONE, R.string.permission_information_dialog_message);
         }
 
@@ -53,17 +55,18 @@ public class AppPermissions {
     }
 
     private static boolean donNotAskIsChecked() {
-       return doNotAskIsChecked;
+        return doNotAskIsChecked;
     }
+
     private static boolean isNotApiAndroidM() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M;
     }
 
     private static void configureDialogs(Activity activity, Dialog informationDialog,
-                                         int visibility, int contentText){
-        TextView informationText = (TextView) informationDialog.findViewById(R.id.permission_information_dialog_text_view);
-        TextView settingsButton  = (TextView) informationDialog.findViewById(R.id.permission_information_dialog_go_to_settings_text_view);
-        TextView okButton        = (TextView) informationDialog.findViewById(R.id.permission_information_dialog_confirmation_text_view);
+                                         int visibility, int contentText) {
+        TextView informationText = informationDialog.findViewById(R.id.permission_information_dialog_text_view);
+        TextView settingsButton = informationDialog.findViewById(R.id.permission_information_dialog_go_to_settings_text_view);
+        TextView okButton = informationDialog.findViewById(R.id.permission_information_dialog_confirmation_text_view);
 
         informationText.setText(activity.getResources().getString(contentText));
 
@@ -88,15 +91,16 @@ public class AppPermissions {
     }
 
     private static void requestPermission(Activity activity) {
-        if (!hasPermissions(activity.getApplicationContext()) && deniedPermissions != null) {
+        if (!hasPermissionsOn(activity.getApplicationContext()) && deniedPermissions != null) {
             ActivityCompat.requestPermissions(activity, deniedPermissions, PERMISSIONS_CODE);
             deniedPermissions = null;
-        } else if (!hasPermissions(activity.getApplicationContext()) && deniedPermissions == null ){
+        } else if (!hasPermissionsOn(activity.getApplicationContext()) && deniedPermissions == null) {
             ActivityCompat.requestPermissions(activity, PERMISSIONS, PERMISSIONS_CODE);
         }
     }
 
-    public static boolean hasPermissions(Context context) {
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public static boolean hasPermissionsOn(Context context) {
         boolean result = true;
         List<String> deniedPermissions = new ArrayList<>();
         for (String permission : PERMISSIONS) {
@@ -111,6 +115,16 @@ public class AppPermissions {
         return result;
     }
 
+    public static boolean hasLocationPermissionsOn(Context context) {
+        boolean hasFineLocationPermission = ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        boolean hasCoarseLocationPermission = ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+        return hasFineLocationPermission && hasCoarseLocationPermission;
+    }
+
+    @SuppressWarnings("unused")
     public static void setDoNotAskAsChecked() {
         doNotAskIsChecked = true;
     }

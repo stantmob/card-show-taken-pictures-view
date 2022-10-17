@@ -437,8 +437,8 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
     }
 
     private void openPickGalleryIntent() {
-        if (!AppPermissions.hasPermissions((mActivity))) {
-            AppPermissions.requestPermissions(mActivity);
+        if (!AppPermissions.hasPermissionsOn((mActivity))) {
+            AppPermissions.requestPermissionsFor(mActivity);
         } else {
             dispatchTakePictureOrPickGalleryIntent();
         }

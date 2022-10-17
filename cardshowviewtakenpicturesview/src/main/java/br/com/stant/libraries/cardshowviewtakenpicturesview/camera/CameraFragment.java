@@ -1,5 +1,19 @@
 package br.com.stant.libraries.cardshowviewtakenpicturesview.camera;
 
+import static android.view.View.INVISIBLE;
+import static androidx.core.content.ContextCompat.getDrawable;
+import static com.annimon.stream.Optional.ofNullable;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_CAPTION_ENABLED;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
+
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -7,9 +21,14 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Criteria;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileUtils;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
@@ -23,18 +42,24 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -47,8 +72,8 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CameraPh
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.DialogLoader;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.OrientationListener;
@@ -58,22 +83,10 @@ import io.fotoapparat.Fotoapparat;
 import io.fotoapparat.result.PhotoResult;
 import io.fotoapparat.result.adapter.rxjava2.SingleAdapter;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-import static android.view.View.INVISIBLE;
-import static androidx.core.content.ContextCompat.getDrawable;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IMAGE_CAMERA_LIST;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView.KEY_IS_CAPTION_ENABLED;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.SAVE_ONLY_MODE;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.domain.constants.SaveMode.STANT_MODE;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.getBitmapFromFile;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator.fromGallery;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_PREFIX;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
-import static com.annimon.stream.Optional.ofNullable;
-
-public class CameraFragment extends Fragment implements CameraContract {
+@SuppressWarnings("deprecation")
+public class CameraFragment extends Fragment implements CameraContract, LocationListener {
 
     private CameraFragmentBinding mCameraFragmentBinding;
     private CameraPhotoPreviewDialogBinding mCameraPhotoPreviewDialogBinding;
@@ -86,7 +99,6 @@ public class CameraFragment extends Fragment implements CameraContract {
     private CameraSetup mCameraSetup;
     private Fotoapparat mFotoapparat;
     private ImageGenerator mImageGenerator;
-    private DialogLoader mDialogLoader;
     private Dialog mPreviewPicDialog;
     private OrientationListener mOrientationListener;
 
@@ -104,12 +116,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     private Toast mDisabledCameraButtonToast;
     private Toast mSaveInProgressHasBeenCanceledToast;
 
-    private final static String KEY_PHOTOS_LIMIT               = "photos_limit";
-    private final static String KEY_IMAGE_LIST_SIZE            = "image_list_size";
+    private final static String KEY_PHOTOS_LIMIT = "photos_limit";
+    private final static String KEY_IMAGE_LIST_SIZE = "image_list_size";
     private final static String KEY_MULTIPLE_GALLERY_SELECTION = "multiple_gallery_selection";
-    private final static String KEY_SAVE_ONLY_MODE             = "save_only_mode";
-    private final static String KEY_DRAG_AND_DROP_MODE         = "drag_and_drop_mode";
-    private final String integerStringFormat                   = "%d";
+    private final static String KEY_SAVE_ONLY_MODE = "save_only_mode";
+    private final static String KEY_DRAG_AND_DROP_MODE = "drag_and_drop_mode";
 
     final static Integer REQUEST_IMAGE_LIST_GALLERY_RESULT = 1;
     private final static Integer REQUEST_CAMERA_PERMISSION = 200;
@@ -117,6 +128,9 @@ public class CameraFragment extends Fragment implements CameraContract {
     private OnCaptionSavedCallback mOnCaptionSavedCallback;
     private Integer mPhotoPosition;
     private Boolean mIsCaptionEnabled = false;
+    private LocationManager locationManager;
+
+    private String currentTagText = "";
 
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
@@ -125,7 +139,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                                              Boolean dragAndDropMode,
                                              Boolean isCaptionEnabled) {
         CameraFragment cameraFragment = new CameraFragment();
-        Bundle arguments              = new Bundle();
+        Bundle arguments = new Bundle();
 
         arguments.putInt(KEY_PHOTOS_LIMIT, limitOfImages);
         arguments.putInt(KEY_IMAGE_LIST_SIZE, imageListSize);
@@ -140,11 +154,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     public CameraFragment() {
-        mPhotosLimit                = -1;
-        mImageListSize              = 0;
+        mPhotosLimit = -1;
+        mImageListSize = 0;
         mIsMultipleGallerySelection = false;
-        mImagesQuantityLimit        = 10;
-        mSaveMode                   = new SaveMode(STANT_MODE);
+        mImagesQuantityLimit = 10;
+        mSaveMode = new SaveMode(STANT_MODE);
     }
 
     @Override
@@ -169,30 +183,29 @@ public class CameraFragment extends Fragment implements CameraContract {
                 (context) -> {
                     setupDialog(getContext());
 
-                    mPath                = ImageViewFileUtil.getPrivateTempDirectory(context);
-                    mDialogLoader        = new DialogLoader(context);
-                    mImageGenerator      = new ImageGenerator(context);
+                    mPath = ImageViewFileUtil.getPrivateTempDirectory(context);
+                    mImageGenerator = new ImageGenerator(context);
                     mCameraPhotosAdapter = new CameraPhotosAdapter(context, this);
                 }
         );
     }
 
     private void unWrapArguments(Bundle arguments) {
-        Integer limitOfImages              = arguments.getInt(KEY_PHOTOS_LIMIT);
-        Integer imageListSize              = arguments.getInt(KEY_IMAGE_LIST_SIZE);
-        Boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
-        SaveOnlyMode saveOnlyMode          = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
-        Boolean dragAndDropMode            = arguments.getBoolean(KEY_DRAG_AND_DROP_MODE);
-        Boolean isCaptionEnabled           = arguments.getBoolean(KEY_IS_CAPTION_ENABLED);
+        Integer limitOfImages = arguments.getInt(KEY_PHOTOS_LIMIT);
+        int imageListSize = arguments.getInt(KEY_IMAGE_LIST_SIZE);
+        boolean isMultipleGallerySelection = arguments.getBoolean(KEY_MULTIPLE_GALLERY_SELECTION);
+        SaveOnlyMode saveOnlyMode = arguments.getParcelable(KEY_SAVE_ONLY_MODE);
+        boolean dragAndDropMode = arguments.getBoolean(KEY_DRAG_AND_DROP_MODE);
+        boolean isCaptionEnabled = arguments.getBoolean(KEY_IS_CAPTION_ENABLED);
 
-        mPhotosLimit                = limitOfImages;
-        mImageListSize              = imageListSize;
+        mPhotosLimit = limitOfImages;
+        mImageListSize = imageListSize;
         mIsMultipleGallerySelection = isMultipleGallerySelection;
-        mSaveOnlyMode               = saveOnlyMode;
-        mDragAndDropMode            = dragAndDropMode;
-        mIsCaptionEnabled           = isCaptionEnabled;
+        mSaveOnlyMode = saveOnlyMode;
+        mDragAndDropMode = dragAndDropMode;
+        mIsCaptionEnabled = isCaptionEnabled;
 
-        Integer remainingImages = mPhotosLimit - mImageListSize;
+        int remainingImages = mPhotosLimit - mImageListSize;
 
         if (remainingImages < mImagesQuantityLimit && isHasNotLimitOfImages(limitOfImages)) {
             mImagesQuantityLimit = remainingImages;
@@ -246,9 +259,10 @@ public class CameraFragment extends Fragment implements CameraContract {
         );
     }
 
+    @SuppressWarnings("SameParameterValue")
     private Integer convertDpToPixels(Integer dpValue) {
         float roundingValue = 0.5f;
-        float scale         = 1f;
+        float scale = 1f;
 
         if (mContext != null && mContext.getResources() != null) {
             scale = mContext.getResources().getDisplayMetrics().density;
@@ -280,7 +294,8 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         setCameraSetup(mCameraFragmentBinding.cameraFragmentSwitchFlashImageView,
                 mCameraFragmentBinding.cameraFragmentZoomSeekBar,
-                mCameraFragmentBinding.cameraFragmentSwitchLensImageView);
+                mCameraFragmentBinding.cameraFragmentSwitchLensImageView,
+                mCameraFragmentBinding.cameraFragmentImageDataView);
 
         configureOrientationListener(mCameraFragmentBinding.cameraFragmentCloseImageView,
                 mCameraFragmentBinding.cameraFragmentChangeSavePicturesMode,
@@ -292,6 +307,8 @@ public class CameraFragment extends Fragment implements CameraContract {
                 mCameraFragmentBinding.cameraFragmentSwitchFlashImageView);
 
         updateCounters();
+
+        onGeolocationStarted();
     }
 
     private void setupSaveModeSnackbars(View root) {
@@ -428,7 +445,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent,
-                mContext.getString(R.string.gallery_select_pictures)),
+                        mContext.getString(R.string.gallery_select_pictures)),
                 REQUEST_IMAGE_LIST_GALLERY_RESULT);
     }
 
@@ -448,7 +465,7 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private void attachDragAndDropTouchHelper(RecyclerView cameraPhotosRecyclerView) {
         DragAndDropTouchHelper dragAndDropTouchHelper = new DragAndDropTouchHelper(mCameraPhotosAdapter);
-        ItemTouchHelper itemTouchHelper               = new ItemTouchHelper(dragAndDropTouchHelper);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(dragAndDropTouchHelper);
 
         mCameraPhotosAdapter.setTouchHelper(itemTouchHelper);
         itemTouchHelper.attachToRecyclerView(cameraPhotosRecyclerView);
@@ -456,7 +473,8 @@ public class CameraFragment extends Fragment implements CameraContract {
 
     private void setCameraSetup(ImageView flashImageView,
                                 VerticalSeekBar zoomSeekBar,
-                                ImageView switchCameraImageView) {
+                                ImageView switchCameraImageView,
+                                ImageView dataInfoImageView) {
         Activity activity = getActivity();
 
         if (activity != null) {
@@ -465,8 +483,9 @@ public class CameraFragment extends Fragment implements CameraContract {
             mCameraSetup = newCameraSetup(mContext, mCameraFragmentBinding);
         }
 
-        configureCameraSetup(mCameraSetup, flashImageView, zoomSeekBar, switchCameraImageView);
+        configureCameraSetup(mCameraSetup, flashImageView, zoomSeekBar, switchCameraImageView, dataInfoImageView);
         mFotoapparat = mCameraSetup.getFotoapparat();
+        mCameraFragmentBinding.imageDateTextView.setFormat24Hour(mContext.getString(R.string.camera_fragment_date_time_format));
     }
 
     private CameraSetup newCameraSetup(Context context, CameraFragmentBinding cameraFragmentBinding) {
@@ -478,8 +497,11 @@ public class CameraFragment extends Fragment implements CameraContract {
     private void configureCameraSetup(CameraSetup cameraSetup,
                                       ImageView flashImageView,
                                       VerticalSeekBar zoomSeekBar,
-                                      ImageView switchCameraImageView) {
+                                      ImageView switchCameraImageView,
+                                      ImageView dataInfoImageView) {
         cameraSetup.toggleTorchOnSwitch(flashImageView);
+        cameraSetup.toggleDataInfoOnSwitch(dataInfoImageView,
+                mCameraFragmentBinding.cameraFragmentDataInfoLayout);
         cameraSetup.zoomSeekBar(zoomSeekBar);
         cameraSetup.switchCameraOnClick(switchCameraImageView, flashImageView);
     }
@@ -495,6 +517,11 @@ public class CameraFragment extends Fragment implements CameraContract {
                 setOrientationView(orientation);
             }
         };
+    }
+
+    public void updateImageDataTextView(String value) {
+        this.currentTagText = mCameraFragmentBinding.imageDateTextView.getText() + "\n" + value;
+        mCameraFragmentBinding.imageLocalTextView.setText(value);
     }
 
     public void updateCounters() {
@@ -513,6 +540,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private String convertIntegerToString(Integer integer) {
+        String integerStringFormat = "%d";
         return String.format(Locale.getDefault(), integerStringFormat, integer);
     }
 
@@ -546,18 +574,20 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_LIST_GALLERY_RESULT && resultCode == Activity.RESULT_OK) {
 
-            if ((data != null) && (data.getData() != null)) {
-                Uri imageUri = data.getData();
-                if (imageUri.getLastPathSegment() != null) {
-                    generateImageCallback(imageUri);
-                }
-            } else if (data.getClipData() != null) {
-                int count = data.getClipData().getItemCount();
+            if (data != null) {
+                if (data.getData() != null) {
+                    Uri imageUri = data.getData();
+                    if (imageUri.getLastPathSegment() != null) {
+                        generateImageCallback(imageUri);
+                    }
+                } else if (data.getClipData() != null) {
+                    int count = data.getClipData().getItemCount();
 
-                for (int i = 0; i < count; i++) {
-                    Uri imageUri = data.getClipData().getItemAt(i).getUri();
+                    for (int i = 0; i < count; i++) {
+                        Uri imageUri = data.getClipData().getItemAt(i).getUri();
 
-                    generateImageCallback(imageUri);
+                        generateImageCallback(imageUri);
+                    }
                 }
             }
 
@@ -583,6 +613,7 @@ public class CameraFragment extends Fragment implements CameraContract {
                 });
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onResume() {
         super.onResume();
@@ -612,6 +643,10 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void onStop() {
         super.onStop();
         mFotoapparat.stop();
+
+        if (locationManager != null) {
+            locationManager.removeUpdates(this);
+        }
     }
 
     @Override
@@ -649,8 +684,8 @@ public class CameraFragment extends Fragment implements CameraContract {
     @Override
     public void takePicture() {
         PhotoResult photoResult = mFotoapparat.takePicture();
-        String uuid             = UUID.randomUUID().toString();
-        File photoPath          = new File(mPath.toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
+        String uuid = UUID.randomUUID().toString();
+        File photoPath = new File(mPath.toString() + "/" + JPG_FILE_PREFIX + uuid + JPG_FILE_SUFFIX);
 
         disableCaptureButton();
 
@@ -671,8 +706,10 @@ public class CameraFragment extends Fragment implements CameraContract {
                 .smoothScrollToPosition(mCameraPhotosAdapter.getItemCount());
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @SuppressLint("CheckResult")
     private void unwrapPhotoResultAndSaveBitmap(PhotoResult photoResult, File photoPath) {
-        Disposable subscribe = photoResult.toBitmap()
+        photoResult.toBitmap()
                 .adapt(SingleAdapter.toSingle())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -682,7 +719,12 @@ public class CameraFragment extends Fragment implements CameraContract {
                             Integer rotationDegrees = bitmapPhoto.rotationDegrees;
 
                             if (saveModeOnlySelected()) {
-                                mImageGenerator.scaleAndSaveInPictures(bitmap, rotationDegrees, UUID.randomUUID().toString());
+                                String tagText = mCameraSetup.mIsDataInfoChecked ? this.currentTagText : "";
+                                mImageGenerator.scaleAndSaveInPictures(
+                                        bitmap,
+                                        rotationDegrees,
+                                        UUID.randomUUID().toString(),
+                                        tagText);
                                 enableCaptureButton();
                             } else {
                                 generateCardShowTakenImageFromCamera(bitmap, rotationDegrees, photoPath);
@@ -700,9 +742,15 @@ public class CameraFragment extends Fragment implements CameraContract {
     }
 
     private void generateCardShowTakenImageFromCamera(Bitmap bitmap, Integer rotationDegrees, File photoPath) {
-        mImageGenerator.generateCardShowTakenImageFromCamera(bitmap, mCameraSetup.getLensPosition(), rotationDegrees,
+        String tagText = mCameraSetup.mIsDataInfoChecked ? this.currentTagText : "";
+        mImageGenerator.generateCardShowTakenImageFromCamera(
+                bitmap,
+                mCameraSetup.getLensPosition(),
+                rotationDegrees,
+                tagText,
                 new CardShowTakenCompressedCallback() {
 
+                    @SuppressWarnings("ResultOfMethodCallIgnored")
                     @Override
                     public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                         CameraPhoto cameraPhoto = new CameraPhoto(imageFilename, tempImagePath, new Date(), new Date());
@@ -773,7 +821,7 @@ public class CameraFragment extends Fragment implements CameraContract {
     public void showPreviewPicDialog(CameraPhoto cameraPhoto, Integer photoPositionOnAdapter, OnCaptionSavedCallback onCaptionSavedCallback) {
         final int sampleSizeForPreviewImages = 1;
 
-        mPhotoPosition          = photoPositionOnAdapter;
+        mPhotoPosition = photoPositionOnAdapter;
         mOnCaptionSavedCallback = onCaptionSavedCallback;
 
         getBitmapFromFile(cameraPhoto.getTempImagePathToShow(), sampleSizeForPreviewImages, new BitmapFromFileCallback() {
@@ -807,5 +855,100 @@ public class CameraFragment extends Fragment implements CameraContract {
         return mDragAndDropMode;
     }
 
+    /**
+     * @suppress MissingPermission is used because the permissions are first checked before use
+     */
+    @SuppressLint("MissingPermission")
+    private void onGeolocationStarted() {
+        locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 
+        if (gpsEnabled) {
+            if (AppPermissions.hasLocationPermissionsOn(mContext)) {
+                Task<Location> locationResult = LocationServices.getFusedLocationProviderClient(requireActivity())
+                        .getCurrentLocation(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY, null);
+                locationResult.addOnSuccessListener(location -> {
+                    if (location != null) {
+                        setLocation(location);
+                    } else {
+                        setLocation(forceLocation());
+                    }
+                });
+            } else {
+                AppPermissions.requestPermissionsFor(requireActivity());
+            }
+        } else {
+            Toast.makeText(mContext, mContext.getString(R.string.geolocation_location_not_enabled_alert_text), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void setLocation(Location location) {
+        if (location == null) {
+            this.updateImageDataTextView(mContext.getString(R.string.geolocation_location_not_available_text));
+            return;
+        }
+
+        double currentLatitude = location.getLatitude();
+        double currentLongitude = location.getLongitude();
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(currentLatitude, currentLongitude, 1);
+            if (!addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String thoroughfare = address.getThoroughfare() + " " + address.getSubThoroughfare();
+                String district = address.getSubLocality();
+                String city = address.getSubAdminArea();
+                String state = address.getAdminArea();
+                this.updateImageDataTextView(
+                        currentLatitude
+                                + ", "
+                                + currentLongitude
+                                + "\n"
+                                + thoroughfare
+                                + "\n"
+                                + district
+                                + "\n"
+                                + city
+                                + "\n"
+                                + state
+                );
+            } else {
+                this.updateImageDataTextView(mContext.getString(R.string.geolocation_location_not_available_text));
+            }
+        } catch (IOException e) {
+            this.updateImageDataTextView(
+                    "Lat. " + location.getLatitude()
+                            + "\n"
+                            + "Lon. " + location.getLongitude()
+            );
+        }
+    }
+
+    private Location forceLocation() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(7 * 1000);
+        if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(mContext, mContext.getString(R.string.permission_information_dialog_message), Toast.LENGTH_LONG).show();
+        }
+        String bestProvider = locationManager.getBestProvider(new Criteria(), true);
+        locationManager.requestLocationUpdates(bestProvider, 0L, 0F, this);
+        return locationManager.getLastKnownLocation(bestProvider);
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        setLocation(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) { }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) { }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) { }
 }

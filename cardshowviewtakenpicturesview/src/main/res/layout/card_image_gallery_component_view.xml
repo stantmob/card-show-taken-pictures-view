@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="handler"
+            type="br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryComponentView" />
+
+        <variable
+            name="updatedAt"
+            type="String" />
+
+        <variable
+            name="currentAndLimitPhotosQuantityText"
+            type="String" />
+
+        <variable
+            name="pictureByName"
+            type="String" />
+
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/card_image_gallery_component_container_linear_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_rectangle_mutable"
+            android:orientation="horizontal"
+            android:padding="9dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/border_circle_grey"
+                android:onClick="@{handler::pickPictureToFinishAction}"
+                android:padding="12dp"
+                android:src="@drawable/ic_cam"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/card_image_gallery_component_list_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:focusable="false"
+                android:minHeight="33dp"
+                android:orientation="horizontal"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/card_image_gallery_component_recycle_item" />
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="8dp"
+                android:onClick="@{handler::goToGallery}"
+                android:padding="12dp"
+                android:src="@drawable/ic_gallery"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    android:padding="6dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="20dp"
+                        android:orientation="horizontal"
+                        android:visibility="@{handler.hasUpdatedAt() ? View.VISIBLE : View.GONE}">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="3dp"
+                            android:text="@string/card_show_taken_picture_view.image_taken_updated_date"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{updatedAt}"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp"
+                            tools:text="@string/card_show_taken_picture_view.date_hint"/>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:visibility="@{handler.hasPictureByName() ? View.VISIBLE : View.GONE}">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp"
+                            tools:text="@string/card_show_taken_picture_view.image_taken_text"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@{pictureByName}"
+                            android:textColor="@color/gray"
+                            android:textSize="12sp"
+                            tools:text="Teste"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/card_image_gallery_component_photos_quantity_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:text="@{currentAndLimitPhotosQuantityText}"
+                        android:textColor="@color/gray"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        tools:text="0/20"
+                        tools:visibility="visible"/>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</layout>

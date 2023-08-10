@@ -6,4 +6,16 @@
         <item name="android:windowTranslucentStatus" tools:targetApi="kitkat">true</item>
         <item name="android:windowTranslucentNavigation" tools:targetApi="kitkat">true</item>
     </style>
+    <style name="ImageStyle_Circle">
+        <item name="cornerSize">50%</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+    <style name="ShapeableImageViwWithError">
+        <item name="strokeColor">@color/red</item>
+        <item name="strokeWidth">6dp</item>
+    </style>
+    <style name="ShapeableImageViwWithoutError">
+        <item name="strokeColor">#00000000</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
 </resources>

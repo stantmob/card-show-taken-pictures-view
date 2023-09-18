@@ -7,5 +7,6 @@
     <color name="black">#000000</color>
     <color name="black_transparent">#99000000</color>
     <color name="red">#F44336</color>
+    <color name="green">#008000</color>
 
 </resources>

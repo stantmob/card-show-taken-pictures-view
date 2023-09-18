@@ -31,5 +31,7 @@
     <string name="geolocation.location_not_enabled_alert_text">Localização do dispositivo inativa. Ative-a para dados de localização da foto.</string>
     <string name="geolocation.location_not_available_text">Localização indisponível no momento</string>
     <string name="image_preview_dialog.caption_hint">Adicionar legenda…</string>
+    <string name="full_screen.image_status_approved">Aprovado</string>
+    <string name="full_screen.image_status_disapproved">Desaprovado</string>
 
 </resources>

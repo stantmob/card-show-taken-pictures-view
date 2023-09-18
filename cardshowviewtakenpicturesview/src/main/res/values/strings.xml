@@ -30,5 +30,7 @@
     <string name="geolocation.location_not_enabled_alert_text">Device location inactive. Enable it for photo location data.</string>
     <string name="geolocation.location_not_available_text">Location currently unavailable</string>
     <string name="image_preview_dialog.caption_hint">Add caption…</string>
+    <string name="full_screen.image_status_approved">Approved</string>
+    <string name="full_screen.image_status_disapproved">Disapproved</string>
 
 </resources>

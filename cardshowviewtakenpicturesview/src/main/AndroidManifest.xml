@@ -21,6 +21,10 @@
             android:configChanges="screenSize|orientation|screenLayout|navigation"
             android:theme="@style/AppThemeCamera" />
 
+        <activity android:name="br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView"/>
+        <activity android:name="br.com.stant.libraries.cameraimagegalleryview.activities.FullScreenImage"/>
+
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

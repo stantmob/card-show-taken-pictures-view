@@ -22,6 +22,13 @@
         <variable
             name="pictureByName"
             type="String" />
+        <variable
+            name="canEditState"
+            type="boolean" />
+
+        <variable
+            name="cardStateEnum"
+            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum" />
 
     </data>
 
@@ -29,6 +36,75 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp">
+
+            <FrameLayout
+                android:id="@+id/card_image_gallery_picture_edit_icon_container_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/card_image_gallery_picture_cancel_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:onClick="@{handler::cancelEditImagesStateViewConfiguration}"
+                    android:text="@string/card_show_taken_picture_view.btn_cancel"
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
+
+                <TextView
+                    android:id="@+id/card_image_gallery_picture_header_title_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif"
+                    android:text="@string/card_show_taken_picture_view.picture_title"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="@{cardStateEnum == cardStateEnum.NORMAL ? View.VISIBLE : View.GONE}" />
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/card_image_gallery_picture_save_edit_icon_container_linear_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="end"
+                    android:onClick="@{handler::showEditStateViewConfiguration}"
+                    android:padding="5dp"
+                    android:src="@drawable/ic_edit_inspection_form_filled"
+                    android:visibility="@{canEditState ? View.VISIBLE : View.GONE}" />
+
+                <TextView
+                    android:id="@+id/card_image_gallery_picture_save_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:onClick="@{handler::saveImageStateViewConfiguration}"
+                    android:text="@string/card_show_taken_picture_view.btn_save"
+                    android:textSize="14sp"
+                    android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}" />
+
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/card_image_gallery_component_container_linear_layout"
@@ -46,7 +122,8 @@
                 android:background="@drawable/border_circle_grey"
                 android:onClick="@{handler::pickPictureToFinishAction}"
                 android:padding="12dp"
-                android:src="@drawable/ic_cam"/>
+                android:src="@drawable/ic_cam"
+                android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/card_image_gallery_component_list_recycler_view"

@@ -1,14 +1,19 @@
 package br.com.stant.libraries.card_show_taken_pictures_view;
 
 import android.content.Intent;
+
 import androidx.databinding.DataBindingUtil;
+
 import android.os.Bundle;
+import android.util.Log;
+
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Date;
 import java.util.List;
 
+import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract;
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
 import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
@@ -28,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
-
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setExampleImages();
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(
@@ -52,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,
                 "Denis Vieira", new Date());
-//        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
+        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
         mBinding.cardShowViewTakenPicturesView.enableDragAndDrop();
         mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(),
@@ -61,6 +65,47 @@ public class MainActivity extends AppCompatActivity {
                 R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
                 "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+
+
+        // CardGalery
+
+        mBinding.cardImageGalleryComponentView.setActivityAndRegisterForCamera(this);
+        mBinding.cardImageGalleryComponentView.setOnSavedCardListener(
+                new CardImageGalleryViewContract.OnSavedCardListener() {
+                    @Override
+                    public void onSaved(List<CardShowTakenImage> currentImages,
+                                        List<CardShowTakenImage> imagesAsAdded,
+                                        List<CardShowTakenImage> imagesAsRemoved) {
+
+                        Log.d("Saved", "Current: " + currentImages.size());
+                        Log.d("Saved", "Added: " + imagesAsAdded.size()+"");
+                        Log.d("Saved", "Removed: " + imagesAsRemoved.size()+"");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        Log.d("Canceled", "Cancelado");
+                    }
+                }
+        );
+
+        if (gallery != null)
+            mBinding.cardImageGalleryComponentView.setCardImages(gallery.getImages());
+        mBinding.cardImageGalleryComponentView.setExampleImages();
+        mBinding.cardImageGalleryComponentView.setBinding(mBinding.cardImageGalleryComponentView,
+                "Denis Vieira", new Date());
+        mBinding.cardImageGalleryComponentView.setImagesQuantityLimit(15, null);
+        mBinding.cardImageGalleryComponentView.setIsMultipleGallerySelection(true);
+        mBinding.cardImageGalleryComponentView.enableDragAndDrop();
+        mBinding.cardImageGalleryComponentView.setStrokeColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.black));
+        mBinding.cardImageGalleryComponentView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.cardview_light_background));
+        mBinding.cardImageGalleryComponentView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
+                "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+        mBinding.cardImageGalleryComponentView.setCaptionEnable(true);
+        mBinding.cardImageGalleryComponentView.ifNoImagesShowEditStateViewConfigurationOnInit();
+
     }
 
     @Override

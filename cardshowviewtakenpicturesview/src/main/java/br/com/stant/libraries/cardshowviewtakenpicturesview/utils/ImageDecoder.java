@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.io.File;
@@ -20,8 +22,8 @@ import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static io.reactivex.Single.just;
-
-public class ImageDecoder {
+@GlideModule
+public class ImageDecoder extends AppGlideModule {
 
     static Bitmap scaleBitmap(@NonNull Bitmap bitmap, @NonNull Integer desiredSize) {
         Integer width  = bitmap.getWidth();

@@ -14,10 +14,10 @@ android {
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         multiDexEnabled true
     }
-
-    dataBinding {
-        enabled true
+    buildFeatures{
+        dataBinding true
     }
+
 
     buildTypes {
         release {

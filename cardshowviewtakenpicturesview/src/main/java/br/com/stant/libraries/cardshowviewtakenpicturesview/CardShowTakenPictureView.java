@@ -479,7 +479,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap,
+                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(
                                         imageFilename, tempImagePath, cameraImage.getCreatedAt(),
                                         cameraImage.getUpdatedAt(), cameraImage.getCaption());
 

@@ -1,5 +1,7 @@
-package br.com.stant.libraries.cameraimagegalleryview;
+package br.com.stant.libraries.cameraimagegalleryview.activities;
 
+
+import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_LIST_GALLERY;
 
 import android.os.Bundle;
 
@@ -15,7 +17,6 @@ import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryVi
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.ActivityCardImageGalleryViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 
 
 public class CardImageGalleryView extends AppCompatActivity{
@@ -24,7 +25,6 @@ public class CardImageGalleryView extends AppCompatActivity{
     private RecyclerView recyclerView;
     private CardImageGalleryViewAdapter cardImageGalleryViewAdapter;
     private GridLayoutManager gridLayoutManager;
-    private ImageGenerator imageGenerator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +37,11 @@ public class CardImageGalleryView extends AppCompatActivity{
 
         List<CardShowTakenImage> cardShowTakenImageList = new ArrayList<>();
 
-        List<CardShowTakenImage> receivedImageList = (List<CardShowTakenImage>) getIntent().getSerializableExtra("imageList");
+        List<CardShowTakenImage> receivedImageList = (List<CardShowTakenImage>) getIntent().getSerializableExtra(KEY_IMAGE_LIST_GALLERY);
 
         if (receivedImageList != null && !receivedImageList.isEmpty()) {
             cardShowTakenImageList.addAll(receivedImageList);
         }
-
         cardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this, cardShowTakenImageList);
         recyclerView.setAdapter(cardImageGalleryViewAdapter);
 

@@ -33,5 +33,6 @@
     <string name="image_preview_dialog.caption_hint">Adicionar legenda…</string>
     <string name="full_screen.image_status_approved">Aprovado</string>
     <string name="full_screen.image_status_disapproved">Desaprovado</string>
+    <string name="full_screen.app_bar_name">Galeria</string>
 
 </resources>

@@ -3,11 +3,14 @@ package br.com.stant.libraries.cameraimagegalleryview.activities;
 import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_FULL_SCREEN;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.MenuItem;
+import android.view.View;
 
 import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
@@ -43,5 +46,10 @@ public class FullScreenImage extends AppCompatActivity {
             mBinding.statusTextView.setTextColor(getResources().getColor(R.color.red));
         }
 
+        mBinding.backButton.setOnClickListener((View view) -> {
+            onBackPressed();
+        });
+
     }
+
 }

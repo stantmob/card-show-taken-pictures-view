@@ -16,6 +16,18 @@
         android:padding="8dp">
 
         <ImageView
+            android:id="@+id/back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            app:layout_constraintBottom_toTopOf="@+id/full_image_view"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="?android:attr/homeAsUpIndicator" />
+
+        <ImageView
             android:id="@+id/full_image_view"
             android:layout_width="match_parent"
             android:layout_height="500dp"
@@ -67,6 +79,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/caption_text_view"
             tools:text="Error" />
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

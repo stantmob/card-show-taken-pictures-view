@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
@@ -69,6 +70,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public static final String KEY_IS_CAPTION_ENABLED = "is_caption_enabled";
 
     private AppCompatActivity mActivity;
+    private Fragment mFragment;
     private Context mContext;
     private File mSdCardTempImagesDirectory = getPrivateTempDirectory(getContext());
     private File mImageTaken;
@@ -113,6 +115,11 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void setActivityAndRegisterForCamera(Activity activity) {
         mActivity = (AppCompatActivity) activity;
         registerActivityForCamera();
+    }
+
+    public void setFragment(Fragment fragment){
+        this.mFragment = fragment;
+       setActivityAndRegisterForCamera(fragment.getActivity());
     }
 
     // Begin Component
@@ -365,8 +372,16 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     @Override
     public void registerActivityForCamera() {
         Intent intent = new Intent(mActivity, CameraActivity.class);
-        openCamera = mActivity.registerForActivityResult
-                (new ActivityResultContracts.StartActivityForResult(), this::addImageOnActivityResult);
+
+        if(mFragment != null){
+            openCamera = mFragment.registerForActivityResult
+                    (new ActivityResultContracts.StartActivityForResult(), this::addImageOnActivityResult);
+        } else {
+            openCamera = mActivity.registerForActivityResult
+                    (new ActivityResultContracts.StartActivityForResult(), this::addImageOnActivityResult);
+        }
+
+
 
         cameraIntent = intent;
     }

@@ -33,5 +33,6 @@
     <string name="full_screen.image_status_approved">Approved</string>
     <string name="full_screen.image_status_disapproved">Disapproved</string>
     <string name="full_screen.app_bar_name">Gallery</string>
+    <string name="full_screen_errors">Errors</string>
 
 </resources>

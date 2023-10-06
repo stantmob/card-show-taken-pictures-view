@@ -15,6 +15,11 @@
             type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage" />
 
         <variable
+            name="hasError"
+            type="Boolean" />
+
+
+        <variable
             name="cardStateEnum"
             type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum" />
     </data>
@@ -59,7 +64,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/stant_city"
             app:shapeAppearance="@style/ImageStyle_Circle"
-            app:strokeColor="@color/black_transparent"
+            app:strokeColor="@{cardShowTakenImage.hasError() ?  @color/red : @color/black_transparent}"
             app:strokeWidth="3dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

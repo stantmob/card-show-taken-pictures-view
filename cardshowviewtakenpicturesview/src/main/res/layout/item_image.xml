@@ -27,7 +27,8 @@
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             app:strokeColor="@color/red"
-            app:strokeWidth="@{hasError ? 6 : 0}"
+            android:padding="2dp"
+            app:strokeWidth="@{hasError ? 8 : 0}"
             tools:src="@tools:sample/backgrounds/scenic"
             />
 

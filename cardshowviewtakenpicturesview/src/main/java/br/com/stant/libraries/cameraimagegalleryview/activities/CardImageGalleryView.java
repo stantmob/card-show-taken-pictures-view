@@ -33,7 +33,8 @@ public class CardImageGalleryView extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_card_image_gallery_view);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setSupportActionBar(mBinding.topAppBar);
+        mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
 
         recyclerView = findViewById(R.id.recycler_view);
         gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
@@ -49,18 +50,5 @@ public class CardImageGalleryView extends AppCompatActivity{
         cardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this, cardShowTakenImageList);
         recyclerView.setAdapter(cardImageGalleryViewAdapter);
 
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-    public boolean onCreateOptionsMenu(@NonNull MenuItem  menu) {
-        return true;
     }
 }

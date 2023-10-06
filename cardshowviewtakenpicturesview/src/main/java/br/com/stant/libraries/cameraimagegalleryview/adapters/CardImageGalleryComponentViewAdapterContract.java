@@ -169,6 +169,7 @@ public class CardImageGalleryComponentViewAdapterContract
                     cardShowTakenImage, 8);
             mServiceInspectionsFormFilledRecyclerItemBinding.setCardShowTakenImage(cardShowTakenImage);
             mServiceInspectionsFormFilledRecyclerItemBinding.setCardStateEnum(mView.getActualCardState());
+            mServiceInspectionsFormFilledRecyclerItemBinding.setHasError(cardShowTakenImage.hasError());
 
             mServiceInspectionsFormFilledRecyclerItemBinding.cardImageGalleryAvatar
                     .setOnClickListener(

@@ -11,16 +11,17 @@ import java.util.List;
 
 import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView;
 import br.com.stant.libraries.cameraimagegalleryview.components.ItemImage;
+import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageGalleryViewAdapter.ViewHolder> {
 
     private CardImageGalleryView mView;
-    private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
+    private CardShowTakenImageInjection mCardShowTakenImages;
 
     public CardImageGalleryViewAdapter(CardImageGalleryView view, List<CardShowTakenImage> cardShowTakenImageList) {
-        mView                               = view;
-        mCurrentCardShowTakenImageList      = new ArrayList<>(cardShowTakenImageList);
+        mView = view;
+        mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
     }
 
     @NonNull
@@ -32,14 +33,17 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
+        CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.getAll().get(position);
+
         ItemImage itemImage = holder.itemImage;
         itemImage.setImage(cardShowTakenImage);
     }
 
+
+
     @Override
     public int getItemCount() {
-        return mCurrentCardShowTakenImageList.size();
+        return mCardShowTakenImages.getAll().size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

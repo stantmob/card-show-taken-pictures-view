@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
 
@@ -53,6 +54,16 @@ public class CardShowTakenImage implements Serializable {
         this.updatedAt = updatedAt;
         this.caption = caption;
         this.status = status;
+    }
+
+    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
+                              Date createdAt, Date updatedAt, String caption) {
+        this.identifier = identifier;
+        this.remoteImageUrl = remoteImageUrl;
+        this.localImageFilename = localImageFilename;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.caption = caption;
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt,
@@ -143,5 +154,25 @@ public class CardShowTakenImage implements Serializable {
     }
     public ImageStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CardShowTakenImage)) return false;
+        CardShowTakenImage that = (CardShowTakenImage) o;
+        if(identifier != null) {
+            return Objects.equals(identifier, that.identifier);
+        }
+        if(localImageFilename != null){
+            return Objects.equals(localImageFilename, that.localImageFilename);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, localImageFilename);
     }
 }

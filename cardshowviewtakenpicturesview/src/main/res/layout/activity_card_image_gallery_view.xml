@@ -10,6 +10,7 @@
         tools:context="br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -18,51 +19,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                app:title="@string/full_screen.app_bar_name"
-                app:navigationIcon="@drawable/ic_arrow_left_white"/>
+                app:navigationIcon="@drawable/ic_arrow_left_white"
+                app:title="@string/full_screen.app_bar_name" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <LinearLayout
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_rectangle_mutable"
-            android:orientation="vertical"
-            android:padding="9dp">
+            android:layout_height="match_parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:foregroundGravity="center"
+                android:layout_marginBottom="45dp"
                 tools:listitem="@layout/item_image" />
 
-        </LinearLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent">
-
             <RelativeLayout
+                android:id="@+id/bottom_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="45dp"
+                android:layout_alignParentBottom="true">
 
-                <LinearLayout
+                <TextView
+                    android:id="@+id/quantity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:orientation="horizontal"
-                    android:padding="6dp">
+                    android:layout_centerVertical="true"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="10dp"
+                    android:textColor="@color/black"
+                    tools:text="0/100" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        tools:text="0/100" />
-
-                </LinearLayout>
+                <ImageView
+                    android:id="@+id/icon_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_camera_alt"/>
 
             </RelativeLayout>
 

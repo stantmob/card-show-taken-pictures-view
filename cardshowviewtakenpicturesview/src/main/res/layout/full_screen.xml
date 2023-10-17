@@ -4,77 +4,84 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="handler"
             type="br.com.stant.libraries.cameraimagegalleryview.activities.FullScreenImage" />
     </data>
 
-    <RelativeLayout
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/transparent">
+        android:background="#99000000"
+        android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/image_view"
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:scaleType="centerCrop"
-            android:src="@drawable/stant_city"/>
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="8dp"
-            android:orientation="vertical"
-            android:background="#99000000">
-
-
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/topAppBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_arrow_left_white" />
+                app:navigationIcon="@drawable/ic_arrow_left_white"
+                app:title="@string/full_screen.app_bar_name" />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
 
-            <ImageView
-                android:id="@+id/full_image_view"
+        <ImageView
+            android:id="@+id/full_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="5"
+            android:scaleType="centerCrop"
+            tools:src="@tools:sample/backgrounds/scenic" />
+
+        <RelativeLayout
+            android:id="@+id/info_box"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:background="@drawable/shape"
+            android:padding="6dp">
+
+            <TextView
+                android:id="@+id/status_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="26dp"
+                android:textSize="24sp"
+                tools:text="Status" />
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="match_parent"
+                android:layout_alignTop="@id/status_text_view"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
-                android:scaleType="centerCrop"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                app:boxStrokeWidthFocused="0dp"
+                app:boxStrokeWidth="0dp"
+                app:boxBackgroundColor="@color/white">
 
-            <LinearLayout
-                android:id="@+id/info_box"
-                android:layout_width="250dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="30dp"
-                android:layout_gravity="center"
-                android:background="@drawable/shape"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/status_text_view"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/caption_edit_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textSize="16sp"
-
-                    tools:text="Status" />
-
-                <TextView
-                    android:id="@+id/caption_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:textSize="16sp"
+                    android:textAlignment="center"
+                    android:textSize="20sp"
+                    android:focusable="false"
+                    android:textColor="@color/black"
                     tools:text="Caption" />
-            </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
+            </com.google.android.material.textfield.TextInputLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
 
 </layout>

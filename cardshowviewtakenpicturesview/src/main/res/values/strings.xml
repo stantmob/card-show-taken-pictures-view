@@ -33,6 +33,11 @@
     <string name="full_screen.image_status_approved">Approved</string>
     <string name="full_screen.image_status_disapproved">Disapproved</string>
     <string name="full_screen.app_bar_name">Gallery</string>
-    <string name="full_screen_errors">Errors</string>
+    <string name="full_screen.app_bar_edit_icon">Edit</string>
+    <string name="full_screen.app_bar_delete_icon">Delete</string>
+    <string name="full_screen.app_bar_save_icon">Save</string>
+    <string name="delete_alert_dialog.confirm">Yes</string>
+    <string name="delete_alert_dialog.cancel">Cancel</string>
+    <string name="delete_alert_dialog.question">Do you sure that want to delete image?</string>
 
 </resources>

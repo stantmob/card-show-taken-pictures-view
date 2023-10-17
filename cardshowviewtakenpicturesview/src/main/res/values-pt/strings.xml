@@ -34,6 +34,11 @@
     <string name="full_screen.image_status_approved">Aprovado</string>
     <string name="full_screen.image_status_disapproved">Desaprovado</string>
     <string name="full_screen.app_bar_name">Galeria</string>
-    <string name="full_screen_errors">Erros</string>
+    <string name="full_screen.app_bar_edit_icon">Editar</string>
+    <string name="full_screen.app_bar_delete_icon">Excluir</string>
+    <string name="full_screen.app_bar_save_icon">Salvar</string>
+    <string name="delete_alert_dialog.confirm">Sim</string>
+    <string name="delete_alert_dialog.cancel">Cancelar</string>
+    <string name="delete_alert_dialog.question">Você tem certeza que deseja excluir a imagem?</string>
 
 </resources>

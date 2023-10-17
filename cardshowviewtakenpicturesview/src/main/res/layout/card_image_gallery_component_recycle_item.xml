@@ -14,14 +14,6 @@
             name="cardShowTakenImage"
             type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage" />
 
-        <variable
-            name="hasError"
-            type="Boolean" />
-
-
-        <variable
-            name="cardStateEnum"
-            type="br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -30,26 +22,6 @@
         android:layout_height="66dp"
         android:layout_margin="5dp">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card_image_gallery_view_item_close_icon_container"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:gravity="center"
-            app:cardBackgroundColor="@color/gray"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:onClick="@{() -> handler.removeImage(cardShowTakenImage)}"
-            android:visibility="@{cardStateEnum == cardStateEnum.EDIT ? View.VISIBLE : View.GONE}">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_close_dialog" />
-
-        </androidx.cardview.widget.CardView>
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/card_image_gallery_avatar"
@@ -63,9 +35,7 @@
             android:padding="5dp"
             android:scaleType="centerCrop"
             android:src="@drawable/stant_city"
-            app:shapeAppearance="@style/ImageStyle_Circle"
-            app:strokeColor="@{cardShowTakenImage.hasError() ?  @color/red : @color/black_transparent}"
-            app:strokeWidth="3dp" />
+            app:shapeAppearance="@style/ImageStyle_Circle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -14,16 +14,12 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
@@ -32,7 +28,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,18 +39,16 @@ import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryCo
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardImageGalleryComponentViewBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.enums.CardShowTakenPictureStateEnum;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.AppPermissions;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageGenerator;
 
 public class CardImageGalleryComponentView extends LinearLayout implements CardImageGalleryViewContract {
+
+    public final static String KEY_APP_BAR_NAME = "app_bar_name";
 
     private AppCompatActivity mActivity;
     private Fragment mFragment;
@@ -69,7 +62,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private ImageStatus imageStatus;
     private SaveOnlyMode mSaveOnlyMode;
     private Camera mCamera;
-
+    private String galleryAppName = "";
 
     public CardImageGalleryComponentView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -185,7 +178,8 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         List<CardShowTakenImage> images = new ArrayList<>();
 
         images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
+                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1",
+                "Error 2", "Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 ", "Error 3", "Error 3", "Error 3")));
         images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
                 new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
 //        images.add(new CardShowTakenImage("", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
@@ -228,6 +222,13 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     }
 
+    public String getGalleryAppName() {
+        return galleryAppName;
+    }
+
+    public void setGalleryAppName(String galleryAppName) {
+        this.galleryAppName = galleryAppName;
+    }
     // End Component
 
     //Begin EditState
@@ -323,6 +324,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void goToGallery() {
         Intent intent = new Intent(mContext, CardImageGalleryView.class);
         intent.putExtra(Camera.KEY_LIMIT_IMAGES, mImagesQuantityLimit);
+        intent.putExtra(KEY_APP_BAR_NAME, galleryAppName);
         mContext.startActivity(intent);
     }
     // End RecyclerViewAdapter

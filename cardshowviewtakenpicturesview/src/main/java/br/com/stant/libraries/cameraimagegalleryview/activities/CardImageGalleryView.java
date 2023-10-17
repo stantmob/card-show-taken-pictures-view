@@ -46,25 +46,8 @@ public class CardImageGalleryView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_card_image_gallery_view);
 
-        setSupportActionBar(mBinding.topAppBar);
-        mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
-
-
-        recyclerView = findViewById(R.id.recycler_view);
-        gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-        recyclerView.setLayoutManager(gridLayoutManager);
-
-        mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
-
-        List<CardShowTakenImage> cardShowTakenImageList = new ArrayList<>();
-
-        List<CardShowTakenImage> receivedImageList = mCardShowTakenImages.getAll();
-
-        if (receivedImageList != null && !receivedImageList.isEmpty()) {
-            cardShowTakenImageList.addAll(receivedImageList);
-        }
-        cardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this, cardShowTakenImageList);
-        recyclerView.setAdapter(cardImageGalleryViewAdapter);
+        configureAppbar();
+        configureAdapter();
 
         mImageQuantityLimit = getIntent().getIntExtra(Camera.KEY_LIMIT_IMAGES, 0);
         showQuantityOfImages();
@@ -74,9 +57,34 @@ public class CardImageGalleryView extends AppCompatActivity {
             cardImageGalleryViewAdapter.notifyDataSetChanged();
             showQuantityOfImages();
         });
+
         mBinding.iconCamera.setOnClickListener((view) -> {
             mCamera.pickPictureToFinishAction();
         });
+    }
+
+    private void configureAppbar(){
+        setSupportActionBar(mBinding.topAppBar);
+        mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
+        String appBarName = getIntent().getStringExtra(CardImageGalleryComponentView.KEY_APP_BAR_NAME);
+        getSupportActionBar().setTitle(appBarName);
+    }
+
+    private void configureAdapter(){
+        recyclerView = findViewById(R.id.recycler_view);
+        gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
+
+        List<CardShowTakenImage> cardShowTakenImageList = new ArrayList<>();
+        List<CardShowTakenImage> receivedImageList = mCardShowTakenImages.getAll();
+
+        if (receivedImageList != null && !receivedImageList.isEmpty()) {
+            cardShowTakenImageList.addAll(receivedImageList);
+        }
+        cardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this, cardShowTakenImageList);
+        recyclerView.setAdapter(cardImageGalleryViewAdapter);
     }
 
     public void registerActivityForCamera() {

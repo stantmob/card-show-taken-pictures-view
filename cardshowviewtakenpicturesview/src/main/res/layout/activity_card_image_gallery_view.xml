@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_arrow_left_white"
-                app:title="@string/full_screen.app_bar_name" />
+                app:title="" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -51,6 +51,7 @@
                     android:textSize="20sp"
                     android:layout_marginEnd="10dp"
                     android:textColor="@color/black"
+                    android:textFontWeight="600"
                     tools:text="0/100" />
 
                 <ImageView

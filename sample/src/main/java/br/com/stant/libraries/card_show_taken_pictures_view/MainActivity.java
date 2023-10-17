@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
                 "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
-
+        mBinding.cardImageGalleryComponentView.setGalleryAppName("Imagens inspeções");
 
         // CardGalery
 

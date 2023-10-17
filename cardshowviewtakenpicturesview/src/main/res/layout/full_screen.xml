@@ -28,18 +28,58 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_arrow_left_white"
-                app:title="@string/full_screen.app_bar_name" />
+                app:title="" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-
-        <ImageView
-            android:id="@+id/full_image_view"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="5"
-            android:scaleType="centerCrop"
-            tools:src="@tools:sample/backgrounds/scenic" />
+            android:layout_weight="5">
+
+            <ImageView
+                android:id="@+id/full_image_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                tools:src="@tools:sample/backgrounds/scenic" />
+
+            <FrameLayout
+                android:id="@+id/error_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/errors_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal|top"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#FF0000"
+                    android:lines="1"
+                    android:scrollbars="vertical"
+                    android:padding="10dp"
+                    android:textFontWeight="500"
+                    android:text="Golden Gate"
+                    android:textColor="#ffffffff"
+                    android:textSize="20sp"
+                    tools:text="Errors" />
+
+                <ImageView
+                    android:id="@+id/errors_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|right|top"
+                    android:padding="10dp"
+                    android:layout_margin="12dp"
+                    android:src="@drawable/ic_right"/>
+            </FrameLayout>
+
+
+        </FrameLayout>
+
 
         <RelativeLayout
             android:id="@+id/info_box"
@@ -55,17 +95,17 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="26dp"
-                android:textSize="24sp"
+                android:layout_marginTop="20dp"
+                android:textSize="28sp"
+                android:textFontWeight="700"
                 tools:text="Status" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_alignTop="@id/status_text_view"
-                android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 app:boxStrokeWidthFocused="0dp"
                 app:boxStrokeWidth="0dp"
                 app:boxBackgroundColor="@color/white">
@@ -75,9 +115,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
+                    android:textFontWeight="500"
                     android:textSize="20sp"
-                    android:focusable="false"
-                    android:textColor="@color/black"
                     tools:text="Caption" />
             </com.google.android.material.textfield.TextInputLayout>
         </RelativeLayout>

@@ -5,26 +5,16 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDe
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
-import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.PopupWindow;
 
-import br.com.stant.libraries.cameraimagegalleryview.adapters.PopUpErrorsAdapter;
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
@@ -35,11 +25,11 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 public class FullScreenImage extends AppCompatActivity {
 
     private FullScreenBinding mBinding;
-    private PopUpErrorsAdapter mPopUpErrorsAdapter;
     private CardShowTakenImage image;
-    private PopupWindow mErrorsPopUp;
     private CardShowTakenImageInjection mCardShowTakenImage;
     private Menu mMenu;
+
+    public boolean showErrorsMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,15 +42,6 @@ public class FullScreenImage extends AppCompatActivity {
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         setValues();
-        configurePopUpErrorsAdapter();
-        configurePopUp();
-//        configureCaptionEditText();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mErrorsPopUp.dismiss();
     }
 
     private void setValues() {
@@ -81,7 +62,37 @@ public class FullScreenImage extends AppCompatActivity {
         mBinding.topAppBar.setNavigationOnClickListener((View view) -> {
             onBackPressed();
         });
+
+        if(image.hasError()){
+            mBinding.errorContainer.setVisibility(View.VISIBLE);
+            mBinding.errorsList.setText(
+                    image.getErrorsAsString()
+            );
+            mBinding.errorsList.setMovementMethod(new ScrollingMovementMethod());
+        }
+    onClickIconErrors();
+
     }
+
+    private void onClickIconErrors(){
+        mBinding.errorsIcon.setOnClickListener((view) -> {
+            if(showErrorsMode){
+                mBinding.errorsList.setLines(1);
+                animateIcon(0);
+            } else {
+                mBinding.errorsList.setMaxLines(50);
+                animateIcon(90f);
+            }
+            showErrorsMode = !showErrorsMode;
+        });
+    }
+
+    private void animateIcon(float goTo){
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mBinding.errorsIcon, "rotation", goTo);
+        anim.setDuration(500);
+        anim.start();
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -111,31 +122,6 @@ public class FullScreenImage extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-    private void configurePopUpErrorsAdapter() {
-        mPopUpErrorsAdapter = new PopUpErrorsAdapter(this, image.getErrors());
-    }
-
-    private PopupWindow createErrorsPopUp() {
-        View view = LayoutInflater.from(this).inflate(R.layout.errors_pop_up, null);
-        RecyclerView errorsRecycleView = view.findViewById(R.id.errors_recycler_view);
-        errorsRecycleView.setAdapter(mPopUpErrorsAdapter);
-
-        return new PopupWindow(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    }
-
-    private void configurePopUp() {
-        mErrorsPopUp = createErrorsPopUp();
-        mErrorsPopUp.setOutsideTouchable(true);
-        mErrorsPopUp.setFocusable(true);
-        mErrorsPopUp.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-    }
-
-    private void configureCaptionEditText() {
-        mBinding.captionEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
-        mBinding.captionEditText.setRawInputType(InputType.TYPE_CLASS_TEXT);
     }
 
     private void startEditMode() {

@@ -81,31 +81,29 @@
         </FrameLayout>
 
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/info_box"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="2"
             android:background="@drawable/shape"
+            android:orientation="vertical"
+            android:gravity="center"
             android:padding="6dp">
 
             <TextView
                 android:id="@+id/status_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
                 android:layout_marginTop="20dp"
                 android:textSize="28sp"
                 android:textFontWeight="700"
                 tools:text="Status" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/caption_edit_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignTop="@id/status_text_view"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="40dp"
                 app:boxStrokeWidthFocused="0dp"
                 app:boxStrokeWidth="0dp"
                 app:boxBackgroundColor="@color/white">
@@ -120,7 +118,7 @@
                     android:textSize="20sp"
                     tools:text="Caption" />
             </com.google.android.material.textfield.TextInputLayout>
-        </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
 
 

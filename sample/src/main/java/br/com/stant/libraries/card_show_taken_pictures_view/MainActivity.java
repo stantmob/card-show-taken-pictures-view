@@ -81,7 +81,14 @@ public class MainActivity extends AppCompatActivity {
                 R.color.cardview_light_background));
         mBinding.cardImageGalleryComponentView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
                 "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+
+        mBinding.cardImageGalleryComponentView.setToolBarColor("#FF0000");
+        mBinding.cardImageGalleryComponentView.setStatusBarColor("#EC5353");
+        mBinding.cardImageGalleryComponentView.setBackIcon(getDrawable(R.drawable.ic_arrow_left_white));
+        mBinding.cardImageGalleryComponentView.setTitleToolBarColor("#FF4500");
+        mBinding.cardImageGalleryComponentView.setColorIcons("#FF4500");
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -4,9 +4,12 @@ import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryView
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -15,9 +18,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.util.Objects;
+
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
-import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
+import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.FullScreenBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -38,10 +44,17 @@ public class FullScreenImage extends AppCompatActivity {
 
         mCardShowTakenImage = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
 
-        setSupportActionBar(mBinding.topAppBar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        configureToolBar();
 
         setValues();
+    }
+
+    private void configureToolBar(){
+        setSupportActionBar(mBinding.topAppBar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Theme.ToolBarColor));
+        getWindow().setStatusBarColor(Color.parseColor(Theme.StatusBarColor));
+        getSupportActionBar().setHomeAsUpIndicator(Theme.BackIcon);
     }
 
     private void setValues() {
@@ -104,6 +117,14 @@ public class FullScreenImage extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         mMenu = menu;
+        try {
+            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_delete_white)).setTint(Color.parseColor(Theme.ColorIcons));
+            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Theme.ColorIcons));
+            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Theme.ColorIcons));
+        } catch (Exception e){
+            return false;
+        }
+
         inflater.inflate(R.menu.full_screen, menu);
         return true;
     }
@@ -131,6 +152,8 @@ public class FullScreenImage extends AppCompatActivity {
         mBinding.captionEditText.setFocusable(true);
         mBinding.captionEditText.setCursorVisible(true);
 
+        mBinding.statusTextView.setVisibility(View.GONE);
+
         mBinding.captionEditText.requestFocusFromTouch();
         int index = mBinding.captionEditText.getText().toString().length();
 
@@ -145,6 +168,7 @@ public class FullScreenImage extends AppCompatActivity {
 
         mBinding.captionEditText.setFocusable(false);
         mBinding.captionEditText.setCursorVisible(false);
+        mBinding.statusTextView.setVisibility(View.VISIBLE);
 
         String caption = mBinding.captionEditText.getText().toString();
         image.setCaption(caption);

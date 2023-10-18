@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
+import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 
 public class CardShowTakenImage implements Serializable {
 

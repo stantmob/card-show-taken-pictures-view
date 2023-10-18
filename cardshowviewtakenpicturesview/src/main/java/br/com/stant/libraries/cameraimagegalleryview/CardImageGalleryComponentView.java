@@ -1,13 +1,12 @@
 package br.com.stant.libraries.cameraimagegalleryview;
 
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -37,8 +36,9 @@ import java.util.List;
 import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView;
 import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryComponentViewAdapterContract;
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
-import br.com.stant.libraries.cameraimagegalleryview.enums.ImageStatus;
+import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardImageGalleryComponentViewBinding;
@@ -63,6 +63,10 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private SaveOnlyMode mSaveOnlyMode;
     private Camera mCamera;
     private String galleryAppName = "";
+    private Color toolBarColor;
+    private Color statusBarColor;
+    private Drawable backIcon;
+
 
     public CardImageGalleryComponentView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -83,7 +87,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         if (mCardShowTakenImages != null) {
-            mCardShowTakenImages.removeAllListener();
+            mCardShowTakenImages.clear();
         }
     }
 
@@ -229,6 +233,47 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void setGalleryAppName(String galleryAppName) {
         this.galleryAppName = galleryAppName;
     }
+
+    public String getToolBarColor() {
+        return Theme.ToolBarColor;
+    }
+
+    public void setToolBarColor(String toolBarColor) {
+        Theme.ToolBarColor = toolBarColor;
+    }
+
+    public String getTitleToolBarColor() {
+        return Theme.TitleToolBarColor;
+    }
+
+    public void setTitleToolBarColor(String titleToolBarColor) {
+        Theme.TitleToolBarColor = titleToolBarColor;
+    }
+
+    public String getStatusBarColor() {
+        return Theme.StatusBarColor;
+    }
+
+    public void setStatusBarColor(String statusBarColor) {
+        Theme.StatusBarColor = statusBarColor;
+    }
+
+    public String getColorIcons() {
+        return Theme.ColorIcons;
+    }
+
+    public void setColorIcons(String colorIcons) {
+        Theme.ColorIcons = colorIcons;
+    }
+
+    public Drawable getBackIcon() {
+        return Theme.BackIcon;
+    }
+
+    public void setBackIcon(Drawable backIcon) {
+        Theme.BackIcon = backIcon;
+    }
+
     // End Component
 
     //Begin EditState

@@ -4,6 +4,8 @@ package br.com.stant.libraries.cameraimagegalleryview.activities;
 import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_LIST_GALLERY;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -13,18 +15,21 @@ import android.view.MenuItem;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryComponentView;
 import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryViewAdapter;
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.ActivityCardImageGalleryViewBinding;
@@ -46,7 +51,7 @@ public class CardImageGalleryView extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_card_image_gallery_view);
 
-        configureAppbar();
+        configureToolbar();
         configureAdapter();
 
         mImageQuantityLimit = getIntent().getIntExtra(Camera.KEY_LIMIT_IMAGES, 0);
@@ -63,11 +68,16 @@ public class CardImageGalleryView extends AppCompatActivity {
         });
     }
 
-    private void configureAppbar(){
+    private void configureToolbar(){
         setSupportActionBar(mBinding.topAppBar);
         mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
         String appBarName = getIntent().getStringExtra(CardImageGalleryComponentView.KEY_APP_BAR_NAME);
         getSupportActionBar().setTitle(appBarName);
+
+        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Theme.ToolBarColor));
+        getWindow().setStatusBarColor(Color.parseColor(Theme.StatusBarColor));
+        getSupportActionBar().setHomeAsUpIndicator(Theme.BackIcon);
+        mBinding.topAppBar.setTitleTextColor(Color.parseColor(Theme.TitleToolBarColor));
     }
 
     private void configureAdapter(){
@@ -106,6 +116,11 @@ public class CardImageGalleryView extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isSelectModeOn()) {
             MenuInflater menuInflater = getMenuInflater();
+            try {
+                Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_delete_white)).setTint(Color.parseColor(Theme.ColorIcons));
+            } catch (Exception e){
+                return false;
+            }
             menuInflater.inflate(R.menu.gallery_trash, menu);
             return true;
         }

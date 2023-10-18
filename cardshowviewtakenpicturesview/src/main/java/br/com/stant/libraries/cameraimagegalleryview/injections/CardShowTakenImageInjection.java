@@ -82,7 +82,7 @@ public class CardShowTakenImageInjection {
         notifyListeners();
     }
 
-    public void removeList(List<CardShowTakenImage> cardShowTakenImages){
+    public void removeList(List<CardShowTakenImage> cardShowTakenImages) {
         images.removeAll(cardShowTakenImages);
         removed.addAll(cardShowTakenImages);
         added.removeAll(cardShowTakenImages);
@@ -93,6 +93,14 @@ public class CardShowTakenImageInjection {
     public void updateImage(CardShowTakenImage image) {
         updated.add(image);
         notifyListeners();
+    }
+
+    public void clear() {
+        images.clear();
+        updated.clear();
+        removed.clear();
+        added.clear();
+        listeners.clear();
     }
 
     public List<CardShowTakenImage> getAll() {

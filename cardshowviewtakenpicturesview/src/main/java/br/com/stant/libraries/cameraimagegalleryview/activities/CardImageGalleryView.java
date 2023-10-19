@@ -29,6 +29,7 @@ import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryVi
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
@@ -45,6 +46,7 @@ public class CardImageGalleryView extends AppCompatActivity {
     private CardShowTakenImageInjection mCardShowTakenImages;
     private Integer mImageQuantityLimit;
     private Camera mCamera;
+    private ImageStatus mImageStatus;
     private List<CardShowTakenImage> selectedImages = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {

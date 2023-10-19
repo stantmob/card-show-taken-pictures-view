@@ -7,7 +7,7 @@ public final class Theme {
     public static String StatusBarColor;
     public static Drawable BackIcon;
     public static String TitleToolBarColor;
-
     public static String ColorIcons;
+    public static ImageStatus ImageStatus;
 
 }

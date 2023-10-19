@@ -59,13 +59,9 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private TypedArray mStyledAttributes;
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
-    private ImageStatus imageStatus;
     private SaveOnlyMode mSaveOnlyMode;
     private Camera mCamera;
     private String galleryAppName = "";
-    private Color toolBarColor;
-    private Color statusBarColor;
-    private Drawable backIcon;
 
 
     public CardImageGalleryComponentView(Context context, AttributeSet attrs) {
@@ -163,7 +159,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     }
 
     public void setImageStatus(ImageStatus imageStatus) {
-        this.imageStatus = imageStatus;
+        Theme.ImageStatus = imageStatus;
     }
 
     public void showStrokeError() {

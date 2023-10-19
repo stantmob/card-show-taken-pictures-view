@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
@@ -101,7 +102,7 @@ public class Camera {
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(
                                         imageFilename, tempImagePath, cameraImage.getCreatedAt(),
-                                        cameraImage.getUpdatedAt(), cameraImage.getCaption());
+                                        cameraImage.getUpdatedAt(), cameraImage.getCaption(), Theme.ImageStatus);
 
                                 mCardShowTakenImages.addImage(cardShowTakenImage);
                             }

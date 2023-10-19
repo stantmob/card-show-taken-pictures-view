@@ -67,16 +67,6 @@ public class CardShowTakenImage implements Serializable {
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt,
-                              Date updatedAt, String caption, ImageStatus status) {
-        this.identifier = identifier;
-        this.remoteImageUrl = remoteImageUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.caption = caption;
-        this.status = status;
-    }
-
-    public CardShowTakenImage(String identifier, String remoteImageUrl, Date createdAt,
                               Date updatedAt) {
         this.identifier = identifier;
         this.remoteImageUrl = remoteImageUrl;
@@ -90,6 +80,16 @@ public class CardShowTakenImage implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.caption = caption;
+    }
+
+    public CardShowTakenImage(String imageFilename, String tempImagePath, Date createdAt
+            , Date updatedAt, String caption, ImageStatus imageStatus) {
+        this.localImageFilename = imageFilename;
+        this.tempImagePathToShow = tempImagePath;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.caption = caption;
+        this.status = imageStatus;
     }
 
     public String getIdentifier() {

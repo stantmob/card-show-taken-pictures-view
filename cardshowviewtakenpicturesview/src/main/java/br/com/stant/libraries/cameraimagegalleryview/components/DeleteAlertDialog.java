@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 
 public class DeleteAlertDialog extends DialogFragment {
@@ -30,14 +32,15 @@ public class DeleteAlertDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setMessage(R.string.delete_alert_dialog_question)
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(mContext, R.style.AlertDialogTheme);
+        builder.setTitle(R.string.delete_alert_dialog_question)
                 .setPositiveButton(R.string.delete_alert_dialog_confirm, (DialogInterface dialog, int id) -> {
                     onDelete.delete();
                 })
                 .setNegativeButton(R.string.delete_alert_dialog_cancel, (DialogInterface dialog, int id) -> {
                     onDelete.cancel();
                 });
+
         return builder.create();
     }
 }

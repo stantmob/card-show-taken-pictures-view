@@ -49,7 +49,7 @@ public class FullScreenImage extends AppCompatActivity {
         setValues();
     }
 
-    private void configureToolBar(){
+    private void configureToolBar() {
         setSupportActionBar(mBinding.topAppBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         mBinding.topAppBar.setBackgroundColor(Color.parseColor(Theme.ToolBarColor));
@@ -76,20 +76,20 @@ public class FullScreenImage extends AppCompatActivity {
             onBackPressed();
         });
 
-        if(image.hasError()){
+        if (image.hasError()) {
             mBinding.errorContainer.setVisibility(View.VISIBLE);
             mBinding.errorsList.setText(
                     image.getErrorsAsString()
             );
             mBinding.errorsList.setMovementMethod(new ScrollingMovementMethod());
         }
-    onClickIconErrors();
+        onClickIconErrors();
 
     }
 
-    private void onClickIconErrors(){
+    private void onClickIconErrors() {
         mBinding.errorsIcon.setOnClickListener((view) -> {
-            if(showErrorsMode){
+            if (showErrorsMode) {
                 mBinding.errorsList.setLines(1);
                 animateIcon(0);
             } else {
@@ -100,7 +100,7 @@ public class FullScreenImage extends AppCompatActivity {
         });
     }
 
-    private void animateIcon(float goTo){
+    private void animateIcon(float goTo) {
         ObjectAnimator anim = ObjectAnimator.ofFloat(mBinding.errorsIcon, "rotation", goTo);
         anim.setDuration(500);
         anim.start();
@@ -121,7 +121,7 @@ public class FullScreenImage extends AppCompatActivity {
             Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_delete_white)).setTint(Color.parseColor(Theme.ColorIcons));
             Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Theme.ColorIcons));
             Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Theme.ColorIcons));
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
 
@@ -171,7 +171,13 @@ public class FullScreenImage extends AppCompatActivity {
         mBinding.statusTextView.setVisibility(View.VISIBLE);
 
         String caption = mBinding.captionEditText.getText().toString();
-        image.setCaption(caption);
+        for (CardShowTakenImage cardShowTakenImage : mCardShowTakenImage.getAll()) {
+            if (cardShowTakenImage.equals(image)) {
+                cardShowTakenImage.setCaption(caption);
+                image.setCaption(caption);
+                break;
+            }
+        }
 
         hideKeyboard();
     }
@@ -186,7 +192,7 @@ public class FullScreenImage extends AppCompatActivity {
         imm.hideSoftInputFromWindow(mBinding.captionEditText.getWindowToken(), 0);
     }
 
-    private void removeImage(){
+    private void removeImage() {
         DeleteAlertDialog deleteAlertDialog = new DeleteAlertDialog(this, new DeleteAlertDialog.OnDelete() {
             @Override
             public void delete() {
@@ -195,7 +201,8 @@ public class FullScreenImage extends AppCompatActivity {
             }
 
             @Override
-            public void cancel() {}
+            public void cancel() {
+            }
         });
 
         deleteAlertDialog.onCreateDialog(null).show();

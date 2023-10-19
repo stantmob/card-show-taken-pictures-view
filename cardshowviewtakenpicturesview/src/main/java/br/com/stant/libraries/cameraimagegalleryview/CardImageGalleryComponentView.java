@@ -363,6 +363,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
             if (!mCardShowTakenImages.hasImagesWithErrors()) {
                 removeStrokeError();
             }
+            updateCurrentAndLimitImagesQuantityText(mCardShowTakenImages.getAll().size());
         });
     }
 

@@ -20,6 +20,7 @@
                 android:layout_height="wrap_content"
                 android:minHeight="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_arrow_left_white"
+                app:titleCentered="true"
                 app:title="" />
 
         </com.google.android.material.appbar.AppBarLayout>

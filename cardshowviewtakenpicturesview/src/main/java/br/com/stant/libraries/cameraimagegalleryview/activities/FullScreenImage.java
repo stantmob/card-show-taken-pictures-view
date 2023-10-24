@@ -172,13 +172,8 @@ public class FullScreenImage extends AppCompatActivity {
         mBinding.statusTextView.setVisibility(View.VISIBLE);
 
         String caption = mBinding.captionEditText.getText().toString();
-        for (CardShowTakenImage cardShowTakenImage : mCardShowTakenImage.getAll()) {
-            if (cardShowTakenImage.equals(image)) {
-                cardShowTakenImage.setCaption(caption);
-                image.setCaption(caption);
-                break;
-            }
-        }
+        image.setCaption(caption);
+        mCardShowTakenImage.updateImage(image);
 
         hideKeyboard();
     }

@@ -14,14 +14,11 @@ public class CardShowTakenImageInjection {
 
     private List<ImageCallback> listeners;
     private List<CardShowTakenImage> images;
-    private List<CardShowTakenImage> originalImages;
     private List<CardShowTakenImage> removed;
-    private List<CardShowTakenImage> updated;
     private List<CardShowTakenImage> added;
 
     private CardShowTakenImageInjection() {
         images = new ArrayList<>();
-        updated = new ArrayList<>();
         removed = new ArrayList<>();
         added = new ArrayList<>();
         listeners = new ArrayList<>();
@@ -63,7 +60,6 @@ public class CardShowTakenImageInjection {
     }
 
     public void setImages(List<CardShowTakenImage> newImages) {
-        originalImages = (List) ((ArrayList) newImages).clone();
         images = (List) ((ArrayList) newImages).clone();
         notifyListeners();
     }
@@ -78,7 +74,6 @@ public class CardShowTakenImageInjection {
         removed.add(image);
         images.remove(image);
         added.remove(image);
-        updated.remove(image);
         notifyListeners();
     }
 
@@ -86,18 +81,22 @@ public class CardShowTakenImageInjection {
         images.removeAll(cardShowTakenImages);
         removed.addAll(cardShowTakenImages);
         added.removeAll(cardShowTakenImages);
-        updated.removeAll(cardShowTakenImages);
         notifyListeners();
     }
 
     public void updateImage(CardShowTakenImage image) {
-        updated.add(image);
+        for (CardShowTakenImage cardShowTakenImage : images) {
+            if (cardShowTakenImage.equals(image)) {
+                cardShowTakenImage.setCaption(image.getCaption());
+                break;
+            }
+        }
+        added.add(image);
         notifyListeners();
     }
 
     public void clear() {
         images.clear();
-        updated.clear();
         removed.clear();
         added.clear();
         listeners.clear();
@@ -110,11 +109,6 @@ public class CardShowTakenImageInjection {
     public List<CardShowTakenImage> getAllRemoved() {
         return removed;
     }
-
-    public List<CardShowTakenImage> getAllUpdated() {
-        return updated;
-    }
-
     public List<CardShowTakenImage> getAllAdded() {
         return added;
     }

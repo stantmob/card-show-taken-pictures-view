@@ -68,7 +68,6 @@ public class AppPermissions {
 
     public static void requestPermissionsFor(Activity activity) {
         if (isNotApiAndroidM()) return;
-
         buildPermissionDialog(activity).show();
     }
 

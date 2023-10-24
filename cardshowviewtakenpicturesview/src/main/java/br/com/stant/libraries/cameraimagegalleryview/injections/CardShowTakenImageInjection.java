@@ -108,15 +108,15 @@ public class CardShowTakenImageInjection {
     }
 
     public List<CardShowTakenImage> getAllRemoved() {
-        return (List) ((ArrayList) removed).clone();
+        return removed;
     }
 
     public List<CardShowTakenImage> getAllUpdated() {
-        return (List) ((ArrayList) updated).clone();
+        return updated;
     }
 
     public List<CardShowTakenImage> getAllAdded() {
-        return (List) ((ArrayList) updated).clone();
+        return added;
     }
 
     public void addListener(ImageCallback imageCallback) {

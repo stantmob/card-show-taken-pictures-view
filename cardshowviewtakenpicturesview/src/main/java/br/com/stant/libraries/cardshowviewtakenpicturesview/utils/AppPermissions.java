@@ -26,7 +26,7 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 
 public class AppPermissions {
 
-    public static final Integer PERMISSIONS_CODE = 1;
+    public static final Integer PERMISSIONS_CODE = 100;
     private static boolean doNotAskIsChecked = false;
     private static String[] deniedPermissions;
     private static final String[] PERMISSIONS = {

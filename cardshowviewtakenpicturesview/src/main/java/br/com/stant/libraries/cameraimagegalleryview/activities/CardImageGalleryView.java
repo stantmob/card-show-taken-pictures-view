@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -19,6 +21,8 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +52,7 @@ public class CardImageGalleryView extends AppCompatActivity {
     private Camera mCamera;
     private ImageStatus mImageStatus;
     private List<CardShowTakenImage> selectedImages = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +60,7 @@ public class CardImageGalleryView extends AppCompatActivity {
 
         configureToolbar();
         configureAdapter();
+        mBinding.galleryActivity.setBackgroundColor(Color.parseColor(Theme.ActivityBackground));
 
         mImageQuantityLimit = getIntent().getIntExtra(Camera.KEY_LIMIT_IMAGES, 0);
         showQuantityOfImages();
@@ -70,7 +76,14 @@ public class CardImageGalleryView extends AppCompatActivity {
         });
     }
 
-    private void configureToolbar(){
+    @Override
+    protected void onResume() {
+        super.onResume();
+        invalidateOptionsMenu();
+        this.selectedImages.clear();
+    }
+
+    private void configureToolbar() {
         setSupportActionBar(mBinding.topAppBar);
         mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
         String appBarName = getIntent().getStringExtra(CardImageGalleryComponentView.KEY_APP_BAR_NAME);
@@ -82,7 +95,7 @@ public class CardImageGalleryView extends AppCompatActivity {
         mBinding.topAppBar.setTitleTextColor(Color.parseColor(Theme.TitleToolBarColor));
     }
 
-    private void configureAdapter(){
+    private void configureAdapter() {
         recyclerView = findViewById(R.id.recycler_view);
         gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -118,26 +131,27 @@ public class CardImageGalleryView extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (isSelectModeOn()) {
             MenuInflater menuInflater = getMenuInflater();
-            try {
-                Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_delete_white)).setTint(Color.parseColor(Theme.ColorIcons));
-            } catch (Exception e){
-                return false;
-            }
+
             menuInflater.inflate(R.menu.gallery_trash, menu);
+            configureMenu(menu);
             return true;
         }
         return false;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        if (item.getItemId() == R.id.gallery_trash) {
+    private void configureMenu(Menu menu) {
+        ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
+                .findViewById(R.id.count_images_trash)).setText("(" + this.selectedImages.size() + ")");
+        ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
+                .findViewById(R.id.count_images_trash)).setTextColor(Color.parseColor(Theme.TitleToolBarColor));
+        ((ImageView) menu.findItem(R.id.gallery_trash_menu).getActionView()
+                .findViewById(R.id.gallery_trash)).setColorFilter(Color.parseColor(Theme.ColorIcons));
+        menu.findItem(R.id.gallery_trash_menu).getActionView().setOnClickListener((view) -> {
             removeImages();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        });
     }
+
+
 
     public boolean isSelectModeOn() {
         return !this.selectedImages.isEmpty();
@@ -150,9 +164,8 @@ public class CardImageGalleryView extends AppCompatActivity {
 
     public void removeImageSelectFromSelectionMode(CardShowTakenImage image) {
         this.selectedImages.remove(image);
-        if (this.selectedImages.isEmpty()) {
-            invalidateOptionsMenu();
-        }
+        invalidateOptionsMenu();
+
     }
 
     private void removeImages() {

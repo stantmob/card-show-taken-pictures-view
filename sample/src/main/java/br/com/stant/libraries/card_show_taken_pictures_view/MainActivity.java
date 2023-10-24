@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract;
+import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
 import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
@@ -81,14 +82,15 @@ public class MainActivity extends AppCompatActivity {
                 R.color.cardview_light_background));
         mBinding.cardImageGalleryComponentView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
                 "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
-
-        mBinding.cardImageGalleryComponentView.setToolBarColor("#FF0000");
-        mBinding.cardImageGalleryComponentView.setStatusBarColor("#EC5353");
         mBinding.cardImageGalleryComponentView.setBackIcon(getDrawable(R.drawable.ic_arrow_left_white));
-        mBinding.cardImageGalleryComponentView.setTitleToolBarColor("#FF4500");
-        mBinding.cardImageGalleryComponentView.setColorIcons("#FF4500");
+        mBinding.cardImageGalleryComponentView.setColorIcons("#ee3923");
+        mBinding.cardImageGalleryComponentView.setTitleToolBarColor("#ee3923");
+        mBinding.cardImageGalleryComponentView.setGalleryAppName("Imagens das inspeções");
+        mBinding.cardImageGalleryComponentView.setToolBarColor("#989898");
+        mBinding.cardImageGalleryComponentView.setStatusBarColor("#a3a3a3");
+        mBinding.cardImageGalleryComponentView.setImageStatus(ImageStatus.Approved);
+        mBinding.cardImageGalleryComponentView.setActivityBackgroundColor("#FFFFFF");
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

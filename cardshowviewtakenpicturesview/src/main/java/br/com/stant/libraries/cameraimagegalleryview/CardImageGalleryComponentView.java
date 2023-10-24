@@ -270,6 +270,14 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         Theme.BackIcon = backIcon;
     }
 
+    public String getActivityBackgroundColor() {
+        return Theme.ActivityBackground;
+    }
+
+    public void setActivityBackgroundColor(String activityBackground) {
+        Theme.ActivityBackground = activityBackground;
+    }
+
     // End Component
 
     //Begin EditState

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
+        android:id="@+id/gallery_activity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"

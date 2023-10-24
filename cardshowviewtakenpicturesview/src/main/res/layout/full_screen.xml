@@ -65,6 +65,7 @@
                     android:text="Golden Gate"
                     android:textColor="#ffffffff"
                     android:textSize="20sp"
+                    android:lineHeight="20dp"
                     tools:text="Errors" />
 
                 <ImageView

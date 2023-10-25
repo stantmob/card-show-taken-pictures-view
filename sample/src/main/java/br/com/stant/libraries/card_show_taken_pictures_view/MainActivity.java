@@ -1,10 +1,11 @@
 package br.com.stant.libraries.card_show_taken_pictures_view;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import androidx.core.content.ContextCompat;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -50,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
         if (gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
-        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,
-                "Denis Vieira", new Date());
+        //noinspection AccessStaticViaInstance
+        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView, "Denis Vieira", new Date());
 //        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
         mBinding.cardShowViewTakenPicturesView.enableDragAndDrop();
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         mBinding.cardShowViewTakenPicturesView.addImageOnActivityResult(requestCode, resultCode, data);
     }
 

@@ -12,6 +12,7 @@ import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
 import java.util.ArrayList;
@@ -25,25 +26,55 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 
 public class AppPermissions {
 
-    public static final Integer PERMISSIONS_CODE = 1;
+    public static final Integer PERMISSIONS_CODE = 100;
     private static boolean doNotAskIsChecked = false;
     private static String[] deniedPermissions;
-    private static final String[] PERMISSIONS = {Manifest.permission.READ_PHONE_STATE
-            , Manifest.permission.CAMERA
-            , Manifest.permission.READ_EXTERNAL_STORAGE
-            , Manifest.permission.WRITE_EXTERNAL_STORAGE
-            , Manifest.permission.ACCESS_COARSE_LOCATION
-            , Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final String[] PERMISSIONS = {
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.VIBRATE};
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private static final String[] PERMISSIONS_SDK_29 = {
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.VIBRATE};
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private static final String[] PERMISSIONS_SDK_33 = {
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.READ_MEDIA_IMAGES,
+            Manifest.permission.READ_MEDIA_VIDEO,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.VIBRATE};
+
+    private static String[] getPermissions() {
+        switch (Build.VERSION.SDK_INT) {
+            case Build.VERSION_CODES.TIRAMISU:
+                return PERMISSIONS_SDK_33;
+            case Build.VERSION_CODES.Q:
+                return PERMISSIONS_SDK_29;
+            default:
+                return PERMISSIONS;
+        }
+    }
 
     public static void requestPermissionsFor(Activity activity) {
         if (isNotApiAndroidM()) return;
-
         buildPermissionDialog(activity).show();
     }
 
     private static Dialog buildPermissionDialog(Activity activity) {
         Dialog informationDialog = new Dialog(activity);
         informationDialog.setContentView(R.layout.permission_information_dialog);
+        informationDialog.setCancelable(false);
 
         if (donNotAskIsChecked()) {
             configureDialogs(activity, informationDialog, View.VISIBLE, R.string.permission_information_dialog_never_checked_message);
@@ -95,7 +126,7 @@ public class AppPermissions {
             ActivityCompat.requestPermissions(activity, deniedPermissions, PERMISSIONS_CODE);
             deniedPermissions = null;
         } else if (!hasPermissionsOn(activity.getApplicationContext()) && deniedPermissions == null) {
-            ActivityCompat.requestPermissions(activity, PERMISSIONS, PERMISSIONS_CODE);
+            ActivityCompat.requestPermissions(activity, getPermissions(), PERMISSIONS_CODE);
         }
     }
 
@@ -103,15 +134,17 @@ public class AppPermissions {
     public static boolean hasPermissionsOn(Context context) {
         boolean result = true;
         List<String> deniedPermissions = new ArrayList<>();
-        for (String permission : PERMISSIONS) {
-            int permissionStatus = ActivityCompat.checkSelfPermission(context, permission);
-            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+
+        for (String permission : getPermissions()) {
+            if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
                 deniedPermissions.add(permission);
                 result = false;
             }
         }
+
         AppPermissions.deniedPermissions = new String[deniedPermissions.size()];
         deniedPermissions.toArray(AppPermissions.deniedPermissions);
+
         return result;
     }
 

@@ -35,13 +35,13 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="45dp"
+                android:layout_marginBottom="65dp"
                 tools:listitem="@layout/item_image" />
 
             <RelativeLayout
                 android:id="@+id/bottom_bar"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
+                android:layout_height="65dp"
                 android:layout_alignParentBottom="true">
 
                 <TextView

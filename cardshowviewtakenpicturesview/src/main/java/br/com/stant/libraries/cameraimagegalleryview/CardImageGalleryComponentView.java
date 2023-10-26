@@ -277,6 +277,13 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void setActivityBackgroundColor(String activityBackground) {
         Theme.ActivityBackground = activityBackground;
     }
+    public String getBottomBarColor() {
+        return Theme.BottomBarColor;
+    }
+
+    public void setBottomBarColor(String bottomBarColor) {
+        Theme.BottomBarColor = bottomBarColor;
+    }
 
     // End Component
 

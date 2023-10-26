@@ -61,6 +61,7 @@ public class CardImageGalleryView extends AppCompatActivity {
         configureToolbar();
         configureAdapter();
         mBinding.galleryActivity.setBackgroundColor(Color.parseColor(Theme.ActivityBackground));
+        mBinding.bottomBar.setBackgroundColor(Color.parseColor(Theme.BottomBarColor));
 
         mImageQuantityLimit = getIntent().getIntExtra(Camera.KEY_LIMIT_IMAGES, 0);
         showQuantityOfImages();

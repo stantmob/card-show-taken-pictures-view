@@ -10,5 +10,6 @@ public final class Theme {
     public static String ColorIcons = "#ee3923";
     public static ImageStatus ImageStatus;
     public static String ActivityBackground = "#FFFFFF";
+    public static String BottomBarColor = "#989898";
 
 }

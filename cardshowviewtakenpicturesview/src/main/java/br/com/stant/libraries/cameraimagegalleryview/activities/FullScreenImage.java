@@ -46,6 +46,7 @@ public class FullScreenImage extends AppCompatActivity {
 
         configureToolBar();
         mBinding.infoBox.setBackgroundColor(Color.parseColor(Theme.ActivityBackground));
+        mBinding.captionEditTextLayout.setBoxBackgroundColor(Color.parseColor(Theme.ActivityBackground));
 
         setValues();
     }

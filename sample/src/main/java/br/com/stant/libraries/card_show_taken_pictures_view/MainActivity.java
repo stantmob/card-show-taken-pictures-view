@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         mBinding.cardImageGalleryComponentView.setStatusBarColor("#a3a3a3");
         mBinding.cardImageGalleryComponentView.setImageStatus(ImageStatus.Approved);
         mBinding.cardImageGalleryComponentView.setActivityBackgroundColor("#FFFFFF");
+        mBinding.cardImageGalleryComponentView.setBottomBarColor("#FFFFFF");
     }
 
     @Override

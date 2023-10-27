@@ -11,5 +11,6 @@ public final class Theme {
     public static ImageStatus ImageStatus;
     public static String ActivityBackground = "#FFFFFF";
     public static String BottomBarColor = "#989898";
+    public static String InfoBoxColor = "#FFFFFF";
 
 }

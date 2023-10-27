@@ -45,8 +45,8 @@ public class FullScreenImage extends AppCompatActivity {
         mCardShowTakenImage = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
 
         configureToolBar();
-        mBinding.infoBox.setBackgroundColor(Color.parseColor(Theme.ActivityBackground));
-        mBinding.captionEditTextLayout.setBoxBackgroundColor(Color.parseColor(Theme.ActivityBackground));
+        mBinding.infoBox.setBackgroundColor(Color.parseColor(Theme.InfoBoxColor));
+        mBinding.captionEditTextLayout.setBoxBackgroundColor(Color.parseColor(Theme.InfoBoxColor));
 
         setValues();
     }

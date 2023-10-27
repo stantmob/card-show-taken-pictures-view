@@ -285,6 +285,14 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         Theme.BottomBarColor = bottomBarColor;
     }
 
+    public String getInfoBoxColor() {
+        return Theme.InfoBoxColor;
+    }
+
+    public void setInfoBoxColor(String infoBoxColor) {
+        Theme.InfoBoxColor = infoBoxColor;
+    }
+
     // End Component
 
     //Begin EditState

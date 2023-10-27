@@ -56,13 +56,13 @@ public class AppPermissions {
             Manifest.permission.VIBRATE};
 
     private static String[] getPermissions() {
-        switch (Build.VERSION.SDK_INT) {
-            case Build.VERSION_CODES.TIRAMISU:
-                return PERMISSIONS_SDK_33;
-            case Build.VERSION_CODES.Q:
-                return PERMISSIONS_SDK_29;
-            default:
-                return PERMISSIONS;
+        int sdkVersion = Build.VERSION.SDK_INT;
+        if (sdkVersion >= Build.VERSION_CODES.TIRAMISU) {
+            return PERMISSIONS_SDK_33;
+        } else if (sdkVersion >= Build.VERSION_CODES.Q) {
+            return PERMISSIONS_SDK_29;
+        } else {
+            return PERMISSIONS;
         }
     }
 
@@ -100,9 +100,7 @@ public class AppPermissions {
         TextView okButton = informationDialog.findViewById(R.id.permission_information_dialog_confirmation_text_view);
 
         informationText.setText(activity.getResources().getString(contentText));
-
         settingsButton.setVisibility(visibility);
-
         addListeners(activity, informationDialog, okButton, settingsButton);
 
     }
@@ -133,17 +131,17 @@ public class AppPermissions {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean hasPermissionsOn(Context context) {
         boolean result = true;
-        List<String> deniedPermissions = new ArrayList<>();
+        List<String> denied = new ArrayList<>();
 
         for (String permission : getPermissions()) {
             if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                deniedPermissions.add(permission);
+                denied.add(permission);
                 result = false;
             }
         }
 
-        AppPermissions.deniedPermissions = new String[deniedPermissions.size()];
-        deniedPermissions.toArray(AppPermissions.deniedPermissions);
+        deniedPermissions = new String[denied.size()];
+        denied.toArray(deniedPermissions);
 
         return result;
     }

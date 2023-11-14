@@ -62,10 +62,9 @@
                     android:scrollbars="vertical"
                     android:padding="10dp"
                     android:textFontWeight="500"
-                    android:text="Golden Gate"
                     android:textColor="#ffffffff"
                     android:textSize="20sp"
-                    android:lineHeight="20dp"
+                    android:lineSpacingExtra="10dp"
                     tools:text="Errors" />
 
                 <ImageView

@@ -127,7 +127,7 @@ public class CardShowTakenImage implements Serializable {
     public String getErrorsAsString() {
         StringBuilder errorsBuild = new StringBuilder();
         for (String error : errors) {
-            errorsBuild.append(error).append("\n\n");
+            errorsBuild.append(error).append("\n");
         }
         return errorsBuild.toString();
     }

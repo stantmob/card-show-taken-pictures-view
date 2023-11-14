@@ -9,6 +9,8 @@ import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -55,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
         if (gallery != null)
             mBinding.cardShowViewTakenPicturesView.setCardImages(gallery.getImages());
 
-        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView,
-                "Denis Vieira", new Date());
-        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
+        //noinspection AccessStaticViaInstance
+        mBinding.cardShowViewTakenPicturesView.setBinding(mBinding.cardShowViewTakenPicturesView, "Denis Vieira", new Date());
+//        mBinding.cardShowViewTakenPicturesView.setImagesQuantityLimit(15, null);
         mBinding.cardShowViewTakenPicturesView.setIsMultipleGallerySelection(true);
         mBinding.cardShowViewTakenPicturesView.enableDragAndDrop();
         mBinding.cardShowViewTakenPicturesView.setStrokeColor(ContextCompat.getColor(getApplicationContext(),

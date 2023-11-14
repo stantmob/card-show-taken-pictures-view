@@ -34,28 +34,6 @@ public class CardShowTakenImage implements Serializable {
         this.errors = errors;
     }
 
-    public CardShowTakenImage(String localImageFilename,
-                              String tempImagePathToShow, Date createdAt, Date updatedAt, String caption, ImageStatus status, List<String> errors) {
-        this.localImageFilename = localImageFilename;
-        this.tempImagePathToShow = tempImagePathToShow;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.caption = caption;
-        this.status = status;
-        this.errors = errors;
-    }
-
-    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
-                              Date createdAt, Date updatedAt, String caption, ImageStatus status) {
-        this.identifier = identifier;
-        this.remoteImageUrl = remoteImageUrl;
-        this.localImageFilename = localImageFilename;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.caption = caption;
-        this.status = status;
-    }
-
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
                               Date createdAt, Date updatedAt, String caption) {
         this.identifier = identifier;
@@ -90,6 +68,16 @@ public class CardShowTakenImage implements Serializable {
         this.updatedAt = updatedAt;
         this.caption = caption;
         this.status = imageStatus;
+    }
+    public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
+                              Date createdAt, Date updatedAt, String caption, List<String> errors) {
+        this.identifier = identifier;
+        this.remoteImageUrl = remoteImageUrl;
+        this.localImageFilename = localImageFilename;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.caption = caption;
+        this.errors = errors;
     }
 
     public String getIdentifier() {
@@ -143,15 +131,19 @@ public class CardShowTakenImage implements Serializable {
         }
         return errorsBuild.toString();
     }
+
     public List<String> getErrors() {
         return errors;
     }
+
     public void setErrors(List<String> errors) {
         this.errors = errors;
     }
+
     public boolean hasError() {
         return !this.errors.isEmpty();
     }
+
     public ImageStatus getStatus() {
         return status;
     }
@@ -161,10 +153,10 @@ public class CardShowTakenImage implements Serializable {
         if (this == o) return true;
         if (!(o instanceof CardShowTakenImage)) return false;
         CardShowTakenImage that = (CardShowTakenImage) o;
-        if(identifier != null) {
+        if (identifier != null) {
             return Objects.equals(identifier, that.identifier);
         }
-        if(localImageFilename != null){
+        if (localImageFilename != null) {
             return Objects.equals(localImageFilename, that.localImageFilename);
         }
 

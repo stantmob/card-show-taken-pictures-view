@@ -66,10 +66,10 @@ public class FullScreenImage extends AppCompatActivity {
 
         mBinding.captionEditText.setText(image.getCaption());
 
-        if (image.getStatus() == ImageStatus.Approved) {
+        if (Theme.ImageStatus == ImageStatus.Approved) {
             mBinding.statusTextView.setText(R.string.full_screen_image_status_approved);
             mBinding.statusTextView.setTextColor(getResources().getColor(R.color.green));
-        } else if (image.getStatus() == ImageStatus.Disapproved) {
+        } else if (Theme.ImageStatus == ImageStatus.Disapproved) {
             mBinding.statusTextView.setText(R.string.full_screen_image_status_disapproved);
             mBinding.statusTextView.setTextColor(getResources().getColor(R.color.red));
         }

@@ -165,7 +165,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void showStrokeError() {
         GradientDrawable drawable = (GradientDrawable) mCardImageGalleryComponentViewBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
-        drawable.setStroke(3, getResources().getColor(R.color.red));
+        drawable.setStroke(3, getResources().getColor(R.color.dark_red));
     }
 
     private void removeStrokeError() {
@@ -181,26 +181,6 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
                 new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
         images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
                 new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
-//        images.add(new CardShowTakenImage("3", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("4", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
-//        images.add(new CardShowTakenImage("5", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("6", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
-//        images.add(new CardShowTakenImage("7", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("8", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
-//        images.add(new CardShowTakenImage("9", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("10", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Approved, Arrays.asList("Error 1", "Error 2", "Error 3")));
-//        images.add(new CardShowTakenImage("11", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
         setCardImages(images);
     }
 

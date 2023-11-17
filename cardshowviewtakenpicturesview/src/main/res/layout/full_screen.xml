@@ -44,24 +44,29 @@
                 android:scaleType="centerCrop"
                 tools:src="@tools:sample/backgrounds/scenic" />
 
-            <FrameLayout
+            <LinearLayout
                 android:id="@+id/error_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone">
+                android:orientation="horizontal"
+                android:background="#FF0000"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginTop="12dp"
+                android:visibility="visible">
 
                 <TextView
                     android:id="@+id/errors_list"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal|top"
-                    android:layout_marginHorizontal="5dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginTop="6dp"
                     android:background="#FF0000"
                     android:lines="1"
+                    android:layout_weight="8"
                     android:scrollbars="vertical"
-                    android:padding="10dp"
                     android:textFontWeight="500"
+                    android:gravity="top"
                     android:textColor="#ffffffff"
                     android:textSize="20sp"
                     android:lineSpacingExtra="10dp"
@@ -69,13 +74,13 @@
 
                 <ImageView
                     android:id="@+id/errors_icon"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:layout_gravity="center_vertical|right|top"
-                    android:padding="10dp"
-                    android:layout_margin="12dp"
                     android:src="@drawable/ic_right"/>
-            </FrameLayout>
+            </LinearLayout>
 
 
         </FrameLayout>

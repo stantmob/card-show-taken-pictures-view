@@ -178,8 +178,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         List<CardShowTakenImage> images = new ArrayList<>();
 
         images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1Error 1",
-                "Error 2", "Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 Error 3 ", "Error 3", "Error 3", "Error 3")));
+                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
         images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
                 new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
 //        images.add(new CardShowTakenImage("", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),

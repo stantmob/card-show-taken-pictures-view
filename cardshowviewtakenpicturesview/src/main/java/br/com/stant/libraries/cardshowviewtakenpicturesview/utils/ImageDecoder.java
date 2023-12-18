@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.annotation.GlideModule;import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.request.RequestOptions;
 
@@ -183,9 +183,10 @@ public class ImageDecoder extends AppGlideModule {
         if (url == null || url.isEmpty()) return;
 
         try {
-            Glide.with(imageView.getContext()).applyDefaultRequestOptions(
-                    new RequestOptions().placeholder(R.drawable.stant_city).centerInside()
-                            .override(500, 500)).load(url).into(imageView);
+            Glide.with(imageView.getContext())
+                    .load(url)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(imageView);
         } catch (Exception e) {
             e.printStackTrace();
         }

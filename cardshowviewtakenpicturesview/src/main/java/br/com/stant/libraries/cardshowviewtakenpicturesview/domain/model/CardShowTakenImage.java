@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
-
 public class CardShowTakenImage implements Serializable {
 
     private String identifier;
@@ -17,12 +15,11 @@ public class CardShowTakenImage implements Serializable {
     private Date createdAt;
     private Date updatedAt;
     private String caption;
-    private ImageStatus status;
     private List<String> errors = new ArrayList<>();
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
                               String tempImagePathToShow, Date createdAt, Date updatedAt, String caption,
-                              ImageStatus status, List<String> errors) {
+                              List<String> errors) {
         this.identifier = identifier;
         this.remoteImageUrl = remoteImageUrl;
         this.localImageFilename = localImageFilename;
@@ -30,7 +27,6 @@ public class CardShowTakenImage implements Serializable {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.caption = caption;
-        this.status = status;
         this.errors = errors;
     }
 
@@ -52,22 +48,13 @@ public class CardShowTakenImage implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public CardShowTakenImage(String imageFilename, String tempImagePath, Date createdAt, Date updatedAt, String caption) {
-        this.localImageFilename = imageFilename;
-        this.tempImagePathToShow = tempImagePath;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.caption = caption;
-    }
-
     public CardShowTakenImage(String imageFilename, String tempImagePath, Date createdAt
-            , Date updatedAt, String caption, ImageStatus imageStatus) {
+            , Date updatedAt, String caption) {
         this.localImageFilename = imageFilename;
         this.tempImagePathToShow = tempImagePath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.caption = caption;
-        this.status = imageStatus;
     }
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
                               Date createdAt, Date updatedAt, String caption, List<String> errors) {
@@ -142,10 +129,6 @@ public class CardShowTakenImage implements Serializable {
 
     public boolean hasError() {
         return !this.errors.isEmpty();
-    }
-
-    public ImageStatus getStatus() {
-        return status;
     }
 
     @Override

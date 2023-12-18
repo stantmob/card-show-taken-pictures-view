@@ -8,7 +8,6 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 
 import android.animation.ObjectAnimator;
-import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -21,7 +20,6 @@ import android.view.inputmethod.InputMethodManager;
 import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
-import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
 import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
@@ -62,17 +60,10 @@ public class FullScreenImage extends AppCompatActivity {
     private void setValues() {
         image = (CardShowTakenImage) getIntent().getSerializableExtra(KEY_IMAGE_FULL_SCREEN);
         setImageBitmapToImageView(mBinding.fullImageView,
-                image, 8);
+                image, 1);
 
         mBinding.captionEditText.setText(image.getCaption());
 
-        if (Theme.ImageStatus == ImageStatus.Approved) {
-            mBinding.statusTextView.setText(R.string.full_screen_image_status_approved);
-            mBinding.statusTextView.setTextColor(getResources().getColor(R.color.green));
-        } else if (Theme.ImageStatus == ImageStatus.Disapproved) {
-            mBinding.statusTextView.setText(R.string.full_screen_image_status_disapproved);
-            mBinding.statusTextView.setTextColor(getResources().getColor(R.color.red));
-        }
 
         mBinding.topAppBar.setNavigationOnClickListener((View view) -> {
             onBackPressed();
@@ -154,8 +145,6 @@ public class FullScreenImage extends AppCompatActivity {
         mBinding.captionEditText.setFocusable(true);
         mBinding.captionEditText.setCursorVisible(true);
 
-        mBinding.statusTextView.setVisibility(View.GONE);
-
         mBinding.captionEditText.requestFocusFromTouch();
         int index = mBinding.captionEditText.getText().toString().length();
 
@@ -170,7 +159,6 @@ public class FullScreenImage extends AppCompatActivity {
 
         mBinding.captionEditText.setFocusable(false);
         mBinding.captionEditText.setCursorVisible(false);
-        mBinding.statusTextView.setVisibility(View.VISIBLE);
 
         String caption = mBinding.captionEditText.getText().toString();
         image.setCaption(caption);

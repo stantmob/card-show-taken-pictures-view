@@ -102,7 +102,7 @@ public class Camera {
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
                                 CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(
                                         imageFilename, tempImagePath, cameraImage.getCreatedAt(),
-                                        cameraImage.getUpdatedAt(), cameraImage.getCaption(), Theme.ImageStatus);
+                                        cameraImage.getUpdatedAt(), cameraImage.getCaption());
 
                                 mCardShowTakenImages.addImage(cardShowTakenImage);
                             }

@@ -8,7 +8,6 @@ public final class Theme {
     public static Drawable BackIcon;
     public static String TitleToolBarColor = "#ee3923";
     public static String ColorIcons = "#ee3923";
-    public static ImageStatus ImageStatus;
     public static String ActivityBackground = "#FFFFFF";
     public static String BottomBarColor = "#989898";
     public static String InfoBoxColor = "#FFFFFF";

@@ -4,54 +4,99 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView;
+import br.com.stant.libraries.cameraimagegalleryview.adapters.selectiontracker.CardImageGalleryItemDetails;
 import br.com.stant.libraries.cameraimagegalleryview.components.ItemImage;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
-public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageGalleryViewAdapter.ViewHolder> {
+public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageGalleryViewAdapter.ItemImageViewHolder> {
 
     private CardImageGalleryView mView;
-    private CardShowTakenImageInjection mCardShowTakenImages;
 
-    public CardImageGalleryViewAdapter(CardImageGalleryView view, List<CardShowTakenImage> cardShowTakenImageList) {
+    private List<CardShowTakenImage> mCardShowTakenImages;
+
+    private SelectionTracker<Long> selectionTracker;
+
+    public CardImageGalleryViewAdapter(CardImageGalleryView view) {
         mView = view;
-        mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
+        mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection().getAll();
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ItemImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ItemImage itemImage = new ItemImage(parent.getContext(), parent, mView);
-        return new ViewHolder(itemImage.getView(), itemImage);
+        return new ItemImageViewHolder(itemImage.getView(), itemImage);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.getAll().get(position);
-
-        ItemImage itemImage = holder.itemImage;
-        itemImage.setImage(cardShowTakenImage);
+    public void onBindViewHolder(@NonNull ItemImageViewHolder holder, int position) {
+        CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.get(position);
+        holder.setItemImage(cardShowTakenImage, position);
     }
-
-
 
     @Override
     public int getItemCount() {
-        return mCardShowTakenImages.getAll().size();
+        return mCardShowTakenImages.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        ItemImage itemImage;
+    public void setSelectionTracker(SelectionTracker<Long> selectionTracker) {
+        this.selectionTracker = selectionTracker;
+    }
 
-        public ViewHolder(@NonNull View itemView, ItemImage itemImage) {
+    public List<CardShowTakenImage> getSelectedItems(){
+        List<CardShowTakenImage> itemsSelected = new ArrayList<>();
+
+        for(CardShowTakenImage image : mCardShowTakenImages) {
+            if(selectionTracker.getSelection().contains((long)image.hashCode())){
+                itemsSelected.add(image);
+            }
+        }
+        return itemsSelected;
+    }
+
+    public int getSelectedCount(){
+        return selectionTracker.getSelection().size();
+    }
+
+    public void clearSelections(){
+        selectionTracker.clearSelection();
+    }
+
+
+    public class ItemImageViewHolder extends RecyclerView.ViewHolder {
+        ItemImage itemImage;
+        CardImageGalleryItemDetails details;
+
+        public ItemImageViewHolder(@NonNull View itemView, ItemImage itemImage) {
             super(itemView);
             this.itemImage = itemImage;
+            details = new CardImageGalleryItemDetails();
+        }
+
+        public CardImageGalleryItemDetails getDetails() {
+            return details;
+        }
+
+        public void setItemImage(CardShowTakenImage cardShowTakenImage, int position){
+            details.setImage(cardShowTakenImage);
+            details.setAdapterPosition(position);
+            itemImage.setImage(cardShowTakenImage);
+
+            if(selectionTracker.isSelected((long)cardShowTakenImage.hashCode())){
+                itemImage.changeImageToSelectedMode();
+            } else {
+                itemImage.removeFromSelectedMode();
+            }
+            mView.reloadToolBar();
+
         }
     }
 }

@@ -5,7 +5,6 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDe
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,17 +28,19 @@ public class ItemImage extends LinearLayout {
         super(context);
         itemImageBinding = DataBindingUtil.inflate(LayoutInflater.
                 from(super.getContext()), R.layout.item_image, parent, false);
+        itemImageBinding.setSelected(false);
         this.mView = view;
     }
 
+    public CardShowTakenImage getImage() {
+        return cardShowTakenImage;
+    }
 
     public void setImage(CardShowTakenImage cardShowTakenImage) {
         this.cardShowTakenImage = cardShowTakenImage;
         this.loadImage();
         this.setErrorIfExist();
         this.onClick();
-        this.onLongClick();
-        itemImageBinding.setSelected(false);
     }
 
     public View getView() {
@@ -57,32 +58,19 @@ public class ItemImage extends LinearLayout {
 
     private void onClick() {
         itemImageBinding.imageView.setOnClickListener(view -> {
-            if (mView.isSelectModeOn() && !itemImageBinding.getSelected()) {
-                changeImageToSelectedMode();
-            } else if (mView.isSelectModeOn()) {
-                mView.removeImageSelectFromSelectionMode(cardShowTakenImage);
-                itemImageBinding.setSelected(false);
-            } else {
-                Intent intent = new Intent(mView, FullScreenImage.class);
-                intent.putExtra(KEY_IMAGE_FULL_SCREEN, cardShowTakenImage);
-                mView.startActivity(intent);
-            }
+            Intent intent = new Intent(mView, FullScreenImage.class);
+            intent.putExtra(KEY_IMAGE_FULL_SCREEN, cardShowTakenImage);
+            mView.startActivity(intent);
         });
     }
 
-    private void onLongClick() {
-        itemImageBinding.imageView.setOnLongClickListener(view -> {
-            if (!itemImageBinding.getSelected()) {
-                changeImageToSelectedMode();
-                return true;
-            }
-            return false;
-        });
-    }
-
-    private void changeImageToSelectedMode() {
-        mView.addImageSelect(cardShowTakenImage);
+    public void changeImageToSelectedMode() {
         itemImageBinding.setSelected(true);
     }
+
+    public void removeFromSelectedMode(){
+        itemImageBinding.setSelected(false);
+    }
+
 
 }

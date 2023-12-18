@@ -1,35 +1,29 @@
 package br.com.stant.libraries.cameraimagegalleryview.activities;
 
 
-import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_LIST_GALLERY;
-
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.selection.SelectionTracker;
+import androidx.recyclerview.selection.StorageStrategy;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryComponentView;
 import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryViewAdapter;
+import br.com.stant.libraries.cameraimagegalleryview.adapters.selectiontracker.CardImageGalleryItemDetailsLookup;
+import br.com.stant.libraries.cameraimagegalleryview.adapters.selectiontracker.CardImageGalleryItemKeyProvider;
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
@@ -45,7 +39,7 @@ public class CardImageGalleryView extends AppCompatActivity {
 
     private ActivityCardImageGalleryViewBinding mBinding;
     private RecyclerView recyclerView;
-    private CardImageGalleryViewAdapter cardImageGalleryViewAdapter;
+    private CardImageGalleryViewAdapter mCardImageGalleryViewAdapter;
     private GridLayoutManager gridLayoutManager;
     private CardShowTakenImageInjection mCardShowTakenImages;
     private Integer mImageQuantityLimit;
@@ -68,7 +62,7 @@ public class CardImageGalleryView extends AppCompatActivity {
 
         registerActivityForCamera();
         mCardShowTakenImages.addListener(() -> {
-            cardImageGalleryViewAdapter.notifyDataSetChanged();
+            mCardImageGalleryViewAdapter.notifyDataSetChanged();
             showQuantityOfImages();
         });
 
@@ -109,8 +103,20 @@ public class CardImageGalleryView extends AppCompatActivity {
         if (receivedImageList != null && !receivedImageList.isEmpty()) {
             cardShowTakenImageList.addAll(receivedImageList);
         }
-        cardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this, cardShowTakenImageList);
-        recyclerView.setAdapter(cardImageGalleryViewAdapter);
+        mCardImageGalleryViewAdapter = new CardImageGalleryViewAdapter(this);
+        recyclerView.setAdapter(mCardImageGalleryViewAdapter);
+        configureSelectionTracker();
+    }
+
+    private void configureSelectionTracker(){
+        SelectionTracker<Long> selectionTracker = new  SelectionTracker.Builder<>(
+                "delete-items",
+                this.recyclerView,
+                new CardImageGalleryItemKeyProvider(),
+                new CardImageGalleryItemDetailsLookup(this.recyclerView),
+                StorageStrategy.createLongStorage())
+                .build();
+        mCardImageGalleryViewAdapter.setSelectionTracker(selectionTracker);
     }
 
     public void registerActivityForCamera() {
@@ -140,13 +146,20 @@ public class CardImageGalleryView extends AppCompatActivity {
         return false;
     }
 
+    public void reloadToolBar() {
+        invalidateOptionsMenu();
+    }
+
     private void configureMenu(Menu menu) {
         ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
-                .findViewById(R.id.count_images_trash)).setText("(" + this.selectedImages.size() + ")");
+                .findViewById(R.id.count_images_trash)).setText("(" + this.mCardImageGalleryViewAdapter.getSelectedCount() + ")");
+
         ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
                 .findViewById(R.id.count_images_trash)).setTextColor(Color.parseColor(Theme.TitleToolBarColor));
+
         ((ImageView) menu.findItem(R.id.gallery_trash_menu).getActionView()
                 .findViewById(R.id.gallery_trash)).setColorFilter(Color.parseColor(Theme.ColorIcons));
+
         menu.findItem(R.id.gallery_trash_menu).getActionView().setOnClickListener((view) -> {
             removeImages();
         });
@@ -155,26 +168,16 @@ public class CardImageGalleryView extends AppCompatActivity {
 
 
     public boolean isSelectModeOn() {
-        return !this.selectedImages.isEmpty();
-    }
-
-    public void addImageSelect(CardShowTakenImage image) {
-        this.selectedImages.add(image);
-        invalidateOptionsMenu();
-    }
-
-    public void removeImageSelectFromSelectionMode(CardShowTakenImage image) {
-        this.selectedImages.remove(image);
-        invalidateOptionsMenu();
-
+        return mCardImageGalleryViewAdapter.getSelectedCount() > 0;
     }
 
     private void removeImages() {
         DeleteAlertDialog deleteAlertDialog = new DeleteAlertDialog(this, new DeleteAlertDialog.OnDelete() {
             @Override
             public void delete() {
-                mCardShowTakenImages.removeList(selectedImages);
-                selectedImages.clear();
+                List<CardShowTakenImage> itemsToRemove = mCardImageGalleryViewAdapter.getSelectedItems();
+                mCardShowTakenImages.removeList(itemsToRemove);
+                mCardImageGalleryViewAdapter.clearSelections();
                 invalidateOptionsMenu();
                 onAttachedToWindow();
             }

@@ -5,18 +5,13 @@ import android.content.Intent;
 import androidx.databinding.DataBindingUtil;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
 
 import java.util.Date;
 import java.util.List;
 
-import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract;
-import br.com.stant.libraries.cameraimagegalleryview.model.ImageStatus;
 import br.com.stant.libraries.card_show_taken_pictures_view.databinding.ActivityMainBinding;
 import br.com.stant.libraries.card_show_taken_pictures_view.models.Gallery;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
@@ -74,12 +69,11 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding.cardImageGalleryComponentView.setActivityAndRegisterForCamera(this);
 
-        if (gallery != null)
-            mBinding.cardImageGalleryComponentView.setCardImages(gallery.getImages());
+
         mBinding.cardImageGalleryComponentView.setExampleImages();
         mBinding.cardImageGalleryComponentView.setBinding(mBinding.cardImageGalleryComponentView,
                 "Denis Vieira", new Date());
-        mBinding.cardImageGalleryComponentView.setImagesQuantityLimit(15, null);
+        mBinding.cardImageGalleryComponentView.setImagesQuantityLimit(100, null);
         mBinding.cardImageGalleryComponentView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),
                 R.color.cardview_light_background));
         mBinding.cardImageGalleryComponentView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
@@ -90,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         mBinding.cardImageGalleryComponentView.setGalleryAppName("Imagens das inspeções");
         mBinding.cardImageGalleryComponentView.setToolBarColor("#989898");
         mBinding.cardImageGalleryComponentView.setStatusBarColor("#a3a3a3");
-        mBinding.cardImageGalleryComponentView.setImageStatus(ImageStatus.Approved);
         mBinding.cardImageGalleryComponentView.setActivityBackgroundColor("#FFFFFF");
         mBinding.cardImageGalleryComponentView.setBottomBarColor("#FFFFFF");
     }

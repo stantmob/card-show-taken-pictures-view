@@ -43,29 +43,19 @@
             android:layout_height="wrap_content"
             android:background="@drawable/shape_rectangle_mutable"
             android:orientation="horizontal"
-            android:padding="9dp">
+            android:padding="9dp"
+            android:layoutDirection="rtl">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/card_image_gallery_component_list_recycler_view"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:focusable="false"
-                android:minHeight="33dp"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/card_image_gallery_component_recycle_item" />
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
+                android:layout_width="66dp"
+                android:layout_height="66dp"
+                android:layout_gravity="end|center"
                 android:layout_marginStart="8dp"
                 android:onClick="@{handler::onClickIcon}"
                 android:padding="6dp"
-                android:src="@{handler.hasImages() ? @drawable/ic_gallery : @drawable/ic_add_photo}"/>
+                android:src="@{handler.hasImages() ? @drawable/ic_imagem_multiple_eye : @drawable/ic_image_plus}"/>
 
         </LinearLayout>
 

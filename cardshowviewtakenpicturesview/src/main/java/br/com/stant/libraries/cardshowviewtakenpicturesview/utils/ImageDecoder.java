@@ -22,8 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 import static io.reactivex.Single.just;
-@GlideModule
-public class ImageDecoder extends AppGlideModule {
+public class ImageDecoder {
 
     static Bitmap scaleBitmap(@NonNull Bitmap bitmap, @NonNull Integer desiredSize) {
         Integer width  = bitmap.getWidth();
@@ -150,41 +149,32 @@ public class ImageDecoder extends AppGlideModule {
     }
 
     public static void setImageBitmapToImageView(ImageView imageView, CardShowTakenImage cardShowTakenImage, Integer sampleSize) {
+        BitmapFromFileCallback callback = new BitmapFromFileCallback() {
+            @Override
+            public void onBitmapDecoded(Bitmap bitmap) throws IOException {
+                imageView.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void fileNotFound() {
+
+            }
+        };
         if (cardShowTakenImage.hasOnlyRemoteUrl()) {
             setBitmapFromInternet(imageView, cardShowTakenImage.getRemoteImageUrl());
         } else if (cardShowTakenImage.hasLocalImage()) {
-            getBitmapFromFile(getPrivateTempDirectory(imageView.getContext()), cardShowTakenImage.getLocalImageFilename(), sampleSize, new BitmapFromFileCallback() {
-                @Override
-                public void onBitmapDecoded(Bitmap bitmap) throws IOException {
-                    imageView.setImageBitmap(bitmap);
-                }
-
-                @Override
-                public void fileNotFound() {
-
-                }
-            });
+            getBitmapFromFile(getPrivateTempDirectory(imageView.getContext()), cardShowTakenImage.getLocalImageFilename(), sampleSize,callback);
         } else {
-            getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, new BitmapFromFileCallback() {
-                @Override
-                public void onBitmapDecoded(Bitmap bitmap) {
-                    imageView.setImageBitmap(bitmap);
-                }
-
-                @Override
-                public void fileNotFound() {
-
-                }
-            });
+            getBitmapFromFile(cardShowTakenImage.getTempImagePathToShow(), sampleSize, callback);
         }
     }
-
-    private static void setBitmapFromInternet(ImageView imageView, String url) {
+    public static void setBitmapFromInternet(ImageView imageView, String url) {
         if (url == null || url.isEmpty()) return;
 
         try {
             Glide.with(imageView.getContext())
                     .load(url)
+                    .placeholder(imageView.getContext().getDrawable(R.drawable.stant_city_image_not_found))
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(imageView);
         } catch (Exception e) {

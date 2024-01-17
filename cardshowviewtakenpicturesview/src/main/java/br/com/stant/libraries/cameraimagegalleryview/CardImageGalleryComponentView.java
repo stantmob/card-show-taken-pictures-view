@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -33,8 +34,8 @@ import java.util.Date;
 import java.util.List;
 
 import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView;
-import br.com.stant.libraries.cameraimagegalleryview.adapters.CardImageGalleryComponentViewAdapterContract;
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
+import br.com.stant.libraries.cameraimagegalleryview.components.CardImageGalleryAvatar;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
 import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
@@ -52,8 +53,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private Fragment mFragment;
     private CardShowTakenImageInjection mCardShowTakenImages;
     private Context mContext;
-    private CardImageGalleryComponentViewBinding mCardImageGalleryComponentViewBinding;
-    private CardImageGalleryComponentViewAdapterContract mCardImagesAdapterContract;
+    private CardImageGalleryComponentViewBinding mBinding;
     private TypedArray mStyledAttributes;
     private Integer mImagesQuantityLimit;
     private OnReachedOnTheImageCountLimit mOnReachedOnTheImageCountLimit;
@@ -68,13 +68,20 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         this.mStyledAttributes = context.obtainStyledAttributes(attrs, R.styleable.CardShowTakenPictureView);
         mCardShowTakenImages = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
 
-        mCardImageGalleryComponentViewBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
+        mBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.card_image_gallery_component_view, this, true);
-        mCardImageGalleryComponentViewBinding.setHandler(this);
+        mBinding.setHandler(this);
 
         setOrientation(HORIZONTAL);
-        setImageListAdapter(mCardImageGalleryComponentViewBinding.cardImageGalleryComponentListRecyclerView);
-        disableScroll(mCardImageGalleryComponentViewBinding.cardImageGalleryComponentListRecyclerView);
+
+        mCardShowTakenImages.addListener(() -> {
+            invalidateIcon();
+            if (!mCardShowTakenImages.hasImagesWithErrors()) {
+                removeStrokeError();
+            }
+            loadImagesComponent();
+            updateCurrentAndLimitImagesQuantityText(mCardShowTakenImages.getAll().size());
+        });
     }
 
     @Override
@@ -98,11 +105,11 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     // Begin Component
     @Override
     public void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit) {
-        Integer currentImagesQuantity = mCardImagesAdapterContract.getItemCount();
+        Integer currentImagesQuantity = mCardShowTakenImages.getAll().size();
         mImagesQuantityLimit = limitQuantity;
         mOnReachedOnTheImageCountLimit = onReachedOnTheImageCountLimit;
 
-        mCardImageGalleryComponentViewBinding.cardImageGalleryComponentPhotosQuantityTextView.setVisibility(VISIBLE);
+        mBinding.cardImageGalleryComponentPhotosQuantityTextView.setVisibility(VISIBLE);
 
         Camera.setmOnReachedOnTheImageCountLimit(onReachedOnTheImageCountLimit);
         Camera.setmImagesQuantityLimit(limitQuantity);
@@ -112,17 +119,17 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     @Override
     public void updateCurrentAndLimitImagesQuantityText(Integer currentQuantity) {
-        mCardImageGalleryComponentViewBinding.setCurrentAndLimitPhotosQuantityText(
+        mBinding.setCurrentAndLimitPhotosQuantityText(
                 currentQuantity + "/" + mImagesQuantityLimit
         );
     }
 
     public boolean hasUpdatedAt() {
-        return mCardImageGalleryComponentViewBinding.getUpdatedAt() != null;
+        return mBinding.getUpdatedAt() != null;
     }
 
     public boolean hasPictureByName() {
-        return mCardImageGalleryComponentViewBinding.getPictureByName() != null;
+        return mBinding.getPictureByName() != null;
     }
 
     @Override
@@ -138,7 +145,18 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     @Override
     public void setCardImages(List<CardShowTakenImage> cardShowTakenImages) {
         mCardShowTakenImages.setImages(cardShowTakenImages);
-        this.updateCurrentAndLimitImagesQuantityText(mCardShowTakenImages.getAll().size());
+        if(mCardShowTakenImages.hasImagesWithErrors()){
+            showStrokeError();
+        }
+    }
+
+    private void loadImagesComponent() {
+        int count = mBinding.cardImageGalleryComponentContainerLinearLayout.getChildCount();
+        for(int i = count - 1; i < mCardShowTakenImages.getAll().size() && i < 4; i++){
+            new CardImageGalleryAvatar(mContext,
+                    mBinding.cardImageGalleryComponentContainerLinearLayout,
+                    mCardShowTakenImages.getAll().get(i));
+        }
     }
 
     @Override
@@ -157,13 +175,13 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     }
 
     public void showStrokeError() {
-        GradientDrawable drawable = (GradientDrawable) mCardImageGalleryComponentViewBinding
+        GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
-        drawable.setStroke(3, getResources().getColor(R.color.dark_red));
+        drawable.setStroke(8, getResources().getColor(R.color.dark_red));
     }
 
     private void removeStrokeError() {
-        GradientDrawable drawable = (GradientDrawable) mCardImageGalleryComponentViewBinding
+        GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
         drawable.setStroke(0, getResources().getColor(R.color.white));
     }
@@ -174,47 +192,12 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
                 new Date(), "", Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
         images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
+                new Date(), "CAPTION", Arrays.asList("Error 1Error 1Error 1Error 1Error 1Erro 1Error 1Erro")));
+        images.add(new CardShowTakenImage("3", "https://purepng.com/public/uploads/thumbnail//nature-ekq.png", "", "", new Date(),
                 new Date(), "CAPTION", Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
-//        images.add(new CardShowTakenImage("1", "https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png", "", "", new Date(),
-//                new Date(), "", ImageStatus.Approved, Arrays.asList("Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d", "Error 1Error 1Error 1Error 1Error 1Error 1Error d")));
-//        images.add(new CardShowTakenImage("2", "https://www.freecodecamp.org/news/content/images/size/w2000/2022/09/jonatan-pie-3l3RwQdHRHg-unsplash.jpg", "", "", new Date(),
-//                new Date(), "CAPTION", ImageStatus.Disapproved, Arrays.asList()));
+        images.add(new CardShowTakenImage("4", "https://freepngimg.com/download/environment/2-2-environment-png-image.png", "", "", new Date(),
+                new Date(), "CAPTION", Arrays.asList()));
+
         setCardImages(images);
     }
 
@@ -226,11 +209,18 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         }
     }
 
+    public void goToGallery() {
+        Intent intent = new Intent(mContext, CardImageGalleryView.class);
+        intent.putExtra(Camera.KEY_LIMIT_IMAGES, mImagesQuantityLimit);
+        intent.putExtra(KEY_APP_BAR_NAME, galleryAppName);
+        mContext.startActivity(intent);
+    }
+
     private void invalidateIcon() {
         if (hasImages()) {
-            mCardImageGalleryComponentViewBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_gallery));
+            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_imagem_multiple_eye));
         } else {
-            mCardImageGalleryComponentViewBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_add_photo));
+            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_image_plus));
         }
 
     }
@@ -312,7 +302,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     @Override
     public void setCardStateEnum(CardShowTakenPictureStateEnum cardStateEnum) {
-        mCardImageGalleryComponentViewBinding.setCardStateEnum(cardStateEnum);
+        mBinding.setCardStateEnum(cardStateEnum);
     }
 
     // End EditState
@@ -371,53 +361,17 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     // End camera
 
-    // Begin RecyclerViewAdapter
-
-    private void disableScroll(RecyclerView cardImageGalleryComponentViewRecyclerView) {
-        LinearLayoutManager disableScroll = new LinearLayoutManager(getContext()) {
-            @Override
-            public boolean canScrollHorizontally() {
-                return false;
-            }
-        };
-        disableScroll.setOrientation(RecyclerView.HORIZONTAL);
-        cardImageGalleryComponentViewRecyclerView.setLayoutManager(disableScroll);
-    }
-
-    private void setImageListAdapter(RecyclerView cardImageGalleryComponentViewRecyclerView) {
-        mCardImagesAdapterContract = new CardImageGalleryComponentViewAdapterContract(this);
-        cardImageGalleryComponentViewRecyclerView.setNestedScrollingEnabled(true);
-        cardImageGalleryComponentViewRecyclerView.setHasFixedSize(true);
-        cardImageGalleryComponentViewRecyclerView.setAdapter(mCardImagesAdapterContract);
-        mCardShowTakenImages.addListener(() -> {
-            mCardImagesAdapterContract.notifyDataSetChanged();
-            invalidateIcon();
-            if (!mCardShowTakenImages.hasImagesWithErrors()) {
-                removeStrokeError();
-            }
-            updateCurrentAndLimitImagesQuantityText(mCardShowTakenImages.getAll().size());
-        });
-    }
-
-    public void goToGallery() {
-        Intent intent = new Intent(mContext, CardImageGalleryView.class);
-        intent.putExtra(Camera.KEY_LIMIT_IMAGES, mImagesQuantityLimit);
-        intent.putExtra(KEY_APP_BAR_NAME, galleryAppName);
-        mContext.startActivity(intent);
-    }
-    // End RecyclerViewAdapter
-
     @BindingAdapter(value = {"pictureByName", "updatedAt"}, requireAll = false)
     public static void setBinding(CardImageGalleryComponentView view,
                                   String mPictureByName, Date updatedAt) {
         if (mPictureByName != null) {
-            view.mCardImageGalleryComponentViewBinding.setPictureByName(mPictureByName);
+            view.mBinding.setPictureByName(mPictureByName);
         }
 
         if (updatedAt != null) {
             String pattern = "MM/dd/yyyy";
             SimpleDateFormat format = new SimpleDateFormat(pattern);
-            view.mCardImageGalleryComponentViewBinding.setUpdatedAt(format.format(updatedAt));
+            view.mBinding.setUpdatedAt(format.format(updatedAt));
         }
     }
 }

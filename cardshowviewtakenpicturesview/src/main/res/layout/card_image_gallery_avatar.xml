@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/card_image_gallery_avatar"
+        android:layout_width="66dp"
+        android:layout_height="66dp"
+        android:padding="5dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/stant_city"
+        app:shapeAppearance="@style/ImageStyle_Circle" />
+
+</layout>

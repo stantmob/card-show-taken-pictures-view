@@ -118,7 +118,7 @@
                 android:focusable="false"
                 android:textFontWeight="500"
                 android:textSize="18sp"
-                android:hint="Clique em Editar para adicionar a legenda"
+                android:hint="@string/full_screen.hint_caption"
                 tools:text="Caption" />
 
         </LinearLayout>

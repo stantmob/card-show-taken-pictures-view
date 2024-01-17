@@ -5,6 +5,9 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDe
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,15 +23,15 @@ import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardSho
 
 public class ItemImage extends LinearLayout {
 
-    private final ItemImageBinding itemImageBinding;
+    private final ItemImageBinding mBinding;
     private CardShowTakenImage cardShowTakenImage;
     private CardImageGalleryView mView;
 
     public ItemImage(Context context, ViewGroup parent, CardImageGalleryView view) {
         super(context);
-        itemImageBinding = DataBindingUtil.inflate(LayoutInflater.
+        mBinding = DataBindingUtil.inflate(LayoutInflater.
                 from(super.getContext()), R.layout.item_image, parent, false);
-        itemImageBinding.setSelected(false);
+        mBinding.setSelected(false);
         this.mView = view;
     }
 
@@ -44,20 +47,26 @@ public class ItemImage extends LinearLayout {
     }
 
     public View getView() {
-        return itemImageBinding.getRoot();
+        return mBinding.getRoot();
     }
 
     private void setErrorIfExist() {
-        this.itemImageBinding.setHasError(this.cardShowTakenImage.hasError());
+        this.mBinding.setHasError(this.cardShowTakenImage.hasError());
+        if(this.cardShowTakenImage.hasError()){
+            this.mBinding.imageView.setColorFilter(getResources().getColor(R.color.red_blur), PorterDuff.Mode.ADD);
+        }
+
     }
 
     private void loadImage() {
-        setImageBitmapToImageView(itemImageBinding.imageView,
-                cardShowTakenImage, 8);
+
+        setImageBitmapToImageView(mBinding.imageView,
+                cardShowTakenImage, 1);
+
     }
 
     private void onClick() {
-        itemImageBinding.imageView.setOnClickListener(view -> {
+        mBinding.imageView.setOnClickListener(view -> {
             Intent intent = new Intent(mView, FullScreenImage.class);
             intent.putExtra(KEY_IMAGE_FULL_SCREEN, cardShowTakenImage);
             mView.startActivity(intent);
@@ -65,11 +74,21 @@ public class ItemImage extends LinearLayout {
     }
 
     public void changeImageToSelectedMode() {
-        itemImageBinding.setSelected(true);
+
+        Drawable drawable = getContext().getDrawable(R.drawable.selected_image);
+        drawable.setBounds(new Rect(
+                0,
+                0,
+                mBinding.imageView.getWidth(),
+                mBinding.imageView.getHeight()
+        ));
+
+        mBinding.imageView.getOverlay().add(drawable);
+
     }
 
     public void removeFromSelectedMode(){
-        itemImageBinding.setSelected(false);
+        mBinding.imageView.getOverlay().clear();
     }
 
 

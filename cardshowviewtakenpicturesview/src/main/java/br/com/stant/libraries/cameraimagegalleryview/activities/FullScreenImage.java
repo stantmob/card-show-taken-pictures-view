@@ -2,21 +2,27 @@ package br.com.stant.libraries.cameraimagegalleryview.activities;
 
 import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_FULL_SCREEN;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
+import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 
 import android.animation.ObjectAnimator;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 
+import java.io.IOException;
 import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
@@ -25,6 +31,8 @@ import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.FullScreenBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
+import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 
 public class FullScreenImage extends AppCompatActivity {
 
@@ -44,7 +52,6 @@ public class FullScreenImage extends AppCompatActivity {
 
         configureToolBar();
         mBinding.infoBox.setBackgroundColor(Color.parseColor(Theme.InfoBoxColor));
-        mBinding.captionEditTextLayout.setBoxBackgroundColor(Color.parseColor(Theme.InfoBoxColor));
 
         setValues();
     }
@@ -69,25 +76,32 @@ public class FullScreenImage extends AppCompatActivity {
             onBackPressed();
         });
 
-        if (image.hasError()) {
+        if(image.hasError()){
             mBinding.errorContainer.setVisibility(View.VISIBLE);
-            mBinding.errorsList.setText(
-                    image.getErrorsAsString()
-            );
-            mBinding.errorsList.setMovementMethod(new ScrollingMovementMethod());
+            mBinding.errorsList.setText(image.getErrorsAsString());
+            mBinding.setHasError(true);
+
+            if(image.getErrors().size() == 1) {
+                mBinding.errorsIcon.setVisibility(View.GONE);
+            } else {
+                mBinding.errorsList.setMovementMethod(new ScrollingMovementMethod());
+                mBinding.errorsList.setLines(2);
+                onClickIconErrors();
+            }
         }
-        onClickIconErrors();
+
+
 
     }
 
     private void onClickIconErrors() {
         mBinding.errorsIcon.setOnClickListener((view) -> {
             if (showErrorsMode) {
-                mBinding.errorsList.setLines(1);
-                animateIcon(0);
+                mBinding.errorsList.setLines(2);
+                animateIcon(0f);
             } else {
                 mBinding.errorsList.setMaxLines(50);
-                animateIcon(90f);
+                animateIcon(180f);
             }
             showErrorsMode = !showErrorsMode;
         });
@@ -111,7 +125,6 @@ public class FullScreenImage extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         mMenu = menu;
         try {
-            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_delete_white)).setTint(Color.parseColor(Theme.ColorIcons));
             Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Theme.ColorIcons));
             Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Theme.ColorIcons));
         } catch (Exception e) {

@@ -113,9 +113,10 @@ public class CardShowTakenImage implements Serializable {
 
     public String getErrorsAsString() {
         StringBuilder errorsBuild = new StringBuilder();
-        for (String error : errors) {
-            errorsBuild.append(error).append("\n");
+        for (int i = 0; i < errors.size()-1; i++) {
+            errorsBuild.append(errors.get(i)).append("\n\n");
         }
+        errorsBuild.append(errors.get(errors.size()-1));
         return errorsBuild.toString();
     }
 

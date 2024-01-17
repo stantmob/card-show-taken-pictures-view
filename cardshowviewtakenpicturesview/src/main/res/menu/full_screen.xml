@@ -9,7 +9,7 @@
             app:showAsAction="always" />
         <item
             android:id="@+id/delete"
-            android:icon="@drawable/ic_delete_white"
+            android:icon="@drawable/ic_trash_orange"
             android:title="@string/full_screen.app_bar_delete_icon"
             app:showAsAction="always" />
     </group>

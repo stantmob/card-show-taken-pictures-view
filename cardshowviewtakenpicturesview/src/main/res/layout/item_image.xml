@@ -31,7 +31,6 @@
             android:layout_height="match_parent"
             android:scaleType="fitXY"
             app:strokeColor="@color/dark_red"
-            android:padding="@{selected ? @dimen/gallery_select_padding : 0 }"
             app:strokeWidth="@{hasError ? 36 : 0}"
             tools:src="@tools:sample/backgrounds/scenic"/>
 

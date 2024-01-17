@@ -8,6 +8,10 @@
         <variable
             name="handler"
             type="br.com.stant.libraries.cameraimagegalleryview.activities.FullScreenImage" />
+        <variable
+            name="hasError"
+            type="boolean" />
+
     </data>
 
 
@@ -34,17 +38,21 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/full_image_view"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:scaleType="fitXY"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
                 tools:src="@tools:sample/backgrounds/scenic"
                 app:layout_constraintTop_toBottomOf="@+id/appBar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/info_box"
                 app:layout_constraintVertical_weight="5"
+                android:background="@{hasError ? @color/red_blur : @color/light_gray}"
+                app:strokeWidth="@{hasError ? 28 : 0}"
+                app:strokeColor="@color/dark_red"
                 />
 
             <LinearLayout
@@ -54,6 +62,7 @@
                 android:orientation="horizontal"
                 android:background="@color/dark_red"
                 android:visibility="gone"
+                android:padding="4dp"
                 app:layout_constraintTop_toBottomOf="@+id/appBar"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
@@ -66,14 +75,12 @@
                     android:layout_marginStart="5dp"
                     android:layout_marginTop="6dp"
                     android:background="@color/dark_red"
-                    android:lines="1"
                     android:layout_weight="8"
                     android:scrollbars="vertical"
                     android:textFontWeight="500"
                     android:gravity="top"
                     android:textColor="@color/white"
                     android:textSize="20sp"
-                    android:lineSpacingExtra="10dp"
                     tools:text="Errors" />
 
                 <ImageView
@@ -83,7 +90,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:layout_gravity="center_vertical|right|top"
-                    android:src="@drawable/ic_right"/>
+                    android:src="@drawable/ic_top_arrow"/>
             </LinearLayout>
 
 
@@ -101,24 +108,19 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_weight="1">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/caption_edit_text_layout"
+            <EditText
+                android:id="@+id/caption_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:boxStrokeWidthFocused="0dp"
-                app:boxStrokeWidth="0dp"
-                app:boxBackgroundColor="@color/white">
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_caption"
+                android:paddingVertical="20dp"
+                android:paddingHorizontal="5dp"
+                android:focusable="false"
+                android:textFontWeight="500"
+                android:textSize="18sp"
+                android:hint="Clique em Editar para adicionar a legenda"
+                tools:text="Caption" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/caption_edit_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:focusable="false"
-                    android:textFontWeight="500"
-                    android:textSize="20sp"
-                    tools:text="Caption" />
-            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

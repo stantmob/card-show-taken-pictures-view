@@ -40,5 +40,7 @@
     <string name="delete_alert_dialog.confirm">Sim</string>
     <string name="delete_alert_dialog.cancel">Cancelar</string>
     <string name="delete_alert_dialog.question">Você tem certeza que deseja excluir a imagem?</string>
+    <string name="card_show_taken_picture_view.selection_counter">%d Selectionada(s)</string>
+    <string name="card_show_taken_picture_view.confirm_image_deleted">%d imagens foram excluídas com sucesso!</string>
 
 </resources>

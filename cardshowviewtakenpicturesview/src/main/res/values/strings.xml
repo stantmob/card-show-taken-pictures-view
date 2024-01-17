@@ -39,5 +39,7 @@
     <string name="delete_alert_dialog.confirm">Yes</string>
     <string name="delete_alert_dialog.cancel">Cancel</string>
     <string name="delete_alert_dialog.question">Do you sure that want to delete image?</string>
+    <string name="card_show_taken_picture_view.selection_counter">%d Selected</string>
+    <string name="card_show_taken_picture_view.confirm_image_deleted">%d images have been deleted successfully!</string>
 
 </resources>

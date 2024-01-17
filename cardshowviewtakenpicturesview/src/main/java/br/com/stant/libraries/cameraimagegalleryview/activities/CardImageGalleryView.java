@@ -4,10 +4,7 @@ package br.com.stant.libraries.cameraimagegalleryview.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.View;
 
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +14,7 @@ import androidx.recyclerview.selection.StorageStrategy;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,12 +65,13 @@ public class CardImageGalleryView extends AppCompatActivity {
         mBinding.iconCamera.setOnClickListener((view) -> {
             mCamera.pickPictureToFinishAction();
         });
+
+        mBinding.delete.setOnClickListener(this::removeImages);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        invalidateOptionsMenu();
         this.selectedImages.clear();
     }
 
@@ -132,52 +131,23 @@ public class CardImageGalleryView extends AppCompatActivity {
         );
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (isSelectModeOn()) {
-            MenuInflater menuInflater = getMenuInflater();
-
-            menuInflater.inflate(R.menu.gallery_trash, menu);
-            configureMenu(menu);
-            return true;
-        }
-        return false;
-    }
-
-    public void reloadToolBar() {
-        invalidateOptionsMenu();
-    }
-
-    private void configureMenu(Menu menu) {
-        ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
-                .findViewById(R.id.count_images_trash)).setText("(" + this.mCardImageGalleryViewAdapter.getSelectedCount() + ")");
-
-        ((TextView) menu.findItem(R.id.gallery_trash_menu).getActionView()
-                .findViewById(R.id.count_images_trash)).setTextColor(Color.parseColor(Theme.TitleToolBarColor));
-
-        ((ImageView) menu.findItem(R.id.gallery_trash_menu).getActionView()
-                .findViewById(R.id.gallery_trash)).setColorFilter(Color.parseColor(Theme.ColorIcons));
-
-        menu.findItem(R.id.gallery_trash_menu).getActionView().setOnClickListener((view) -> {
-            removeImages();
-        });
-    }
-
-
-
     public boolean isSelectModeOn() {
         return mCardImageGalleryViewAdapter.getSelectedCount() > 0;
     }
 
-    private void removeImages() {
+    public void changeSelectionMode() {
+        String textCounter = getApplicationContext().getResources().getString(R.string.card_show_taken_picture_view_selection_counter);
+        mBinding.selectedImagesCounter.setText(String.format(textCounter, mCardImageGalleryViewAdapter.getSelectedCount()));
+        mBinding.setIsSelectionMode(isSelectModeOn());
+    }
+
+    private void removeImages(View view) {
         DeleteAlertDialog deleteAlertDialog = new DeleteAlertDialog(this, new DeleteAlertDialog.OnDelete() {
             @Override
             public void delete() {
                 List<CardShowTakenImage> itemsToRemove = mCardImageGalleryViewAdapter.getSelectedItems();
                 mCardShowTakenImages.removeList(itemsToRemove);
-                mCardImageGalleryViewAdapter.clearSelections();
-                invalidateOptionsMenu();
-                onAttachedToWindow();
+                deleteFinished();
             }
 
             @Override
@@ -186,6 +156,19 @@ public class CardImageGalleryView extends AppCompatActivity {
         });
 
         deleteAlertDialog.onCreateDialog(null).show();
+    }
+
+    private void deleteFinished() {
+
+        String textCounter = getApplicationContext().getResources().getString(R.string.card_show_taken_picture_view_confirm_image_deleted);
+        textCounter = String.format(textCounter, mCardImageGalleryViewAdapter.getSelectedCount());
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this, R.style.AlertDialogTheme);
+        builder
+                .setTitle(textCounter)
+                .setPositiveButton(R.string.permission_information_dialog_ok_hint, (dialogInterface, i) -> {
+                    onAttachedToWindow();
+                    mCardImageGalleryViewAdapter.clearSelections();
+            }).show();
     }
 }
 

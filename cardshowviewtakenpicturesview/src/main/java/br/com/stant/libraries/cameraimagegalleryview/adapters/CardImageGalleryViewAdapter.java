@@ -95,8 +95,7 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
             } else {
                 itemImage.removeFromSelectedMode();
             }
-            mView.reloadToolBar();
-
+            mView.changeSelectionMode();
         }
     }
 }

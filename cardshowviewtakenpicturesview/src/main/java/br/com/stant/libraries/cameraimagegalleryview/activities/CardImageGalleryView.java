@@ -168,7 +168,8 @@ public class CardImageGalleryView extends AppCompatActivity {
                 .setPositiveButton(R.string.permission_information_dialog_ok_hint, (dialogInterface, i) -> {
                     onAttachedToWindow();
                     mCardImageGalleryViewAdapter.clearSelections();
-            }).show();
+                    mBinding.setIsSelectionMode(isSelectModeOn());
+                }).show();
     }
 }
 

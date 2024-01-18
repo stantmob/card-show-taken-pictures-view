@@ -152,7 +152,10 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     private void loadImagesComponent() {
         int count = mBinding.cardImageGalleryComponentContainerLinearLayout.getChildCount();
-        for(int i = count - 1; i < mCardShowTakenImages.getAll().size() && i < 4; i++){
+        if(count > 1){
+            mBinding.cardImageGalleryComponentContainerLinearLayout.removeViews(1, count-1);
+        }
+        for(int i = 0; i < mCardShowTakenImages.getAll().size() && i < 4; i++){
             new CardImageGalleryAvatar(mContext,
                     mBinding.cardImageGalleryComponentContainerLinearLayout,
                     mCardShowTakenImages.getAll().get(i));

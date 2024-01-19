@@ -39,7 +39,11 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
     @Override
     public void onBindViewHolder(@NonNull ItemImageViewHolder holder, int position) {
         CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.get(position);
-        holder.setItemImage(cardShowTakenImage, position);
+        if(holder.isLoaded){
+            holder.selectImage(cardShowTakenImage);
+        } else {
+            holder.setItemImage(cardShowTakenImage, position);
+        }
     }
 
     @Override
@@ -73,11 +77,13 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
 
     public class ItemImageViewHolder extends RecyclerView.ViewHolder {
         ItemImage itemImage;
+        boolean isLoaded;
         CardImageGalleryItemDetails details;
 
         public ItemImageViewHolder(@NonNull View itemView, ItemImage itemImage) {
             super(itemView);
             this.itemImage = itemImage;
+            isLoaded = false;
             details = new CardImageGalleryItemDetails();
         }
 
@@ -86,10 +92,13 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
         }
 
         public void setItemImage(CardShowTakenImage cardShowTakenImage, int position){
+            isLoaded = true;
             details.setImage(cardShowTakenImage);
             details.setAdapterPosition(position);
             itemImage.setImage(cardShowTakenImage);
+        }
 
+        public void selectImage(CardShowTakenImage cardShowTakenImage){
             if(selectionTracker.isSelected((long)cardShowTakenImage.hashCode())){
                 itemImage.changeImageToSelectedMode();
             } else {

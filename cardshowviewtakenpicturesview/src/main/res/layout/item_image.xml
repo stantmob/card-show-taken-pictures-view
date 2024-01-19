@@ -6,18 +6,6 @@
     tools:context="br.com.stant.libraries.cameraimagegalleryview.components.ItemImage"
     android:layout_margin="4dp">
 
-    <data>
-        <import type="android.view.View"/>
-
-        <variable
-            name="hasError"
-            type="Boolean" />
-
-        <variable
-            name="selected"
-            type="boolean" />
-    </data>
-
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="@dimen/image_size"
@@ -30,8 +18,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"
-            app:strokeColor="@color/dark_red"
-            app:strokeWidth="@{hasError ? 36 : 0}"
             tools:src="@tools:sample/backgrounds/scenic"/>
 
     </androidx.cardview.widget.CardView>

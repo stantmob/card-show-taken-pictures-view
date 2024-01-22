@@ -39,6 +39,7 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
     @Override
     public void onBindViewHolder(@NonNull ItemImageViewHolder holder, int position) {
         CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.get(position);
+        holder.setIsRecyclable(false);
         if(holder.isLoaded){
             holder.selectImage(cardShowTakenImage);
         } else {

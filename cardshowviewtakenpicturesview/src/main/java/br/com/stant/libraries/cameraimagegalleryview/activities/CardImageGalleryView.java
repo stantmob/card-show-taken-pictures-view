@@ -1,6 +1,7 @@
 package br.com.stant.libraries.cameraimagegalleryview.activities;
 
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -41,7 +42,6 @@ public class CardImageGalleryView extends AppCompatActivity {
     private CardShowTakenImageInjection mCardShowTakenImages;
     private Integer mImageQuantityLimit;
     private Camera mCamera;
-    private List<CardShowTakenImage> selectedImages = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,6 @@ public class CardImageGalleryView extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        this.selectedImages.clear();
     }
 
     private void configureToolbar() {
@@ -135,12 +134,6 @@ public class CardImageGalleryView extends AppCompatActivity {
         return mCardImageGalleryViewAdapter.getSelectedCount() > 0;
     }
 
-    public void changeSelectionMode() {
-        String textCounter = getApplicationContext().getResources().getString(R.string.card_show_taken_picture_view_selection_counter);
-        mBinding.selectedImagesCounter.setText(String.format(textCounter, mCardImageGalleryViewAdapter.getSelectedCount()));
-        mBinding.setIsSelectionMode(isSelectModeOn());
-    }
-
     private void removeImages(View view) {
         DeleteAlertDialog deleteAlertDialog = new DeleteAlertDialog(this, new DeleteAlertDialog.OnDelete() {
             @Override
@@ -152,6 +145,7 @@ public class CardImageGalleryView extends AppCompatActivity {
 
             @Override
             public void cancel() {
+                hideDeleteMode();
             }
         });
 
@@ -166,10 +160,20 @@ public class CardImageGalleryView extends AppCompatActivity {
         builder
                 .setTitle(textCounter)
                 .setPositiveButton(R.string.permission_information_dialog_ok_hint, (dialogInterface, i) -> {
-                    onAttachedToWindow();
-                    mCardImageGalleryViewAdapter.clearSelections();
-                    mBinding.setIsSelectionMode(isSelectModeOn());
+                    hideDeleteMode();
                 }).show();
+    }
+
+    public void showDeleteMode() {
+        String textCounter = getApplicationContext().getResources().getString(R.string.card_show_taken_picture_view_selection_counter);
+        mBinding.selectedImagesCounter.setText(String.format(textCounter, mCardImageGalleryViewAdapter.getSelectedCount()));
+        mBinding.setIsSelectionMode(isSelectModeOn());
+    }
+
+    private void hideDeleteMode(){
+        mCardImageGalleryViewAdapter.clearSelections();
+        mBinding.setIsSelectionMode(isSelectModeOn());
+        onAttachedToWindow();
     }
 }
 

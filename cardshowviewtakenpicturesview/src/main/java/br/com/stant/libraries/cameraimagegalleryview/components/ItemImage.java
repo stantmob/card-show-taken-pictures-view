@@ -24,16 +24,18 @@ public class ItemImage extends LinearLayout {
 
     private final ItemImageBinding mBinding;
     private CardShowTakenImage cardShowTakenImage;
-    private CardImageGalleryView mView;
+    private Context mContext;
     private Drawable mSelectedDrawableLayer;
     private Drawable mErrorDrawableLayer;
 
-    public ItemImage(Context context, ViewGroup parent, CardImageGalleryView view) {
+    public ItemImage(Context context, ViewGroup parent) {
         super(context);
         mBinding = DataBindingUtil.inflate(LayoutInflater.
                 from(super.getContext()), R.layout.item_image, parent, false);
 
-        this.mView = view;
+        this.mContext = context;
+        this.loadDrawables();
+
     }
 
     public CardShowTakenImage getImage() {
@@ -43,7 +45,6 @@ public class ItemImage extends LinearLayout {
     public void setImage(CardShowTakenImage cardShowTakenImage) {
         this.cardShowTakenImage = cardShowTakenImage;
         this.loadImage();
-        this.loadDrawables();
         this.setErrorIfExist();
         this.onClick();
     }
@@ -65,9 +66,9 @@ public class ItemImage extends LinearLayout {
 
     private void onClick() {
         mBinding.imageView.setOnClickListener(view -> {
-            Intent intent = new Intent(mView, FullScreenImage.class);
+            Intent intent = new Intent(mContext, FullScreenImage.class);
             intent.putExtra(KEY_IMAGE_FULL_SCREEN, cardShowTakenImage);
-            mView.startActivity(intent);
+            mContext.startActivity(intent);
         });
     }
 

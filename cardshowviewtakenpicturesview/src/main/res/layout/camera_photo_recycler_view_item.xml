@@ -26,12 +26,24 @@
             android:layout_height="0dp"
             android:layout_margin="8dp"
             android:background="@drawable/border_circle_blue"
-            android:src="@drawable/stant_city"
+            android:src="@drawable/stant_city_image_not_found"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/ic_cam" />
+
+        <ImageView
+            android:id="@+id/camera_photo_view_item_photo_image_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/image_size"
+            android:layout_margin="8dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/stant_city_image_not_found"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/ic_cam"
+            android:visibility="gone"/>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/camera_photo_view_item_close_icon_container"

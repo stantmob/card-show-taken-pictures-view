@@ -191,6 +191,7 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     new BitmapFromFileCallback() {
                         @Override
                         public void onBitmapDecoded(Bitmap bitmap) {
+                            mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoImageView.setImageBitmap(bitmap);
                             mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setImageBitmap(bitmap);
                         }
 
@@ -211,6 +212,27 @@ public class CameraPhotosAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         }
                     })
             );
+            setSize();
+        }
+
+        public void setSize() {
+            ViewGroup.LayoutParams layoutParams = mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.getLayoutParams();
+
+            if(mCameraFragment.ismIsContentImageOpen()){
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoImageView.setVisibility(View.VISIBLE);
+                mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setVisibility(View.GONE);
+            } else {
+                Integer size = mCameraFragment.convertDpToPixels(66);
+                layoutParams.height = size;
+                layoutParams.width = size;
+                mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoImageView.setVisibility(View.GONE);
+                mCameraPhotosRecyclerViewBinding.cameraPhotoViewItemPhotoCircularImageView.setVisibility(View.VISIBLE);
+            }
+
+            mCameraPhotosRecyclerViewBinding.cameraShowPhotoConstraintLayout.setLayoutParams(layoutParams);
+
         }
 
         @Override

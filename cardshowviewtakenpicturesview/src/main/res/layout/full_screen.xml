@@ -111,10 +111,9 @@
             <EditText
                 android:id="@+id/caption_edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="66dp"
                 android:background="@drawable/shape_caption"
-                android:paddingVertical="20dp"
-                android:paddingHorizontal="5dp"
+                android:padding="5dp"
                 android:focusable="false"
                 android:textFontWeight="500"
                 android:textSize="18sp"

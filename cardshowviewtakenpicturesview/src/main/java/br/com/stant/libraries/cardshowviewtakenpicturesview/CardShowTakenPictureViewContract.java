@@ -53,10 +53,10 @@ public interface CardShowTakenPictureViewContract {
 
     void addCardImages(List<CardShowTakenImage> cardShowTakenImages);
 
-    List<CardShowTakenImage> getCardImages();
-
+    List<CardShowTakenImage> getCardAllImages();
     List<CardShowTakenImage> getCardImagesAsAdded();
 
+    List<CardShowTakenImage> getCardImagesAsUpdated();
     List<CardShowTakenImage> getCardImagesAsRemoved();
 
     interface OnSavedCardListener {

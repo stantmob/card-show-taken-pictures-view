@@ -2,6 +2,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model;
 
 import android.graphics.Bitmap;
 import java.util.Date;
+import java.util.Objects;
 
 public class CardShowTakenImage {
 
@@ -85,5 +86,25 @@ public class CardShowTakenImage {
         this.caption = caption;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CardShowTakenImage)) return false;
+        CardShowTakenImage that = (CardShowTakenImage) o;
+        if (identifier != null) {
+            return Objects.equals(identifier, that.identifier);
+        }
+        if (localImageFilename != null) {
+            return Objects.equals(localImageFilename, that.localImageFilename);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, localImageFilename);
+    }
 
 }

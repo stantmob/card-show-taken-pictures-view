@@ -2,6 +2,7 @@ package br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model;
 
 import android.graphics.Bitmap;
 import java.util.Date;
+import java.util.Objects;
 
 public class CardShowTakenImage {
 
@@ -13,6 +14,7 @@ public class CardShowTakenImage {
     private Date createdAt;
     private Date updatedAt;
     private String caption;
+    private int order;
 
     public CardShowTakenImage(Bitmap bitmapImageFromIntentPath, String localImageFilename,
                               String tempImagePathToShow, Date createdAt, Date updatedAt, String caption) {
@@ -25,10 +27,11 @@ public class CardShowTakenImage {
     }
 
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
-                              Date createdAt, Date updatedAt, String caption) {
+                              int order, Date createdAt, Date updatedAt, String caption) {
         this.identifier         = identifier;
         this.remoteImageUrl     = remoteImageUrl;
         this.localImageFilename = localImageFilename;
+        this.order              = order;
         this.createdAt          = createdAt;
         this.updatedAt          = updatedAt;
         this.caption            = caption;
@@ -61,6 +64,8 @@ public class CardShowTakenImage {
         return updatedAt;
     }
 
+    public int getOrder() { return order; }
+
     public boolean hasOnlyRemoteUrl() {
         return !hasLocalImage() && !hasTempPathToShow() && remoteImageUrl != null && !remoteImageUrl.isEmpty();
     }
@@ -85,5 +90,25 @@ public class CardShowTakenImage {
         this.caption = caption;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CardShowTakenImage)) return false;
+        CardShowTakenImage that = (CardShowTakenImage) o;
+        if (identifier != null) {
+            return Objects.equals(identifier, that.identifier);
+        }
+        if (localImageFilename != null) {
+            return Objects.equals(localImageFilename, that.localImageFilename);
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, localImageFilename);
+    }
 
 }

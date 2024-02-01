@@ -26,18 +26,20 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
         implements DragAndDropHandler {
 
     private CardShowTakenPictureView mView;
-    private List<CardShowTakenImage> mCurrentCardShowTakenImageList;
-    private List<CardShowTakenImage> mOriginalTempCardShowTakenImageList;
+    private List<CardShowTakenImage> mAllCardShowTakenImageList;
+    private List<CardShowTakenImage> mOriginalCardShowTakenImageList;
     private List<CardShowTakenImage> mCardShowTakenImageListAsAdded;
     private List<CardShowTakenImage> mCardShowTakenImageListAsRemoved;
+    private List<CardShowTakenImage> mCardShowTakenImageListAsUpdated;
     private ItemTouchHelper mItemTouchHelper;
 
     public CardShowTakenPictureViewImagesAdapter(CardShowTakenPictureView view) {
         mView                               = view;
-        mCurrentCardShowTakenImageList      = new ArrayList<>(0);
-        mOriginalTempCardShowTakenImageList = new ArrayList<>(0);
+        mAllCardShowTakenImageList = new ArrayList<>(0);
+        mOriginalCardShowTakenImageList = new ArrayList<>(0);
         mCardShowTakenImageListAsAdded      = new ArrayList<>(0);
         mCardShowTakenImageListAsRemoved    = new ArrayList<>(0);
+        mCardShowTakenImageListAsUpdated    = new ArrayList<>(0);
     }
 
     @NonNull
@@ -54,7 +56,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder itemViewHolder, int position) {
-        CardShowTakenImage cardShowTakenImage = mCurrentCardShowTakenImageList.get(position);
+        CardShowTakenImage cardShowTakenImage = mAllCardShowTakenImageList.get(position);
 
         itemViewHolder.mServiceInspectionsFormFilledRecycleItemBinding.setHandler(this);
 
@@ -75,13 +77,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void replaceData(List<CardShowTakenImage> imageUrlsList) {
-        mCurrentCardShowTakenImageList = imageUrlsList;
+        mAllCardShowTakenImageList = imageUrlsList;
+        mOriginalCardShowTakenImageList = (List) ((ArrayList) mAllCardShowTakenImageList).clone();
         mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
         notifyDataSetChanged();
     }
 
-    public List<CardShowTakenImage> getCurrentImages() {
-        return mCurrentCardShowTakenImageList;
+    public List<CardShowTakenImage> getAllImages() {
+        return mAllCardShowTakenImageList;
     }
 
     public void saveEditData() {
@@ -89,11 +92,14 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void cancelEditData() {
-        replaceData(mOriginalTempCardShowTakenImageList);
+        replaceData(mOriginalCardShowTakenImageList);
     }
 
     public List<CardShowTakenImage> getImagesAsAdded() {
         return mCardShowTakenImageListAsAdded;
+    }
+    public List<CardShowTakenImage> getImagesAsUpdated() {
+        return mCardShowTakenImageListAsUpdated;
     }
 
     public List<CardShowTakenImage> getImagesAsRemoved() {
@@ -101,20 +107,21 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     void saveOriginalList() {
-        mOriginalTempCardShowTakenImageList = (List) ((ArrayList) mCurrentCardShowTakenImageList).clone();
         mCardShowTakenImageListAsAdded      = new ArrayList<>();
+        mCardShowTakenImageListAsUpdated    = new ArrayList<>();
         mCardShowTakenImageListAsRemoved    = new ArrayList<>();
     }
 
     public void removeImage(View view, CardShowTakenImage cardShowTakenImage) {
-        int position = mCurrentCardShowTakenImageList.indexOf(cardShowTakenImage);
+        int position = mAllCardShowTakenImageList.indexOf(cardShowTakenImage);
 
-        mCurrentCardShowTakenImageList.remove(cardShowTakenImage);
-        mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
-
-        if (cardShowTakenImage != null) {
-            mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+        if(mOriginalCardShowTakenImageList.contains(cardShowTakenImage)){
+            mCardShowTakenImageListAsRemoved.add(cardShowTakenImage);
         }
+        mAllCardShowTakenImageList.remove(cardShowTakenImage);
+        mCardShowTakenImageListAsAdded.remove(cardShowTakenImage);
+        mCardShowTakenImageListAsUpdated.remove(cardShowTakenImage);
+
 
         notifyItemRemoved(position);
 
@@ -122,11 +129,11 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
     }
 
     public void addPicture(CardShowTakenImage cardShowTakenImage) {
-        mCurrentCardShowTakenImageList.add(cardShowTakenImage);
+        mAllCardShowTakenImageList.add(cardShowTakenImage);
         mCardShowTakenImageListAsAdded.add(cardShowTakenImage);
 
         mView.updateCurrentAndLimitImagesQuantityText(getItemCount());
-        notifyItemInserted(mCurrentCardShowTakenImageList.size());
+        notifyItemInserted(mAllCardShowTakenImageList.size());
     }
 
     public void addPictures(List<CardShowTakenImage> cardShowTakenImages) {
@@ -140,7 +147,7 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     @Override
     public int getItemCount() {
-        return mCurrentCardShowTakenImageList.size();
+        return mAllCardShowTakenImageList.size();
     }
 
     public void setTouchHelper(ItemTouchHelper itemTouchHelper) {
@@ -149,10 +156,10 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
 
     @Override
     public void onViewMoved(int oldPosition, int newPosition) {
-        CardShowTakenImage targetCardShowTakenImage = mCurrentCardShowTakenImageList.get(oldPosition);
+        CardShowTakenImage targetCardShowTakenImage = mAllCardShowTakenImageList.get(oldPosition);
 
-        mCurrentCardShowTakenImageList.remove(oldPosition);
-        mCurrentCardShowTakenImageList.add(newPosition, targetCardShowTakenImage);
+        mAllCardShowTakenImageList.remove(oldPosition);
+        mAllCardShowTakenImageList.add(newPosition, targetCardShowTakenImage);
 
         notifyItemMoved(oldPosition, newPosition);
     }
@@ -178,7 +185,13 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                             v -> mView.showPreviewPicDialog(cardShowTakenImage, getAdapterPosition(), new OnCaptionSavedCallback() {
                                 @Override
                                 public void onCaptionSaved(@NonNull String caption, int photoPosition) {
-                                    mCurrentCardShowTakenImageList.get(photoPosition).setCaption(caption);
+                                    mAllCardShowTakenImageList.get(photoPosition).setCaption(caption);
+                                    if(mCardShowTakenImageListAsAdded.contains(mAllCardShowTakenImageList.get(photoPosition))){
+                                        int index = mCardShowTakenImageListAsAdded.indexOf(mAllCardShowTakenImageList.get(photoPosition));
+                                        mCardShowTakenImageListAsAdded.get(index).setCaption(caption);
+                                    } else {
+                                        mCardShowTakenImageListAsUpdated.add(mAllCardShowTakenImageList.get(photoPosition));
+                                    }
                                 }
                             })
                     );

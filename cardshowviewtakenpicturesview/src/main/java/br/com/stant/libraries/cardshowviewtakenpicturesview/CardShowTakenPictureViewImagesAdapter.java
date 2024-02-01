@@ -186,7 +186,12 @@ public class CardShowTakenPictureViewImagesAdapter extends RecyclerView.Adapter<
                                 @Override
                                 public void onCaptionSaved(@NonNull String caption, int photoPosition) {
                                     mAllCardShowTakenImageList.get(photoPosition).setCaption(caption);
-                                    mCardShowTakenImageListAsUpdated.add(mAllCardShowTakenImageList.get(photoPosition));
+                                    if(mCardShowTakenImageListAsAdded.contains(mAllCardShowTakenImageList.get(photoPosition))){
+                                        int index = mCardShowTakenImageListAsAdded.indexOf(mAllCardShowTakenImageList.get(photoPosition));
+                                        mCardShowTakenImageListAsAdded.get(index).setCaption(caption);
+                                    } else {
+                                        mCardShowTakenImageListAsUpdated.add(mAllCardShowTakenImageList.get(photoPosition));
+                                    }
                                 }
                             })
                     );

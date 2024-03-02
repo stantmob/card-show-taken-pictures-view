@@ -12,7 +12,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -23,8 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.BindingAdapter;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 import java.text.SimpleDateFormat;
@@ -37,7 +34,7 @@ import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGallery
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.components.CardImageGalleryAvatar;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
-import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
+import br.com.stant.libraries.cameraimagegalleryview.model.Proprieties;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.CardImageGalleryComponentViewBinding;
@@ -163,8 +160,13 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     }
 
     @Override
-    public List<CardShowTakenImage> getCardImages() {
+    public List<CardShowTakenImage> getCardAllImages() {
         return mCardShowTakenImages.getAll();
+    }
+
+    @Override
+    public List<CardShowTakenImage> getCardImagesAsRemoved() {
+        return mCardShowTakenImages.getAllRemoved();
     }
 
     @Override
@@ -173,8 +175,8 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     }
 
     @Override
-    public List<CardShowTakenImage> getCardImagesAsRemoved() {
-        return mCardShowTakenImages.getAllRemoved();
+    public List<CardShowTakenImage> getCardImagesAsUpdated() {
+        return mCardShowTakenImages.getAllUpdated();
     }
 
     public void showStrokeError() {
@@ -237,66 +239,70 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     }
 
     public String getToolBarColor() {
-        return Theme.ToolBarColor;
+        return Proprieties.ToolBarColor;
     }
 
     public void setToolBarColor(String toolBarColor) {
-        Theme.ToolBarColor = toolBarColor;
+        Proprieties.ToolBarColor = toolBarColor;
     }
 
     public String getTitleToolBarColor() {
-        return Theme.TitleToolBarColor;
+        return Proprieties.TitleToolBarColor;
     }
 
     public void setTitleToolBarColor(String titleToolBarColor) {
-        Theme.TitleToolBarColor = titleToolBarColor;
+        Proprieties.TitleToolBarColor = titleToolBarColor;
     }
 
     public String getStatusBarColor() {
-        return Theme.StatusBarColor;
+        return Proprieties.StatusBarColor;
     }
 
     public void setStatusBarColor(String statusBarColor) {
-        Theme.StatusBarColor = statusBarColor;
+        Proprieties.StatusBarColor = statusBarColor;
     }
 
     public String getColorIcons() {
-        return Theme.ColorIcons;
+        return Proprieties.ColorIcons;
     }
 
     public void setColorIcons(String colorIcons) {
-        Theme.ColorIcons = colorIcons;
+        Proprieties.ColorIcons = colorIcons;
     }
 
     public Drawable getBackIcon() {
-        return Theme.BackIcon;
+        return Proprieties.BackIcon;
     }
 
     public void setBackIcon(Drawable backIcon) {
-        Theme.BackIcon = backIcon;
+        Proprieties.BackIcon = backIcon;
     }
 
     public String getActivityBackgroundColor() {
-        return Theme.ActivityBackground;
+        return Proprieties.ActivityBackground;
     }
 
     public void setActivityBackgroundColor(String activityBackground) {
-        Theme.ActivityBackground = activityBackground;
+        Proprieties.ActivityBackground = activityBackground;
     }
     public String getBottomBarColor() {
-        return Theme.BottomBarColor;
+        return Proprieties.BottomBarColor;
     }
 
     public void setBottomBarColor(String bottomBarColor) {
-        Theme.BottomBarColor = bottomBarColor;
+        Proprieties.BottomBarColor = bottomBarColor;
     }
 
     public String getInfoBoxColor() {
-        return Theme.InfoBoxColor;
+        return Proprieties.InfoBoxColor;
     }
 
     public void setInfoBoxColor(String infoBoxColor) {
-        Theme.InfoBoxColor = infoBoxColor;
+        Proprieties.InfoBoxColor = infoBoxColor;
+    }
+
+    public void setReadyModeOn(boolean on){
+        Proprieties.readyModeOn = on;
     }
 
     // End Component

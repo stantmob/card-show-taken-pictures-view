@@ -14,6 +14,7 @@ import br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGallery
 import br.com.stant.libraries.cameraimagegalleryview.adapters.selectiontracker.CardImageGalleryItemDetails;
 import br.com.stant.libraries.cameraimagegalleryview.components.ItemImage;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
+import br.com.stant.libraries.cameraimagegalleryview.model.Proprieties;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
 
 public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageGalleryViewAdapter.ItemImageViewHolder> {
@@ -92,13 +93,18 @@ public class CardImageGalleryViewAdapter extends RecyclerView.Adapter<CardImageG
             details.setImage(cardShowTakenImage);
             details.setAdapterPosition(position);
             itemImage.setImage(cardShowTakenImage);
-            if (mSelectionTracker.isSelected((long) cardShowTakenImage.hashCode()) && mView.isSelectModeOn()) {
-                itemImage.changeImageToSelectedMode();
+            if(!Proprieties.readyModeOn){
+                if (mSelectionTracker.isSelected((long) cardShowTakenImage.hashCode()) && mView.isSelectModeOn()) {
+                    itemImage.changeImageToSelectedMode();
+                } else {
+                    itemImage.removeFromSelectedMode();
+                }
+
+                mView.showDeleteMode();
             } else {
-                itemImage.removeFromSelectedMode();
+                mSelectionTracker.deselect((long) cardShowTakenImage.hashCode());
             }
 
-            mView.showDeleteMode();
         }
     }
 

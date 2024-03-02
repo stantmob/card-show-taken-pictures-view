@@ -15,7 +15,6 @@ import java.util.ArrayList;
 
 import br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
-import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureViewContract;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CameraPhoto;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;

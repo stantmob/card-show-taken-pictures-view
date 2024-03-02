@@ -16,11 +16,13 @@ public class CardShowTakenImageInjection {
     private List<CardShowTakenImage> images;
     private List<CardShowTakenImage> removed;
     private List<CardShowTakenImage> added;
+    private List<CardShowTakenImage> updated;
 
     private CardShowTakenImageInjection() {
         images = new ArrayList<>();
         removed = new ArrayList<>();
         added = new ArrayList<>();
+        updated = new ArrayList<>();
         listeners = new ArrayList<>();
     }
 
@@ -74,6 +76,17 @@ public class CardShowTakenImageInjection {
         removed.add(image);
         images.remove(image);
         added.remove(image);
+        updated.remove(image);
+        notifyListeners();
+    }
+
+    public void updateImage(CardShowTakenImage image) {
+        if(!added.contains(image)){
+            updated.add(image);
+        } else {
+            int index = added.indexOf(image);
+            added.set(index, image);
+        }
         notifyListeners();
     }
 
@@ -81,17 +94,6 @@ public class CardShowTakenImageInjection {
         images.removeAll(cardShowTakenImages);
         removed.addAll(cardShowTakenImages);
         added.removeAll(cardShowTakenImages);
-        notifyListeners();
-    }
-
-    public void updateImage(CardShowTakenImage image) {
-        for (CardShowTakenImage cardShowTakenImage : images) {
-            if (cardShowTakenImage.equals(image)) {
-                cardShowTakenImage.setCaption(image.getCaption());
-                break;
-            }
-        }
-        added.add(image);
         notifyListeners();
     }
 
@@ -111,6 +113,10 @@ public class CardShowTakenImageInjection {
     }
     public List<CardShowTakenImage> getAllAdded() {
         return added;
+    }
+
+    public List<CardShowTakenImage> getAllUpdated() {
+        return updated;
     }
 
     public void addListener(ImageCallback imageCallback) {

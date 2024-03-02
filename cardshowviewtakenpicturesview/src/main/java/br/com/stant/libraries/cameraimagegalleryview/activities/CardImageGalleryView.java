@@ -1,7 +1,6 @@
 package br.com.stant.libraries.cameraimagegalleryview.activities;
 
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,7 +25,7 @@ import br.com.stant.libraries.cameraimagegalleryview.adapters.selectiontracker.C
 import br.com.stant.libraries.cameraimagegalleryview.components.Camera;
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
-import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
+import br.com.stant.libraries.cameraimagegalleryview.model.Proprieties;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.camera.CameraActivity;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.ActivityCardImageGalleryViewBinding;
@@ -50,8 +49,8 @@ public class CardImageGalleryView extends AppCompatActivity {
 
         configureToolbar();
         configureAdapter();
-        mBinding.galleryActivity.setBackgroundColor(Color.parseColor(Theme.ActivityBackground));
-        mBinding.bottomBar.setBackgroundColor(Color.parseColor(Theme.BottomBarColor));
+        mBinding.galleryActivity.setBackgroundColor(Color.parseColor(Proprieties.ActivityBackground));
+        mBinding.bottomBar.setBackgroundColor(Color.parseColor(Proprieties.BottomBarColor));
 
         mImageQuantityLimit = getIntent().getIntExtra(Camera.KEY_LIMIT_IMAGES, 0);
         showQuantityOfImages();
@@ -65,6 +64,7 @@ public class CardImageGalleryView extends AppCompatActivity {
         mBinding.iconCamera.setOnClickListener((view) -> {
             mCamera.pickPictureToFinishAction();
         });
+
 
         mBinding.delete.setOnClickListener(this::removeImages);
     }
@@ -80,10 +80,10 @@ public class CardImageGalleryView extends AppCompatActivity {
         String appBarName = getIntent().getStringExtra(CardImageGalleryComponentView.KEY_APP_BAR_NAME);
         getSupportActionBar().setTitle(appBarName);
 
-        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Theme.ToolBarColor));
-        getWindow().setStatusBarColor(Color.parseColor(Theme.StatusBarColor));
-        getSupportActionBar().setHomeAsUpIndicator(Theme.BackIcon);
-        mBinding.topAppBar.setTitleTextColor(Color.parseColor(Theme.TitleToolBarColor));
+        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Proprieties.ToolBarColor));
+        getWindow().setStatusBarColor(Color.parseColor(Proprieties.StatusBarColor));
+        getSupportActionBar().setHomeAsUpIndicator(Proprieties.BackIcon);
+        mBinding.topAppBar.setTitleTextColor(Color.parseColor(Proprieties.TitleToolBarColor));
     }
 
     private void configureAdapter() {

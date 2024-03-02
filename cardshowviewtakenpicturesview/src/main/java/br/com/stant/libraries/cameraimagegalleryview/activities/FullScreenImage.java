@@ -2,37 +2,29 @@ package br.com.stant.libraries.cameraimagegalleryview.activities;
 
 import static br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryViewContract.KEY_IMAGE_FULL_SCREEN;
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder.setImageBitmapToImageView;
-import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.getPrivateTempDirectory;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.databinding.DataBindingUtil;
 
 import android.animation.ObjectAnimator;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 
-import java.io.IOException;
 import java.util.Objects;
 
 import br.com.stant.libraries.cameraimagegalleryview.components.DeleteAlertDialog;
 import br.com.stant.libraries.cameraimagegalleryview.injections.CardShowTakenImageInjection;
-import br.com.stant.libraries.cameraimagegalleryview.model.Theme;
+import br.com.stant.libraries.cameraimagegalleryview.model.Proprieties;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.databinding.FullScreenBinding;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.CardShowTakenImage;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.BitmapFromFileCallback;
-import br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageDecoder;
 
 public class FullScreenImage extends AppCompatActivity {
 
@@ -51,7 +43,7 @@ public class FullScreenImage extends AppCompatActivity {
         mCardShowTakenImage = CardShowTakenImageInjection.getCardShowTakenPictureInjection();
 
         configureToolBar();
-        mBinding.infoBox.setBackgroundColor(Color.parseColor(Theme.InfoBoxColor));
+        mBinding.infoBox.setBackgroundColor(Color.parseColor(Proprieties.InfoBoxColor));
 
         setValues();
     }
@@ -59,9 +51,9 @@ public class FullScreenImage extends AppCompatActivity {
     private void configureToolBar() {
         setSupportActionBar(mBinding.topAppBar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Theme.ToolBarColor));
-        getWindow().setStatusBarColor(Color.parseColor(Theme.StatusBarColor));
-        getSupportActionBar().setHomeAsUpIndicator(Theme.BackIcon);
+        mBinding.topAppBar.setBackgroundColor(Color.parseColor(Proprieties.ToolBarColor));
+        getWindow().setStatusBarColor(Color.parseColor(Proprieties.StatusBarColor));
+        getSupportActionBar().setHomeAsUpIndicator(Proprieties.BackIcon);
     }
 
     private void setValues() {
@@ -122,11 +114,12 @@ public class FullScreenImage extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if(Proprieties.readyModeOn) return false;
         MenuInflater inflater = getMenuInflater();
         mMenu = menu;
         try {
-            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Theme.ColorIcons));
-            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Theme.ColorIcons));
+            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Proprieties.ColorIcons));
+            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Proprieties.ColorIcons));
         } catch (Exception e) {
             return false;
         }

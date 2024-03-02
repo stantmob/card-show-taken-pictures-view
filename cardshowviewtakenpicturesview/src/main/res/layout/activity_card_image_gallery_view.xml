@@ -9,6 +9,9 @@
         <variable
             name="isSelectionMode"
             type="Boolean" />
+        <variable
+            name="proprieties"
+            type="br.com.stant.libraries.cameraimagegalleryview.model.Proprieties" />
     </data>
 
     <LinearLayout
@@ -59,7 +62,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="10dp"
-                    android:visibility="@{!isSelectionMode ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{!isSelectionMode &amp; proprieties.readyModeOn ? View.GONE : View.VISIBLE}"
                     android:src="@drawable/ic_camera_alt"/>
 
                 <TextView

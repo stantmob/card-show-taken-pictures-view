@@ -17,6 +17,8 @@ public class CardShowTakenImage implements Serializable {
     private String caption;
     private List<String> errors = new ArrayList<>();
 
+    private int order;
+
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
                               String tempImagePathToShow, Date createdAt, Date updatedAt, String caption,
                               List<String> errors) {
@@ -57,7 +59,7 @@ public class CardShowTakenImage implements Serializable {
         this.caption = caption;
     }
     public CardShowTakenImage(String identifier, String remoteImageUrl, String localImageFilename,
-                              Date createdAt, Date updatedAt, String caption, List<String> errors) {
+                              Date createdAt, Date updatedAt, String caption, List<String> errors, int order) {
         this.identifier = identifier;
         this.remoteImageUrl = remoteImageUrl;
         this.localImageFilename = localImageFilename;
@@ -65,6 +67,7 @@ public class CardShowTakenImage implements Serializable {
         this.updatedAt = updatedAt;
         this.caption = caption;
         this.errors = errors;
+        this.order = order;
     }
 
     public String getIdentifier() {
@@ -85,6 +88,10 @@ public class CardShowTakenImage implements Serializable {
 
     public Date getUpdatedAt() {
         return updatedAt;
+    }
+
+    public int getOrder() {
+        return order;
     }
 
     public boolean hasOnlyRemoteUrl() {

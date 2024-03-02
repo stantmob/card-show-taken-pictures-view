@@ -18,15 +18,27 @@ public interface CardImageGalleryViewContract {
     String KEY_IMAGE_FULL_SCREEN = "image";
 
     void registerActivityForCamera();
+
     void setImagesQuantityLimit(Integer limitQuantity, OnReachedOnTheImageCountLimit onReachedOnTheImageCountLimit);
+
     void updateCurrentAndLimitImagesQuantityText(Integer currentQuantity);
+
     void setCardStateEnum(CardShowTakenPictureStateEnum cardStateEnum);
+
     void setCardImages(List<CardShowTakenImage> cardShowTakenImages);
+
     boolean hasImages();
+
     boolean hasImageByIdentifier(String identifier);
-    List<CardShowTakenImage> getCardImages();
+
+    List<CardShowTakenImage> getCardAllImages();
+
     List<CardShowTakenImage> getCardImagesAsAdded();
+
+    List<CardShowTakenImage> getCardImagesAsUpdated();
+
     List<CardShowTakenImage> getCardImagesAsRemoved();
+
     interface OnSavedCardListener {
         void onSaved(List<CardShowTakenImage> currentImages, List<CardShowTakenImage> imagesAsAdded, List<CardShowTakenImage> imagesAsRemoved);
 

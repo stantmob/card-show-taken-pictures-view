@@ -75,6 +75,8 @@ public class CardImageGalleryView extends AppCompatActivity {
     }
 
     private void configureToolbar() {
+        mBinding.setShowCamera(Proprieties.readyModeOn);
+
         setSupportActionBar(mBinding.topAppBar);
         mBinding.topAppBar.setNavigationOnClickListener(view -> onBackPressed());
         String appBarName = getIntent().getStringExtra(CardImageGalleryComponentView.KEY_APP_BAR_NAME);

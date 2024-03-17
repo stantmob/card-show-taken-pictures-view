@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-public class CardShowTakenImage implements Serializable {
+public class CardShowTakenImage implements Serializable, Cloneable {
 
     private String identifier;
     private String remoteImageUrl;
@@ -94,6 +94,10 @@ public class CardShowTakenImage implements Serializable {
         return order;
     }
 
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     public boolean hasOnlyRemoteUrl() {
         return !hasLocalImage() && !hasTempPathToShow() && remoteImageUrl != null && !remoteImageUrl.isEmpty();
     }
@@ -157,5 +161,16 @@ public class CardShowTakenImage implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(identifier, localImageFilename);
+    }
+
+
+    @Override
+    public CardShowTakenImage clone() {
+        try {
+            CardShowTakenImage clone = (CardShowTakenImage) super.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

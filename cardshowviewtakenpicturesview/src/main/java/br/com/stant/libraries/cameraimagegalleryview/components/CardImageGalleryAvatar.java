@@ -22,7 +22,7 @@ public class CardImageGalleryAvatar extends LinearLayout {
 
         mBinding = DataBindingUtil.inflate(LayoutInflater.from(context),
                 R.layout.card_image_gallery_avatar, parent, true);
-
+        mBinding.cardImageGalleryContainer.setTranslationZ(-image.getOrder());
         ImageDecoder.setImageBitmapToImageView(mBinding.cardImageGalleryAvatar, image, 1);
 
     }

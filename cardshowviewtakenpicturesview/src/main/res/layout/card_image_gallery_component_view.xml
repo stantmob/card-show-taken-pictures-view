@@ -47,15 +47,37 @@
             android:layoutDirection="rtl">
 
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/icon"
+            <RelativeLayout
                 android:layout_width="66dp"
                 android:layout_height="66dp"
-                android:layout_gravity="end|center"
-                android:layout_marginStart="8dp"
-                android:onClick="@{handler::onClickIcon}"
-                android:padding="6dp"
-                android:src="@{handler.hasImages() ? @drawable/ic_imagem_multiple_eye : @drawable/ic_image_plus}"/>
+                android:background="@drawable/shape_component"
+                android:onClick="@{handler::onClickIcon}">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/icon"
+                    android:layout_width="52dp"
+                    android:layout_height="66dp"
+                    android:layout_gravity="end|center"
+                    android:layout_marginStart="8dp"
+                    android:padding="6dp"
+                    android:layout_centerInParent="true"
+                    />
+
+                <TextView
+                    android:id="@+id/over_images_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22sp"
+                    android:textColor="#2196F3"
+                    android:gravity="center"
+                    android:layout_centerInParent="true"
+                    android:layoutDirection="ltr"
+                    android:visibility="gone"
+                    />
+
+            </RelativeLayout>
+
+
 
         </LinearLayout>
 

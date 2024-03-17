@@ -12,6 +12,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.VectorDrawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -149,13 +150,31 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     private void loadImagesComponent() {
         int count = mBinding.cardImageGalleryComponentContainerLinearLayout.getChildCount();
+
+        //When back from gallery remove old images to reload. if count > 1 means that there's no only icon
         if(count > 1){
             mBinding.cardImageGalleryComponentContainerLinearLayout.removeViews(1, count-1);
         }
-        for(int i = 0; i < mCardShowTakenImages.getAll().size() && i < 4; i++){
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        mActivity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int width = displayMetrics.widthPixels;
+
+        double pixelPerImage = 45 * ((float) mContext.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+
+        int imagesQuantity =  (int) Math.floor(width/pixelPerImage) - 1;
+
+        for(int i = 0; i < mCardShowTakenImages.getAll().size() && i < imagesQuantity; i++){
+            CardShowTakenImage cardShowTakenImage = mCardShowTakenImages.getAll().get(i).clone();
+            cardShowTakenImage.setOrder(i+1);
             new CardImageGalleryAvatar(mContext,
-                    mBinding.cardImageGalleryComponentContainerLinearLayout,
-                    mCardShowTakenImages.getAll().get(i));
+                    mBinding.cardImageGalleryComponentContainerLinearLayout, cardShowTakenImage);
+        }
+
+        if(mCardShowTakenImages.getAll().size() > imagesQuantity){
+            mBinding.icon.setVisibility(View.GONE);
+            mBinding.overImagesTextView.setText("+" + (mCardShowTakenImages.getAll().size() - imagesQuantity));
+            mBinding.overImagesTextView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -223,9 +242,9 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     private void invalidateIcon() {
         if (hasImages()) {
-            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_imagem_multiple_eye));
+            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_multiple_images));
         } else {
-            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_image_plus));
+            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_no_images));
         }
 
     }

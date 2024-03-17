@@ -3,13 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/card_image_gallery_avatar"
-        android:layout_width="66dp"
-        android:layout_height="66dp"
-        android:padding="5dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/stant_city"
-        app:shapeAppearance="@style/ImageStyle_Circle" />
 
+    <LinearLayout
+        android:id="@+id/card_image_gallery_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="-25dp"
+        android:background="@drawable/circle_white"
+        android:translationZ="-1dp">
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/card_image_gallery_avatar"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/stant_city"
+            app:shapeAppearance="@style/ImageStyle_Circle" />
+    </LinearLayout>
 </layout>

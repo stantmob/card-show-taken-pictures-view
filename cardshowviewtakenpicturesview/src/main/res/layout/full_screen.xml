@@ -61,6 +61,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:background="@color/dark_red"
+                android:alpha="0.8"
                 android:visibility="gone"
                 android:padding="4dp"
                 app:layout_constraintTop_toBottomOf="@+id/appBar"
@@ -114,11 +115,22 @@
                 android:layout_height="66dp"
                 android:background="@drawable/shape_caption"
                 android:padding="5dp"
-                android:focusable="false"
                 android:textFontWeight="500"
                 android:textSize="18sp"
                 android:hint="@string/full_screen.hint_caption"
+
                 tools:text="Caption" />
+
+            <TextView
+                android:id="@+id/save_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_gravity="end"
+                android:textSize="18sp"
+                android:text="@string/full_screen.app_bar_save_icon"
+                />
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

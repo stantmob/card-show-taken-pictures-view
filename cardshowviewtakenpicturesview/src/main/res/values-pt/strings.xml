@@ -42,6 +42,7 @@
     <string name="delete_alert_dialog.question">Você tem certeza que deseja excluir a imagem?</string>
     <string name="card_show_taken_picture_view.selection_counter">%d Selectionada(s)</string>
     <string name="card_show_taken_picture_view.confirm_image_deleted">%d imagens foram excluídas com sucesso!</string>
-    <string name="full_screen.hint_caption">Clique em Editar para adicionar a legenda</string>
+    <string name="full_screen.hint_caption">Digite uma legenda para a imagem</string>
+    <string name="fullscreen_without_caption_in_read_mode">Imagem sem legenda, para adicionar vá em editar inspeção.</string>
 
 </resources>

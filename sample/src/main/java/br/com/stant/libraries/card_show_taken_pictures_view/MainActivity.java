@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         mBinding.cardImageGalleryComponentView.setExampleImages();
-        mBinding.cardImageGalleryComponentView.setReadyModeOn(false);
+        mBinding.cardImageGalleryComponentView.setReadyModeOn(true);
         mBinding.cardImageGalleryComponentView.setBinding(mBinding.cardImageGalleryComponentView,
                 "Denis Vieira", new Date());
         mBinding.cardImageGalleryComponentView.setImagesQuantityLimit(100, null);

@@ -3,25 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/show_mode">
         <item
-            android:id="@+id/edit"
-            android:icon="@drawable/ic_edit_white"
-            android:title="@string/full_screen.app_bar_edit_icon"
-            app:showAsAction="always" />
-        <item
             android:id="@+id/delete"
             android:icon="@drawable/ic_trash_orange"
             android:title="@string/full_screen.app_bar_delete_icon"
             app:showAsAction="always" />
     </group>
-    <group
-        android:id="@+id/edit_mode"
-        android:visible="false">
-        <item
-            android:id="@+id/save"
-            android:icon="@drawable/ic_done"
-            android:title="@string/full_screen.app_bar_save_icon"
-            app:showAsAction="always" />
-
-    </group>
-
 </menu>

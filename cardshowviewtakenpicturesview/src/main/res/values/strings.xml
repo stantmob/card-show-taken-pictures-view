@@ -41,6 +41,7 @@
     <string name="delete_alert_dialog.question">Do you sure that want to delete image?</string>
     <string name="card_show_taken_picture_view.selection_counter">%d Selected</string>
     <string name="card_show_taken_picture_view.confirm_image_deleted">%d images have been deleted successfully!</string>
-    <string name="full_screen.hint_caption">Click Edit to add the caption</string>
+    <string name="full_screen.hint_caption">Enter a caption for the image</string>
+    <string name="fullscreen_without_caption_in_read_mode">Image without caption, to add go to edit inspection.</string>
 
 </resources>

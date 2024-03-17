@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import java.util.Objects;
 
@@ -82,8 +83,15 @@ public class FullScreenImage extends AppCompatActivity {
             }
         }
 
+        if(Proprieties.readyModeOn){
+            mBinding.captionEditText.setFocusable(false);
+            mBinding.saveTextView.setVisibility(View.GONE);
+            if(image.getCaption() == null || image.getCaption().isEmpty()){
+                mBinding.captionEditText.setHint(R.string.fullscreen_without_caption_in_read_mode);
+            }
+        }
 
-
+        mBinding.saveTextView.setOnClickListener(this::saveChanges);
     }
 
     private void onClickIconErrors() {
@@ -109,7 +117,6 @@ public class FullScreenImage extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        hideKeyboard();
     }
 
     @Override
@@ -117,12 +124,6 @@ public class FullScreenImage extends AppCompatActivity {
         if(Proprieties.readyModeOn) return false;
         MenuInflater inflater = getMenuInflater();
         mMenu = menu;
-        try {
-            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_edit_white)).setTint(Color.parseColor(Proprieties.ColorIcons));
-            Objects.requireNonNull(AppCompatResources.getDrawable(this, R.drawable.ic_done)).setTint(Color.parseColor(Proprieties.ColorIcons));
-        } catch (Exception e) {
-            return false;
-        }
 
         inflater.inflate(R.menu.full_screen, menu);
         return true;
@@ -131,56 +132,18 @@ public class FullScreenImage extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.edit) {
-            startEditMode();
-            return true;
-        } else if (itemId == R.id.delete) {
+        if (itemId == R.id.delete) {
             removeImage();
-            return true;
-        } else if (itemId == R.id.save) {
-            saveChanges();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void startEditMode() {
-        mMenu.setGroupVisible(R.id.show_mode, false);
-        mMenu.setGroupVisible(R.id.edit_mode, true);
-
-        mBinding.captionEditText.setFocusable(true);
-        mBinding.captionEditText.setCursorVisible(true);
-
-        mBinding.captionEditText.requestFocusFromTouch();
-        int index = mBinding.captionEditText.getText().toString().length();
-
-        mBinding.captionEditText.setSelection(index);
-
-        showKeyboard();
-    }
-
-    private void saveChanges() {
-        mMenu.setGroupVisible(R.id.show_mode, true);
-        mMenu.setGroupVisible(R.id.edit_mode, false);
-
-        mBinding.captionEditText.setFocusable(false);
-        mBinding.captionEditText.setCursorVisible(false);
-
+    private void saveChanges(View view) {
         String caption = mBinding.captionEditText.getText().toString();
         image.setCaption(caption);
         mCardShowTakenImage.updateImage(image);
-
-        hideKeyboard();
-    }
-
-    private void showKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-        imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, 0);
-    }
-
-    private void hideKeyboard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(this.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mBinding.captionEditText.getWindowToken(), 0);
+        Toast.makeText(this, "A legenda foi alterarda", Toast.LENGTH_LONG).show();
     }
 
     private void removeImage() {

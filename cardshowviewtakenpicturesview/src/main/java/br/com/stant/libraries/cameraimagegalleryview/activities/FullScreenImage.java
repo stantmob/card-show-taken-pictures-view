@@ -142,8 +142,9 @@ public class FullScreenImage extends AppCompatActivity {
     private void saveChanges(View view) {
         String caption = mBinding.captionEditText.getText().toString();
         image.setCaption(caption);
+        mBinding.captionEditText.clearFocus();
+        Toast.makeText(this, getResources().getString(R.string.full_screen_caption_updated), Toast.LENGTH_LONG).show();
         mCardShowTakenImage.updateImage(image);
-        Toast.makeText(this, "A legenda foi alterarda", Toast.LENGTH_LONG).show();
     }
 
     private void removeImage() {

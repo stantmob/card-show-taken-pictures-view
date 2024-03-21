@@ -242,7 +242,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
 
     private void invalidateIcon() {
         if (hasImages()) {
-            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_multiple_images));
+            mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_image_multiple));
         } else {
             mBinding.icon.setImageDrawable(getResources().getDrawable(R.drawable.ic_no_images));
         }

@@ -87,6 +87,8 @@ public class CardShowTakenImageInjection {
             int index = added.indexOf(image);
             added.set(index, image);
         }
+        int index = images.indexOf(image);
+        images.set(index, image);
         notifyListeners();
     }
 

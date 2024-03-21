@@ -48,20 +48,20 @@
 
 
             <RelativeLayout
-                android:layout_width="66dp"
-                android:layout_height="66dp"
-                android:background="@drawable/shape_component"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/selector_state_button_component"
                 android:onClick="@{handler::onClickIcon}">
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/icon"
-                    android:layout_width="52dp"
-                    android:layout_height="66dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerInParent="true"
                     android:layout_gravity="end|center"
                     android:layout_marginStart="8dp"
                     android:padding="6dp"
-                    android:layout_centerInParent="true"
-                    />
+                    android:src="@drawable/ic_no_images"/>
 
                 <TextView
                     android:id="@+id/over_images_text_view"

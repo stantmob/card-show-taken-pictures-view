@@ -228,7 +228,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     public void onClickIcon(View view) {
         if (hasImages()) {
             this.goToGallery();
-        } else {
+        } else if(!Proprieties.readyModeOn) {
             mCamera.pickPictureToFinishAction();
         }
     }

@@ -204,7 +204,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         mStrokeColor = color;
         GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
-        drawable.setStroke(8, color);
+        drawable.setStroke(2, color);
     }
 
     public void showStrokeError() {
@@ -216,7 +216,7 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private void removeStrokeError() {
         GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
-        drawable.setStroke(mStrokeColor == 0 ? 0 : 8, mStrokeColor);
+        drawable.setStroke(mStrokeColor == 0 ? 0 : 2, mStrokeColor);
 
     }
 

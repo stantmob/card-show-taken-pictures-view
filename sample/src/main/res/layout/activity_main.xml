@@ -14,7 +14,14 @@
         <br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTakenPictureView
             android:id="@+id/card_show_view_taken_pictures_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <br.com.stant.libraries.cameraimagegalleryview.CardImageGalleryComponentView
+            android:id="@+id/card_image_gallery_component_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:editModeOnly="false"/>
 
     </RelativeLayout>
 

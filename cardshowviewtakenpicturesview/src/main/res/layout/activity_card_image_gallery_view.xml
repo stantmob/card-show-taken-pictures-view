@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import type="android.view.View"/>
+
+        <variable
+            name="isSelectionMode"
+            type="Boolean" />
+
+        <variable
+            name="showCamera"
+            type="Boolean" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/gallery_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context="br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/topAppBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:navigationIcon="@drawable/ic_arrow_left_white"
+                app:titleCentered="true"
+                app:title="" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="65dp"
+                tools:listitem="@layout/item_image" />
+
+            <RelativeLayout
+                android:id="@+id/bottom_bar"
+                android:layout_width="match_parent"
+                android:layout_height="65dp"
+                android:layout_alignParentBottom="true">
+
+                <ImageView
+                    android:id="@+id/icon_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:visibility="@{isSelectionMode || showCamera ? View.GONE : View.VISIBLE}"
+                    android:src="@drawable/ic_camera_alt"/>
+
+                <TextView
+                    android:id="@+id/quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:textSize="20sp"
+                    android:layout_marginEnd="10dp"
+                    android:textFontWeight="600"
+                    android:visibility="@{!isSelectionMode ? View.VISIBLE : View.GONE}"
+                    tools:text="0/100" />
+
+                <TextView
+                    android:id="@+id/selected_images_counter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="10dp"
+                    android:visibility="@{isSelectionMode ? View.VISIBLE : View.GONE}"
+                    android:text="2 Selecionada(s)"
+                    tools:text="2 Selecionada(s)"/>
+
+                <TextView
+                    android:id="@+id/delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="@{isSelectionMode ? View.VISIBLE : View.GONE}"
+                    android:textColor="@color/blue"
+                    android:text="Excluir"
+                    tools:text="Excluir"
+                    />
+
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+</layout>

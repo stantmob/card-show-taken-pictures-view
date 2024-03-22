@@ -31,5 +31,19 @@
     <string name="geolocation.location_not_enabled_alert_text">Localização do dispositivo inativa. Ative-a para dados de localização da foto.</string>
     <string name="geolocation.location_not_available_text">Localização indisponível no momento</string>
     <string name="image_preview_dialog.caption_hint">Adicionar legenda…</string>
+    <string name="full_screen.image_status_approved">Aprovado</string>
+    <string name="full_screen.image_status_disapproved">Desaprovado</string>
+    <string name="full_screen.app_bar_name">Galeria</string>
+    <string name="full_screen.app_bar_edit_icon">Editar</string>
+    <string name="full_screen.app_bar_delete_icon">Excluir</string>
+    <string name="full_screen.app_bar_save_icon">Salvar</string>
+    <string name="delete_alert_dialog.confirm">Sim</string>
+    <string name="delete_alert_dialog.cancel">Cancelar</string>
+    <string name="delete_alert_dialog.question">Você tem certeza que deseja excluir a imagem?</string>
+    <string name="card_show_taken_picture_view.selection_counter">%d Selectionada(s)</string>
+    <string name="card_show_taken_picture_view.confirm_image_deleted">%d imagens foram excluídas com sucesso!</string>
+    <string name="full_screen.hint_caption">Digite uma legenda para a imagem</string>
+    <string name="fullscreen_without_caption_in_read_mode">Imagem sem legenda, para adicionar vá em editar inspeção.</string>
+    <string name="full_screen_caption_updated">Legenda atualizada</string>
 
 </resources>

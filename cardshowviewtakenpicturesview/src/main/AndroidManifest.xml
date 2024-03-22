@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -20,12 +21,23 @@
 
     <application
         android:allowBackup="true"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".camera.CameraActivity"
             android:configChanges="screenSize|orientation|screenLayout|navigation"
             android:theme="@style/AppThemeCamera" />
+
+        <activity
+            android:name="br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar" />
+        <activity
+            android:name="br.com.stant.libraries.cameraimagegalleryview.activities.FullScreenImage"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+            android:parentActivityName="br.com.stant.libraries.cameraimagegalleryview.activities.CardImageGalleryView"
+            android:windowSoftInputMode="adjustResize" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,7 +46,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
     </application>

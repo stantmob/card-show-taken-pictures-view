@@ -13,6 +13,8 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageVi
 import static br.com.stant.libraries.cardshowviewtakenpicturesview.utils.ImageViewFileUtil.JPG_FILE_SUFFIX;
 
 import android.Manifest;
+import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -42,12 +44,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.constraintlayout.widget.ConstraintsChangedListener;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.TransitionManager;
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -132,6 +140,8 @@ public class CameraFragment extends Fragment implements CameraContract, Location
 
     private String currentTagText = "";
 
+    private boolean mIsContentImageOpen = false;
+
     public static CameraFragment newInstance(Integer limitOfImages,
                                              Integer imageListSize,
                                              Boolean isMultipleGallerySelection,
@@ -157,7 +167,7 @@ public class CameraFragment extends Fragment implements CameraContract, Location
         mPhotosLimit = -1;
         mImageListSize = 0;
         mIsMultipleGallerySelection = false;
-        mImagesQuantityLimit = 10;
+        mImagesQuantityLimit = 100;
         mSaveMode = new SaveMode(STANT_MODE);
     }
 
@@ -260,7 +270,7 @@ public class CameraFragment extends Fragment implements CameraContract, Location
     }
 
     @SuppressWarnings("SameParameterValue")
-    private Integer convertDpToPixels(Integer dpValue) {
+    public Integer convertDpToPixels(Integer dpValue) {
         float roundingValue = 0.5f;
         float scale = 1f;
 
@@ -282,7 +292,8 @@ public class CameraFragment extends Fragment implements CameraContract, Location
         setButtonsClick(mCameraFragmentBinding.cameraFragmentCloseImageView,
                 mCameraFragmentBinding.cameraFragmentChangeSavePicturesMode,
                 mCameraFragmentBinding.cameraFragmentGalleryImageView,
-                mCameraFragmentBinding.cameraFragmentSaveImageView);
+                mCameraFragmentBinding.cameraFragmentSaveImageView,
+                mCameraFragmentBinding.upImageView);
 
         final RecyclerView cameraPhotosRecyclerView = mCameraFragmentBinding.cameraPhotosRecyclerView;
 
@@ -327,7 +338,8 @@ public class CameraFragment extends Fragment implements CameraContract, Location
     private void setButtonsClick(ImageView closeButton,
                                  ImageView changeSavePicturesMode,
                                  ImageView openGalleryButton,
-                                 ImageView savePhotosButton) {
+                                 ImageView savePhotosButton,
+                                 ImageView upButton) {
         closeButton.setOnClickListener((view) -> closeCamera());
 
         setChangeSavePicturesModeOnClickListener(changeSavePicturesMode, mSaveOnlyMode);
@@ -339,6 +351,14 @@ public class CameraFragment extends Fragment implements CameraContract, Location
                 showCameraLimitQuantityToast();
             } else {
                 openGallery();
+            }
+        });
+
+        upButton.setOnClickListener(view -> {
+            if(mIsContentImageOpen){
+                closePresentationMode();
+            } else {
+                openPresentationMode();
             }
         });
 
@@ -951,4 +971,82 @@ public class CameraFragment extends Fragment implements CameraContract, Location
 
     @Override
     public void onProviderDisabled(@NonNull String provider) { }
+
+    public boolean ismIsContentImageOpen() {
+        return mIsContentImageOpen;
+    }
+
+    private void openPresentationMode() {
+        mIsContentImageOpen = true;
+        animateIcon(180f);
+        mCameraFragmentBinding.imageContentConstraintLayout.setBackgroundColor(mContext.getResources().getColor(R.color.cardview_light_background));
+        disableCaptureButton();
+        addConstraintsToContentImage();
+        animateOpenContentImage();
+        openContentImageAndRecyclerView();
+    }
+
+    private void closePresentationMode() {
+        mIsContentImageOpen = false;
+        animateIcon(0f);
+        mCameraFragmentBinding.imageContentConstraintLayout.setBackgroundColor(0);
+        enableCaptureButton();
+        removeConstraintsToContentImage();
+        animateCloseContentImage();
+        closeContentImageAndRecyclerView();
+    }
+
+    private void animateIcon(float goTo) {
+        ObjectAnimator anim = ObjectAnimator.ofFloat(mCameraFragmentBinding.upImageView, "rotationX", goTo);
+        anim.setDuration(1000);
+        anim.start();
+    }
+
+    private void addConstraintsToContentImage() {
+        ConstraintSet set = new ConstraintSet();
+        set.clone(mCameraFragmentBinding.cameraShowPhotoConstraintLayout);
+        set.connect(mCameraFragmentBinding.imageContentConstraintLayout.getId(), ConstraintSet.TOP, mCameraFragmentBinding.cameraFragmentChipLinearLayout.getId(), ConstraintSet.BOTTOM);
+        set.applyTo(mCameraFragmentBinding.cameraShowPhotoConstraintLayout);
+    }
+    private void removeConstraintsToContentImage() {
+        ConstraintSet set = new ConstraintSet();
+        set.clone(mCameraFragmentBinding.cameraShowPhotoConstraintLayout);
+        set.clear(mCameraFragmentBinding.imageContentConstraintLayout.getId(), ConstraintSet.TOP);
+        set.applyTo(mCameraFragmentBinding.cameraShowPhotoConstraintLayout);
+    }
+
+    private void openContentImageAndRecyclerView() {
+        ViewGroup.LayoutParams layoutParams = mCameraFragmentBinding.cameraPhotosRecyclerView.getLayoutParams();
+        layoutParams.height = 0;
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutParams(layoutParams);
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 2, RecyclerView.VERTICAL, false));
+
+        layoutParams = mCameraFragmentBinding.imageContentConstraintLayout.getLayoutParams();
+        layoutParams.height = 0;
+        mCameraFragmentBinding.imageContentConstraintLayout.setLayoutParams(layoutParams);
+    }
+    private void closeContentImageAndRecyclerView() {
+        ViewGroup.LayoutParams layoutParams = mCameraFragmentBinding.cameraPhotosRecyclerView.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutParams(layoutParams);
+        mCameraFragmentBinding.cameraPhotosRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, RecyclerView.HORIZONTAL, false));
+
+        layoutParams = mCameraFragmentBinding.imageContentConstraintLayout.getLayoutParams();
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        mCameraFragmentBinding.imageContentConstraintLayout.setLayoutParams(layoutParams);
+    }
+
+    private void animateOpenContentImage() {
+        LayoutTransition transition = new LayoutTransition();
+        transition.enableTransitionType(LayoutTransition.CHANGING);
+        transition.setDuration(1000);
+        mCameraFragmentBinding.imageContentConstraintLayout.setLayoutTransition(transition);
+    }
+    private void animateCloseContentImage() {
+        LayoutTransition transition = new LayoutTransition();
+        transition.enableTransitionType(LayoutTransition.CHANGING);
+        transition.setDuration(1000);
+        mCameraFragmentBinding.imageContentConstraintLayout.setLayoutTransition(transition);
+    }
+
 }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/camera_show_photo_constraint_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:background="@color/black_transparent">
@@ -32,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginStart="@dimen/cam_widget_margin_top_sides"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="10dp"
             android:animateLayoutChanges="true"
             android:padding="5dp"
             android:src="@drawable/ic_close_camera"
@@ -85,7 +86,7 @@
             android:id="@+id/camera_fragment_change_save_pictures_mode"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginTop="42dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toStartOf="@+id/camera_fragment_top_linear_layout"
             app:layout_constraintTop_toTopOf="parent" />
@@ -94,7 +95,7 @@
             android:id="@+id/camera_fragment_top_linear_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="42dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="@dimen/cam_widget_margin_top_sides"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
@@ -139,6 +140,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/camera_fragment_top_linear_layout" />
 
+
         <LinearLayout
             android:id="@+id/camera_fragment_data_info_layout"
             android:layout_width="0dp"
@@ -146,7 +148,7 @@
             android:orientation="vertical"
             android:padding="8dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@id/camera_photos_recycler_view"
+            app:layout_constraintBottom_toTopOf="@id/image_content_constraint_layout"
             app:layout_constraintEnd_toStartOf="@id/camera_fragment_zoom_seek_bar"
             app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible">
@@ -181,19 +183,42 @@
                 tools:text="@string/camera_fragment.image_data_info_mock" />
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/camera_photos_recycler_view"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/image_content_constraint_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="8dp"
-            android:orientation="horizontal"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="vertical"
             app:layout_constraintBottom_toTopOf="@+id/camera_fragment_bottom_linear_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/up_image_view"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_top_arrow"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/gray" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/camera_photos_recycler_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/up_image_view" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
         <LinearLayout
             android:id="@+id/camera_fragment_bottom_linear_layout"

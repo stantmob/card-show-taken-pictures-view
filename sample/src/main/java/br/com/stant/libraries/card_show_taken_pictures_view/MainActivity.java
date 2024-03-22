@@ -1,11 +1,13 @@
 package br.com.stant.libraries.card_show_taken_pictures_view;
 
 import android.content.Intent;
+
+import androidx.databinding.DataBindingUtil;
+
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.databinding.DataBindingUtil;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Date;
 import java.util.List;
@@ -29,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         Gallery gallery = (Gallery) getIntent().getSerializableExtra(KEY_GALLERY);
-
         mBinding.cardShowViewTakenPicturesView.setActivity(this);
         mBinding.cardShowViewTakenPicturesView.setExampleImages();
         mBinding.cardShowViewTakenPicturesView.setOnSavedCardListener(
@@ -62,6 +63,30 @@ public class MainActivity extends AppCompatActivity {
                 R.color.colorPrimary));
         mBinding.cardShowViewTakenPicturesView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
                 "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+        mBinding.cardImageGalleryComponentView.setGalleryAppName("Imagens inspeções");
+
+        // CardGalery
+
+        mBinding.cardImageGalleryComponentView.setActivityAndRegisterForCamera(this);
+
+        mBinding.cardImageGalleryComponentView.setStroke(0xFF000000);
+        mBinding.cardImageGalleryComponentView.setExampleImages();
+        //mBinding.cardImageGalleryComponentView.setReadyModeOn(true);
+        mBinding.cardImageGalleryComponentView.setBinding(mBinding.cardImageGalleryComponentView,
+                "Denis Vieira", new Date());
+        mBinding.cardImageGalleryComponentView.setImagesQuantityLimit(100, null);
+        mBinding.cardImageGalleryComponentView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),
+                R.color.cardview_light_background));
+        mBinding.cardImageGalleryComponentView.enableSaveOnlyMode(ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_cam),
+                "oii", ContextCompat.getDrawable(getBaseContext(), R.drawable.ic_close_dialog), "Tchau");
+        mBinding.cardImageGalleryComponentView.setBackIcon(getDrawable(R.drawable.ic_arrow_left_white));
+        mBinding.cardImageGalleryComponentView.setColorIcons("#ee3923");
+        mBinding.cardImageGalleryComponentView.setTitleToolBarColor("#ee3923");
+        mBinding.cardImageGalleryComponentView.setGalleryAppName("Imagens das inspeções");
+        mBinding.cardImageGalleryComponentView.setToolBarColor("#989898");
+        mBinding.cardImageGalleryComponentView.setStatusBarColor("#a3a3a3");
+        mBinding.cardImageGalleryComponentView.setActivityBackgroundColor("#FFFFFF");
+        mBinding.cardImageGalleryComponentView.setBottomBarColor("#FFFFFF");
     }
 
     @Override

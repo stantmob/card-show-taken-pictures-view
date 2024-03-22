@@ -280,7 +280,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         mCardShowTakenPictureViewImagesAdapter.saveEditData();
 
         if (mOnSavedCardListener != null) {
-            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getCurrentImages(),
+            mOnSavedCardListener.onSaved(mCardShowTakenPictureViewImagesAdapter.getAllImages(),
                     mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded(),
                     mCardShowTakenPictureViewImagesAdapter.getImagesAsRemoved());
         }
@@ -355,7 +355,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
 
     @Override
     public boolean hasImageByIdentifier(String identifier) {
-        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
+        List<CardShowTakenImage> cardShowTakenPictures = mCardShowTakenPictureViewImagesAdapter.getAllImages();
         for (CardShowTakenImage cardShowTakenImage : cardShowTakenPictures) {
             if (identifier.equals(cardShowTakenImage.getIdentifier()))
                 return true;
@@ -396,13 +396,19 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
         }
     }
 
-    public List<CardShowTakenImage> getCardImages() {
-        return mCardShowTakenPictureViewImagesAdapter.getCurrentImages();
+    @Override
+    public List<CardShowTakenImage> getCardAllImages() {
+        return mCardShowTakenPictureViewImagesAdapter.getAllImages();
     }
 
     @Override
     public List<CardShowTakenImage> getCardImagesAsAdded() {
         return mCardShowTakenPictureViewImagesAdapter.getImagesAsAdded();
+    }
+
+    @Override
+    public List<CardShowTakenImage> getCardImagesAsUpdated() {
+        return mCardShowTakenPictureViewImagesAdapter.getImagesAsUpdated();
     }
 
     @Override
@@ -479,7 +485,7 @@ public class CardShowTakenPictureView extends LinearLayout implements CardShowTa
                         new CardShowTakenCompressedCallback() {
                             @Override
                             public void onSuccess(Bitmap bitmap, String imageFilename, String tempImagePath) {
-                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(bitmap,
+                                CardShowTakenImage cardShowTakenImage = new CardShowTakenImage(
                                         imageFilename, tempImagePath, cameraImage.getCreatedAt(),
                                         cameraImage.getUpdatedAt(), cameraImage.getCaption());
 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:clickable="true">
+
+    <TextView
+        android:id="@+id/count_images_trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:textFontWeight="600"
+        android:text="" />
+
+    <ImageView
+        android:id="@+id/gallery_trash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/ic_delete_white" />
+
+</LinearLayout>

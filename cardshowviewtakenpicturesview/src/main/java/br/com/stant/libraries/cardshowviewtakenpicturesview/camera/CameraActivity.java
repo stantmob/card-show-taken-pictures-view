@@ -10,6 +10,9 @@ import static br.com.stant.libraries.cardshowviewtakenpicturesview.CardShowTaken
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import br.com.stant.libraries.cardshowviewtakenpicturesview.R;
 import br.com.stant.libraries.cardshowviewtakenpicturesview.domain.model.SaveOnlyMode;
@@ -37,6 +40,21 @@ public class CameraActivity extends AppCompatActivity {
                 dragAndDropMode,
                 isCaptionEnabled
         );
+        hideBarSystem();
         ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), mCameraFragment, R.id.camera_content_frame);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        hideBarSystem();
+    }
+
+    private void hideBarSystem() {
+        WindowInsetsControllerCompat windowInsetsController =
+                WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        windowInsetsController.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+
+        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars());
     }
 }

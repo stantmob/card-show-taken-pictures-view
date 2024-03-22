@@ -16,5 +16,6 @@
     <dimen name="cam_widget_margin_right">10dp</dimen>
     <dimen name="cam_widget_margin_left">10dp</dimen>
     <dimen name="cam_widget_margin_top_sides">15dp</dimen>
+    <dimen name="gallery_select_padding">30dp</dimen>
 
 </resources>

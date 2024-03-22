@@ -30,5 +30,19 @@
     <string name="geolocation.location_not_enabled_alert_text">Device location inactive. Enable it for photo location data.</string>
     <string name="geolocation.location_not_available_text">Location currently unavailable</string>
     <string name="image_preview_dialog.caption_hint">Add caption…</string>
+    <string name="full_screen.image_status_approved">Approved</string>
+    <string name="full_screen.image_status_disapproved">Disapproved</string>
+    <string name="full_screen.app_bar_name">Gallery</string>
+    <string name="full_screen.app_bar_edit_icon">Edit</string>
+    <string name="full_screen.app_bar_delete_icon">Delete</string>
+    <string name="full_screen.app_bar_save_icon">Save</string>
+    <string name="delete_alert_dialog.confirm">Yes</string>
+    <string name="delete_alert_dialog.cancel">Cancel</string>
+    <string name="delete_alert_dialog.question">Do you sure that want to delete image?</string>
+    <string name="card_show_taken_picture_view.selection_counter">%d Selected</string>
+    <string name="card_show_taken_picture_view.confirm_image_deleted">%d images have been deleted successfully!</string>
+    <string name="full_screen.hint_caption">Enter a caption for the image</string>
+    <string name="fullscreen_without_caption_in_read_mode">Image without caption, to add go to edit inspection.</string>
+    <string name="full_screen_caption_updated">Caption updated</string>
 
 </resources>

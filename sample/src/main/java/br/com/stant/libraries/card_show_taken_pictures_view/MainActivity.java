@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         mBinding.cardImageGalleryComponentView.setActivityAndRegisterForCamera(this);
 
-
+        mBinding.cardImageGalleryComponentView.setStroke(0xFF000000);
         mBinding.cardImageGalleryComponentView.setExampleImages();
         //mBinding.cardImageGalleryComponentView.setReadyModeOn(true);
         mBinding.cardImageGalleryComponentView.setBinding(mBinding.cardImageGalleryComponentView,

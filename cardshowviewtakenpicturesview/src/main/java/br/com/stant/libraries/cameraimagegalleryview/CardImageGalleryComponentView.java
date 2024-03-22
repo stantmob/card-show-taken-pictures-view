@@ -59,6 +59,8 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private Camera mCamera;
     private String galleryAppName = "";
 
+    private int mStrokeColor;
+
 
     public CardImageGalleryComponentView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -198,6 +200,13 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
         return mCardShowTakenImages.getAllUpdated();
     }
 
+    public void setStroke(int color) {
+        mStrokeColor = color;
+        GradientDrawable drawable = (GradientDrawable) mBinding
+                .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
+        drawable.setStroke(8, color);
+    }
+
     public void showStrokeError() {
         GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
@@ -207,7 +216,8 @@ public class CardImageGalleryComponentView extends LinearLayout implements CardI
     private void removeStrokeError() {
         GradientDrawable drawable = (GradientDrawable) mBinding
                 .cardImageGalleryComponentContainerLinearLayout.getBackground().mutate();
-        drawable.setStroke(0, getResources().getColor(R.color.white));
+        drawable.setStroke(mStrokeColor == 0 ? 0 : 8, mStrokeColor);
+
     }
 
     public void setExampleImages() {
